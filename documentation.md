@@ -32,3 +32,5 @@ Beállítottam egy Trigger functiont is, amely annyit csinál, hogy ha létrehoz
 
 ### API kezelés
 A kommunikáció a szerver és a kliens között API hívásokkal lesz megoldva, ehhez futni fog a szerveren egy Docker konténerben egy ASP.NET Core WebAPI alkalmazás.
+
+Először a kapcsolatot létesítjük az adatbázis szerverrel, ehhez NuGet csomagokat telepítünk (PostgreSQL és EF.Tools). Ezután létre hozunk egy diszkertDbContext fájlt, amely felelős a kapcsolatért az adatbázissal. Létre hozunk egy modelt a sorainknak az adatbázison belül, ez lesz a Plant.cs. Ahhoz, hogy csatlakozni tudjon az alkalmazás az adatbázishoz, szükségünk lesz egy úgynevezett ConnectionStringre, amit az appsettings.json fáljban deklarálunk. Ezután konfiguráljuk a Program.cs fáljban. 
