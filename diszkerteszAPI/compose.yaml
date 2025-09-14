@@ -1,0 +1,34 @@
+services:
+  postgres:
+    image: postgres
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: feri
+      POSTGRES_PASSWORD: feri
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+  pgadmin:
+    image: dpage/pgadmin4
+    restart: always
+    ports:
+      - "8080:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: rferko@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: feri
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    depends_on:
+      - postgres
+  webapi:
+    image: rferko/diszkerteszapi:1.1
+    restart: always
+    ports:
+      - "5000:80"
+    environment:
+      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=diszkertesz;Username=feri;Password=feri"
+
+volumes:
+  pgdata:
+  pgadmin-data:
