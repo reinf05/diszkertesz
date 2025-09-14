@@ -46,7 +46,6 @@ Létre hozzuk az API endpointokat:
 /plant/quiz: Visszaad egy Quiz adattípust, amely tartalmaz egy képet és négy nevet, amelyből az első (index 0) a képen látható növény neve.
 /plant/fullpant{id}: Visszaad egy növényt minden adatával együtt.
 
-
-
+Miután ezek elkészültek, egy Docker image-be csomagolom a programot, és feltelepítem a szerverre, majd frissítem a compose.yaml fájlt, így a Docker Compose ezt a szolgáltatást is el tudja indítani a többivel együtt.
 
 
