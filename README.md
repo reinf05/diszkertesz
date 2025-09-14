@@ -21,4 +21,8 @@ A kliens oldal csak az UI-ért lesz felelős, valamint API hívásokat fog küld
 
 A kliens felépítése MAUI-val lesz megoldva, és REST API (HTTP + JSON) alapon fog kommunikálni a szerverrel.
 
+## Docker image
+A Docker image a szerveren futtatott ASP.NET Core WebAPI szolgáltatáshoz megtalálható a Dockerhubon. 
+Letöltés: `docker pull rferko/diszkerteszapi:1.0`
+
 # Alkalmazás működése
