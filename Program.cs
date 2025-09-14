@@ -14,7 +14,7 @@ namespace diszkerteszAPI
 
             // Add services to the container.
 
-            builder.WebHost.UseUrls("http://0.0.0.0:80");
+            builder.WebHost.UseUrls("http://0.0.0.0:5000");
 
 
             //Add Db connection
