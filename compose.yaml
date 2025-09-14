@@ -1,4 +1,4 @@
-ervices:
+services:
   postgres:
     image: postgres
     restart: always
@@ -21,6 +21,13 @@ ervices:
       - pgadmin-data:/var/lib/pgadmin
     depends_on:
       - postgres
+  webapi:
+    image: rferko/diszkerteszapi:1.1
+    restart: always
+    ports:
+      - "5000:80"
+    environment:
+      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=diszkertesz;Username=feri;Password=feri"
 
 volumes:
   pgdata:
