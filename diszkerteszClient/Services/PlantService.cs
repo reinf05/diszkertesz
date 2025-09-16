@@ -1,0 +1,39 @@
+﻿using diszkerteszClient.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http.Json;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace diszkerteszClient.Services
+{
+    public class PlantService
+    {
+        private HttpClient httpClient;
+        private List<Plant> plants = new();
+        private string baseURL = "http://192.168.1.151:5000/Plant/";
+
+        public PlantService()
+        {
+            httpClient = new();
+        }
+
+        public async Task<List<Plant>> GetAllPlants()
+        {
+            if(plants.Count > 0)
+            {
+                return plants;
+            }
+
+            string URL = baseURL + "plants";
+            var response = await httpClient.GetAsync(URL);
+            if (response.IsSuccessStatusCode)
+            {
+                plants = await response.Content.ReadFromJsonAsync<List<Plant>>();
+            }
+
+            return plants;
+        }
+    }
+}

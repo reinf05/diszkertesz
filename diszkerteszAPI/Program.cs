@@ -1,5 +1,6 @@
 using diszkerteszAPI.Controllers;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 
 namespace diszkerteszAPI
 {
@@ -14,8 +15,7 @@ namespace diszkerteszAPI
 
             // Add services to the container.
 
-            builder.WebHost.UseUrls("http://0.0.0.0:5000");
-
+            //builder.WebHost.UseUrls("http://0.0.0.0:8080");
 
             //Add Db connection
             builder.Services.AddDbContext<diszkerteszDbContext>(options => options.UseNpgsql(connectionString));
@@ -26,6 +26,12 @@ namespace diszkerteszAPI
             builder.Services.AddSwaggerGen();
 
             var app = builder.Build();
+
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider("/app/images"),
+                RequestPath = "/images"
+            });
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())

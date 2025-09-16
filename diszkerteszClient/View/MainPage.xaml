@@ -1,0 +1,55 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:model="clr-namespace:diszkerteszClient.Models"
+             xmlns:viewmodel="clr-namespace:diszkerteszClient.Viewmodels"
+             x:DataType="viewmodel:MainViewModel"
+             x:Class="diszkerteszClient.View.MainPage"
+             Title="{Binding Title}">
+
+    <Grid
+        ColumnDefinitions="*, *"
+        RowDefinitions="*, 80">
+        <CollectionView
+            Grid.ColumnSpan="2"
+            ItemsSource="{Binding PlantList}">
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate
+                    x:DataType="{x:Type model:Plant}">
+                    <Grid
+                        ColumnDefinitions="125,*"
+                        Padding="10"
+                        ColumnSpacing="20">
+                        <Image
+                            Source="{Binding Imagepath}"
+                            WidthRequest="125"
+                            HeightRequest="125"
+                            Aspect="AspectFill"
+                            Grid.Column="0"
+                            />
+                        <VerticalStackLayout
+                            Grid.Column="1"
+                            Spacing="10"
+                            VerticalOptions="Center">
+                            <Label Text="{Binding Nameh}"
+                                   FontSize="20"
+                                   FontAttributes="Bold"/>
+                            <Label Text="{Binding Namel}"/>
+                            <Label Text="{Binding Type}"/>
+                        </VerticalStackLayout>
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <Button
+            Grid.Row="1"
+            Margin="10"
+            Text="Betöltés"
+            Command="{Binding GetPlantsCommand}">
+            
+        </Button>
+    </Grid>
+
+</ContentPage>
