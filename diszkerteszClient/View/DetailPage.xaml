@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:model="clr-namespace:diszkerteszClient.Models"
+             x:Class="diszkerteszClient.View.DetailPage"
+             Title="{Binding Title}">
+
+    <VerticalStackLayout>
+        <Grid
+            ColumnDefinitions="125,*"
+            Padding="10"
+            ColumnSpacing="20"
+            VerticalOptions="Center"
+            HorizontalOptions="Center">
+            <Image
+                Source="{Binding FullPlant.Imagepath}"
+                WidthRequest="125"
+                HeightRequest="125"
+                Aspect="AspectFill"
+                Grid.Column="0"/>
+            <VerticalStackLayout
+                Grid.Column="1"
+                Spacing="10"
+                VerticalOptions="Center">
+            <Label Text="{Binding FullPlant.Namel}"
+                FontSize="20"
+                FontAttributes="Bold"/>
+            <Label Text="{Binding FullPlant.Nameh}"/>
+            <Label Text="{Binding FullPlant.Type}"/>
+            </VerticalStackLayout>
+        </Grid>
+        <Label 
+            Text="{Binding FullPlant.Description}"
+            VerticalOptions="Center" 
+            HorizontalOptions="Center" />
+        <Label 
+            Text="{Binding FullPlant.Usage}"
+            VerticalOptions="Center" 
+            HorizontalOptions="Center" />
+        <Label 
+            Text="{Binding FullPlant.Pathogens}"
+            VerticalOptions="Center" 
+            HorizontalOptions="Center" />
+        <Label 
+            Text="{Binding FullPlant.Propagation}"
+            VerticalOptions="Center"
+            HorizontalOptions="Center"/>
+
+    <ActivityIndicator
+        HorizontalOptions="Center"
+        VerticalOptions="Center"
+        IsVisible="{Binding IsBusy}"
+        IsRunning="{Binding IsBusy}"
+        Scale="2">
+
+    </ActivityIndicator>
+    </VerticalStackLayout>
+</ContentPage>

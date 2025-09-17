@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using diszkerteszClient.Services;
 using System.Diagnostics;
 using CommunityToolkit.Mvvm.Input;
+using diszkerteszClient.View;
 
 namespace diszkerteszClient.Viewmodels
 {
@@ -15,10 +16,23 @@ namespace diszkerteszClient.Viewmodels
     {
         private PlantService plantService;
         public ObservableCollection<Plant> PlantList { get; } = new();
+        private FullPlant fullPlant;
         public MainViewModel(PlantService plantService)
         {
             this.Title = "Dísznövények";
             this.plantService = plantService;
+        }
+
+        [RelayCommand]
+        async Task GoToDetailsAsync(Plant plant)
+        {
+            //AppShell.xaml.cs-ben regisztrálni kell a DetailPage-t routeként
+            if (plant is null) return;
+            await GetFullPlantAsync(plant.Id);
+            await Shell.Current.GoToAsync(nameof(DetailPage), true, new Dictionary<string, object>
+             {
+                 {"fullPlant", fullPlant }
+             });
         }
 
         [RelayCommand]
@@ -58,5 +72,49 @@ namespace diszkerteszClient.Viewmodels
                 IsBusy = false;
             }
         }
+
+        private async Task GetFullPlantAsync(int plantId)
+        {
+            if (IsBusy)
+            {
+                return;
+            }
+
+            try
+            {
+                IsBusy = true;
+                var plant = await plantService.GetFullPlantById(plantId);
+
+                if (plant == null)
+                {
+                    await Shell.Current.DisplayAlert("Error", "No plant found.", "OK");
+                    return;
+                }
+
+                string baseURL = "http://192.168.1.151:5000/images/";
+                fullPlant = new FullPlant()
+                {
+                    Id = plant.Id,
+                    Namel = plant.Namel,
+                    Nameh = plant.Nameh,
+                    Type = plant.Type,
+                    Imagepath = baseURL + plant.Imagepath,
+                    Description = plant.Description,
+                    Usage = plant.Usage,
+                    Pathogens = plant.Pathogens,
+                    Propagation = plant.Propagation
+                };
+                return;
+            }
+            catch (Exception ex)
+            {
+                await Shell.Current.DisplayAlert("Error", ex.Message, "OK");
+            }
+            finally
+            {
+                IsBusy = false;
+            }
+        }
     }
 }
+

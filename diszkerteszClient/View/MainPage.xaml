@@ -9,36 +9,43 @@
 
     <Grid
         ColumnDefinitions="*, *"
-        RowDefinitions="*, 80">
+        RowDefinitions="*, Auto">
         <CollectionView
             Grid.ColumnSpan="2"
-            ItemsSource="{Binding PlantList}">
+            ItemsSource="{Binding PlantList}"
+            SelectionMode="None">
 
             <CollectionView.ItemTemplate>
                 <DataTemplate
                     x:DataType="{x:Type model:Plant}">
-                    <Grid
+                    <Border>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:MainViewModel}}, Path=GoToDetailsCommand}"
+                                    CommandParameter="{Binding .}"/>
+                        </Border.GestureRecognizers>
+                        <Grid
                         ColumnDefinitions="125,*"
                         Padding="10"
                         ColumnSpacing="20">
-                        <Image
+                            <Image
                             Source="{Binding Imagepath}"
                             WidthRequest="125"
                             HeightRequest="125"
                             Aspect="AspectFill"
-                            Grid.Column="0"
-                            />
-                        <VerticalStackLayout
+                            Grid.Column="0"/>
+                            <VerticalStackLayout
                             Grid.Column="1"
                             Spacing="10"
                             VerticalOptions="Center">
-                            <Label Text="{Binding Nameh}"
+                                <Label Text="{Binding Namel}"
                                    FontSize="20"
                                    FontAttributes="Bold"/>
-                            <Label Text="{Binding Namel}"/>
-                            <Label Text="{Binding Type}"/>
-                        </VerticalStackLayout>
-                    </Grid>
+                                <Label Text="{Binding Nameh}"/>
+                                <Label Text="{Binding Type}"/>
+                            </VerticalStackLayout>
+                        </Grid>
+                    </Border>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>
@@ -48,8 +55,19 @@
             Margin="10"
             Text="Betöltés"
             Command="{Binding GetPlantsCommand}">
-            
+
         </Button>
+
+        <ActivityIndicator
+            Grid.ColumnSpan="2"
+            Grid.RowSpan="2"
+            HorizontalOptions="Center"
+            VerticalOptions="Center"
+            IsVisible="{Binding IsBusy}"
+            IsRunning="{Binding IsBusy}"
+            Scale="2">
+            
+        </ActivityIndicator>
     </Grid>
 
 </ContentPage>

@@ -31,9 +31,21 @@ namespace diszkerteszClient.Services
             if (response.IsSuccessStatusCode)
             {
                 plants = await response.Content.ReadFromJsonAsync<List<Plant>>();
+                return plants;
             }
+            return null;
+        }
 
-            return plants;
+        public async Task<FullPlant> GetFullPlantById(int id)
+        {
+            string URL = baseURL + "fullplants/" + id;
+            var response = await httpClient.GetAsync(URL);
+            if (response.IsSuccessStatusCode)
+            {
+                var plant = await response.Content.ReadFromJsonAsync<FullPlant>();
+                return plant;
+            }
+            return null;
         }
     }
 }

@@ -6,9 +6,13 @@
     xmlns:view="clr-namespace:diszkerteszClient.View"
     Title="diszkerteszClient">
 
-    <ShellContent
-        Title="Homepage"
-        ContentTemplate="{DataTemplate view:MainPage}"
-        Route="MainPage" />
+    <TabBar>
+        <ShellContent
+            Title="Homepage"
+            ContentTemplate="{DataTemplate view:MainPage}"/>
+        <ShellContent
+            Title="Másik lap"
+            ContentTemplate="{DataTemplate view:QuizPage}"/>
+    </TabBar>   
 
 </Shell>

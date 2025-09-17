@@ -24,9 +24,15 @@ namespace diszkerteszClient
             //Add services
             builder.Services.AddSingleton<PlantService>();
 
+            //Add viewmodels
             builder.Services.AddSingleton<MainViewModel>();
+            builder.Services.AddTransient<DetailViewModel>();
+            builder.Services.AddTransient<QuizViewModel>();
 
+            //Add views
             builder.Services.AddSingleton<MainPage>();
+            builder.Services.AddTransient<DetailPage>();
+            builder.Services.AddTransient<QuizPage>();
 
             return builder.Build();
         }
