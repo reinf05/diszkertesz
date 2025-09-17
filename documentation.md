@@ -44,7 +44,7 @@ Létre hozzuk az API endpointokat:
 /plant/details/{id}: Visszaad egy növény leírását a Details táblából.
 /plant/fullplants: Visszaad egy listát az összes növényről, amely a növények összes adatát tartalmazza.
 /plant/quiz: Visszaad egy Quiz adattípust, amely tartalmaz egy képet és négy nevet, amelyből az első (index 0) a képen látható növény neve.
-/plant/fullpant{id}: Visszaad egy növényt minden adatával együtt.
+/plant/fullpants/{id}: Visszaad egy növényt minden adatával együtt.
 
 Miután ezek elkészültek, egy Docker image-be csomagolom a programot, és feltelepítem a szerverre, majd frissítem a compose.yaml fájlt, így a Docker Compose ezt a szolgáltatást is el tudja indítani a többivel együtt.
 
@@ -53,9 +53,15 @@ A kliens alapját egy .NET MAUI applikáció fogja adni, amelynek a felépítés
 <img width="388" height="392" alt="image" src="https://github.com/user-attachments/assets/0c48ee03-6f5c-4784-b1f8-5f21cc51e88e" />
 
 Ezután először a Main Page viewt fogom megcsinálni, ahol látható lesz egy lista a növényekről. Ehhez először csinálok egy modellt (Plant.cs). Ezután a MainPage.XAML fájlban megcsinálom a UI-t.
+A Detail Page view fog felelni azért, hogy ha kiválasztunk egy adott növényt, akkor a részletes adatait megjelenítse. Ehhez szükségünk lesz egy FullPlant.cs modellre.
 
-A viewmodelekhez csinálok először egy BaseViewModel.cs osztályt, ami az összes többi ViewModelnek az alapja lesz. Ebben olyan tulajdonságok vannak, amelyek közösek lesznek a ViewModellek között. A MainViewModel a MainPage viewmodelje. Ebben létrehozunk egy ObservableCollection, amely arra jó, hogy nem csak tárolja a növények adatait, hanem ha változás van bennük, akkor tudja értesíteni a MainPage viewt is, és tudja frissíteni azt. Dependency injection-nel átadjuk a konstruktoron keresztül a PlantService-t (amely felel a WebAPI kommunikációért), majd létre hozunk egy GetPlantsAsync() Task-ot, amelyet az MVVM Community Toolkit segítségével egy egyszerű tag-el ([RelayCommand]) Command-ra Generálunk, ezt fogja tudni meghívni a View.
+A viewmodelekhez csinálok először egy BaseViewModel.cs osztályt, ami az összes többi ViewModelnek az alapja lesz. Ebben olyan tulajdonságok vannak, amelyek közösek lesznek a ViewModellek között. 
+A MainViewModel a MainPage viewmodelje. Ebben létrehozunk egy ObservableCollection, amely arra jó, hogy nem csak tárolja a növények adatait, hanem ha változás van bennük, akkor tudja értesíteni a MainPage viewt is, és tudja frissíteni azt. Dependency injection-nel átadjuk a konstruktoron keresztül a PlantService-t (amely felel a WebAPI kommunikációért), majd létre hozunk egy GetPlantsAsync() Task-ot, amelyet az MVVM Community Toolkit segítségével egy egyszerű tag-el ([RelayCommand]) Command-ra Generálunk, ezt fogja tudni meghívni a View.
+Ahhoz hogy átirányítsunk egy Detail nézetre, konfigurálnunk kell egy új Task-ot (GoToDetailsCommand), majd ezt hozzá kell kötnünk a MainView.xaml fájlban a Grid-hez, amely egy egy növény kártyáját fogja egybe. Ehhez GestureRecogniser-t használok, és ide beállítok egy CommandParameter-t is, ami át fogja adni a Detail viewnak az adott növényt, amiről több részletet akarunk látni. Hogy működjön is ez a navigáció, regisztrálni kell egy Route-ot az AppShell.xaml.cs fájlban. Ahhoz, hogy a megfelelő növény adatait átadjuk a DetailPage-nek, a MainViewModel-ben készítettem egy privát Task-ot, ami lekéri az adott növény teljes verzióját (FullPlant) és azt adja át a view-nak. Egy QueryProperty segítségével Shell navigáción keresztül át is lehet adni paraméterként, így a view be tudja tölteni és meg tudja jeleníteni.
 
 Hogy összekössük a view-t a viewmodel-el, az adott View mögötti C# kódban a konstruktorban Dependency injection-nel át kell adni a view modelt, majd egy BindingContext-et beállítani hozzá.
 
 A Services mappában létrehozom a PlantService.cs fájlt, amely felelős lesz a kommunikációért a szerverrel az API hívásokon keresztül.
+GetAllPlants visszaadja az összes növényt (szimpla Plant formátumban), GetPlantById visszaad egy adott növényt (FullPlant formátumban).
+
+Az AppShell.xaml fájlban létre hozok egy menüt, aminek segítségével lehet lépni a különböző lapok között. Ehhez TabBar-t használok.
