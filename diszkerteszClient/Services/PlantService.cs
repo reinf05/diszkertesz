@@ -47,5 +47,17 @@ namespace diszkerteszClient.Services
             }
             return null;
         }
+
+        public async Task<Quiz> GetQuiz()
+        {
+            string URL = baseURL + "quiz";
+            var response = await httpClient.GetAsync(URL);
+            if (response.IsSuccessStatusCode)
+            {
+                var quiz = await response.Content.ReadFromJsonAsync<Quiz>();
+                return quiz;
+            }
+            return null;
+        }
     }
 }

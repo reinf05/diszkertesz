@@ -2,15 +2,30 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="diszkerteszClient.View.QuizPage"
-             Title="QuizPage">
+             xmlns:model="clr-namespace:diszkerteszClient.Models"
+             Title="{Binding Title}">
     <VerticalStackLayout>
-        <Label 
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-        <Label 
-            Text="Ez a kvíz oldal"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
+        <Grid
+            ColumnDefinitions="*,*"
+            RowDefinitions="*,*,*"
+            RowSpacing="10"
+            IsVisible="{Binding IsLoaded}"
+            x:DataType="{x:Type model:Quiz}">
+            <Image
+                Source="{Binding Quiz.ImagePath}"
+                WidthRequest="125"
+                HeightRequest="125"
+                Aspect="AspectFill"
+                Grid.Column="0"/>
+            <Label Text="Ide jönnek a nevek, gombokként, mindhez kell egy külön commandot csinálni, meg kell oldani, hogy jelölve legyen az is, hogy melyik a jó növény haha"/>
+
+        </Grid>
+
+        <Button
+            Margin="10"
+            Text="Játék!"
+            HorizontalOptions="Center"
+            Command="{Binding GetQuizCommand}"
+            IsVisible="{Binding IsNotLoaded}"/>
     </VerticalStackLayout>
 </ContentPage>
