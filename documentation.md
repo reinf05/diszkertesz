@@ -65,3 +65,5 @@ A Services mappában létrehozom a PlantService.cs fájlt, amely felelős lesz a
 GetAllPlants visszaadja az összes növényt (szimpla Plant formátumban), GetPlantById visszaad egy adott növényt (FullPlant formátumban).
 
 Az AppShell.xaml fájlban létre hozok egy menüt, aminek segítségével lehet lépni a különböző lapok között. Ehhez TabBar-t használok.
+
+A Quiz logikához szükség lesz egy Quiz modelre, amelynek két propertyje lesz, egy ImagePath, ami a kérdéses növény képének elérési útja, valamint egy string[] amelyben 4 növény neve lesz tárolva, ebből az első (0. index) mindig a helyes megoldás. Ezután a PlantService-ben létrehozok egy új functiont, amely felelős lesz a webAPI kommunikációért, és visszaad egy Quiz típust. Ezt fogja meghívni egy gomb nyomásra a felhasználó a viewmodel-en keresztül. A UI egy IsLoaded observableProperty-től függően fog változni, ami a sikeres/sikertelen betöltést jelöli. Ha nincs betöltve játékmenet, akkor csak egy Játék! gomb jelenik meg a képernyőn, ami eltűnik ha betöltött a játék, és megjelennek a játék UI elemei.
