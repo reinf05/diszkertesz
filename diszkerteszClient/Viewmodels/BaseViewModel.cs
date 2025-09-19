@@ -16,6 +16,12 @@ namespace diszkerteszClient.Viewmodels
         [ObservableProperty]
         private string title;
 
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(IsNotLoaded))]
+        private bool isLoaded = false;
+
+        public bool IsNotLoaded => !IsLoaded;
+
         public bool IsNotBusy => !IsBusy;
     }
 }

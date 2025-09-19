@@ -6,29 +6,54 @@
              Title="{Binding Title}">
 
     <VerticalStackLayout>
-        <Grid
-            ColumnDefinitions="125,*"
+        <HorizontalStackLayout 
             Padding="10"
-            ColumnSpacing="20"
+            Spacing="10"    
             VerticalOptions="Center"
-            HorizontalOptions="Center">
+            HorizontalOptions="Center"
+            Grid.Column="0">
+
             <Image
-                Source="{Binding FullPlant.Imagepath}"
-                WidthRequest="125"
-                HeightRequest="125"
-                Aspect="AspectFill"
-                Grid.Column="0"/>
-            <VerticalStackLayout
-                Grid.Column="1"
+            Source="{Binding FullPlant.Imagepath, StringFormat='{0}/1.jpeg'}"
+            WidthRequest="125"
+            HeightRequest="125"
+            Aspect="AspectFill"
+            Grid.Column="0"/>
+            <Image
+            Source="{Binding FullPlant.Imagepath, StringFormat='{0}/2.jpeg'}"
+            WidthRequest="125"
+            HeightRequest="125"
+            Aspect="AspectFill"
+            Grid.Column="0"/>
+            <Image
+            Source="{Binding FullPlant.Imagepath, StringFormat='{0}/3.jpeg'}"
+            WidthRequest="125"
+            HeightRequest="125"
+            Aspect="AspectFill"
+            Grid.Column="0"/>
+            <Image
+            Source="{Binding FullPlant.Imagepath, StringFormat='{0}/4.jpeg'}"
+            WidthRequest="125"
+            HeightRequest="125"
+            Aspect="AspectFill"
+            Grid.Column="0"/>
+            <Image
+            Source="{Binding FullPlant.Imagepath, StringFormat='{0}/5.jpeg'}"
+            WidthRequest="125"
+            HeightRequest="125"
+            Aspect="AspectFill"
+            Grid.Column="0"/>
+
+        </HorizontalStackLayout>
+        <VerticalStackLayout
                 Spacing="10"
-                VerticalOptions="Center">
+                HorizontalOptions="Center">
             <Label Text="{Binding FullPlant.Namel}"
                 FontSize="20"
                 FontAttributes="Bold"/>
             <Label Text="{Binding FullPlant.Nameh}"/>
             <Label Text="{Binding FullPlant.Type}"/>
-            </VerticalStackLayout>
-        </Grid>
+        </VerticalStackLayout>
         <Label 
             Text="{Binding FullPlant.Description}"
             VerticalOptions="Center" 

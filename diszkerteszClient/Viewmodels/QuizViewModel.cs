@@ -16,12 +16,7 @@ namespace diszkerteszClient.Viewmodels
         private PlantService plantService;
 
         [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(IsNotLoaded))]
-        private bool isLoaded = false;
-
-        [ObservableProperty]
         private Quiz quiz;
-        public bool IsNotLoaded => !IsLoaded;
 
         public QuizViewModel(PlantService plantService)
         {
@@ -48,10 +43,11 @@ namespace diszkerteszClient.Viewmodels
                     await Shell.Current.DisplayAlert("Error", "Could not load quiz", "OK");
                     return;
                 }
-                string baseURL = "http://192.168.1.151:5000/images/";
-                quizGet.ImagePath = baseURL + quizGet.ImagePath;
-
                 var rnd = new Random();
+
+                string baseURL = "http://192.168.1.151:5000/images/";
+                quizGet.ImagePath = $"{baseURL}{quizGet.ImagePath}{rnd.Next(6)}.jpeg";
+
                 quizGet.Names = quizGet.Names.OrderBy(x => rnd.Next()).ToArray();
 
                 Quiz = quizGet;

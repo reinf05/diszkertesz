@@ -14,8 +14,8 @@
             x:DataType="{x:Type model:Quiz}">
             <Image
                 Source="{Binding Quiz.ImagePath}"
-                WidthRequest="125"
-                HeightRequest="125"
+                WidthRequest="300"
+                HeightRequest="300"
                 Aspect="AspectFill"
                 Grid.Row="0"
                 Grid.ColumnSpan="2"/>
@@ -48,6 +48,7 @@
             Text="Játék!"
             HorizontalOptions="Center"
             Command="{Binding GetQuizCommand}"
+            IsVisible="{Binding IsNotLoaded}"
             />
     </VerticalStackLayout>
 </ContentPage>

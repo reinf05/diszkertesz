@@ -29,7 +29,7 @@
                         Padding="10"
                         ColumnSpacing="20">
                             <Image
-                            Source="{Binding Imagepath}"
+                            Source="{Binding Imagepath, StringFormat='{0}/1.jpeg'}"
                             WidthRequest="125"
                             HeightRequest="125"
                             Aspect="AspectFill"
@@ -54,7 +54,8 @@
             Grid.Row="1"
             Margin="10"
             Text="Betöltés"
-            Command="{Binding GetPlantsCommand}">
+            Command="{Binding GetPlantsCommand}"
+            IsVisible="{Binding IsNotLoaded}">
 
         </Button>
 

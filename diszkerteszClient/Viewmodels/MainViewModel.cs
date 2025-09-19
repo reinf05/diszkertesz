@@ -61,6 +61,7 @@ namespace diszkerteszClient.Viewmodels
                     plant.Imagepath = baseURL + path;
                     PlantList.Add(plant);
                 }
+                IsLoaded = true;
             }
             catch (Exception ex)
             {

@@ -95,13 +95,20 @@ namespace diszkerteszAPI.Controllers
             Quiz returnquiz = new Quiz();
             returnquiz.Names = new string[4];
 
+            int plantCount = await _context.Plants.CountAsync();
+
+            if (plantCount == 0)
+            {
+                return NotFound("Nincsenek növények az adatbázisban.");
+            }
+
             Random rand = new Random();
             int index = 0;
             while(index < 4)
             {
-                int id = rand.Next(1, 11);
+                int id = rand.Next(1, plantCount);
                 Plant plant = await _context.Plants.FindAsync(id);
-                if (!returnquiz.Names.Contains(plant.Namel))
+                if (plant != null && !returnquiz.Names.Contains(plant.Namel))
                 {
                     returnquiz.Names[index] = plant.Namel;
                     if (index == 0)
