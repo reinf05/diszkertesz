@@ -10,5 +10,6 @@ namespace diszkerteszClient.Models
     {
         public string ImagePath { get; set; }
         public string[] Names { get; set; } = new string[4];
+        public string Correct { get; set; }
     }
 }

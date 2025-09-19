@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using diszkerteszClient.Models;
 using diszkerteszClient.Services;
 using System;
 using System.Collections.Generic;
@@ -17,6 +18,9 @@ namespace diszkerteszClient.Viewmodels
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(IsNotLoaded))]
         private bool isLoaded = false;
+
+        [ObservableProperty]
+        private Quiz quiz;
         public bool IsNotLoaded => !IsLoaded;
 
         public QuizViewModel(PlantService plantService)
@@ -37,15 +41,20 @@ namespace diszkerteszClient.Viewmodels
             {
                 IsBusy = true;
 
-                var quiz = await plantService.GetQuiz();
+                var quizGet = await plantService.GetQuiz();
 
-                if(quiz is null)
+                if(quizGet is null)
                 {
                     await Shell.Current.DisplayAlert("Error", "Could not load quiz", "OK");
                     return;
                 }
                 string baseURL = "http://192.168.1.151:5000/images/";
-                quiz.ImagePath = baseURL + quiz.ImagePath;
+                quizGet.ImagePath = baseURL + quizGet.ImagePath;
+
+                var rnd = new Random();
+                quizGet.Names = quizGet.Names.OrderBy(x => rnd.Next()).ToArray();
+
+                Quiz = quizGet;
                 IsLoaded = true;
             }
             catch (Exception ex)
@@ -57,6 +66,21 @@ namespace diszkerteszClient.Viewmodels
             {
                 IsBusy = false;
             }
+        }
+
+        [RelayCommand]
+        private async Task GiveAnswerAsync(string givenAnswer)
+        {
+            if(givenAnswer == Quiz.Correct)
+            {
+                await Shell.Current.DisplayAlert("Helyes!", "Gratulálok, helyes választ adtál!", "OK");
+            }
+            else
+            {
+                await Shell.Current.DisplayAlert("Helytelen!", $"Sajnos nem jó a válaszod! A helyes válasz: {Quiz.Correct}", "OK");
+            }
+
+            await GetQuizAsync();
         }
     }
 }

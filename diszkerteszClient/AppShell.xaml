@@ -11,7 +11,7 @@
             Title="Homepage"
             ContentTemplate="{DataTemplate view:MainPage}"/>
         <ShellContent
-            Title="Másik lap"
+            Title="Játék"
             ContentTemplate="{DataTemplate view:QuizPage}"/>
     </TabBar>   
 

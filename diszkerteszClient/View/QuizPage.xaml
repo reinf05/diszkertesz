@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="diszkerteszClient.View.QuizPage"
              xmlns:model="clr-namespace:diszkerteszClient.Models"
+             xmlns:viewmodel="clr-namespace:diszkerteszClient.Viewmodels"
              Title="{Binding Title}">
     <VerticalStackLayout>
         <Grid
@@ -16,8 +17,29 @@
                 WidthRequest="125"
                 HeightRequest="125"
                 Aspect="AspectFill"
-                Grid.Column="0"/>
-            <Label Text="Ide jönnek a nevek, gombokként, mindhez kell egy külön commandot csinálni, meg kell oldani, hogy jelölve legyen az is, hogy melyik a jó növény haha"/>
+                Grid.Row="0"
+                Grid.ColumnSpan="2"/>
+            
+            <CollectionView
+                ItemsSource="{Binding Quiz.Names}"
+                Grid.Row="1"
+                Grid.ColumnSpan="2">
+                <CollectionView.ItemsLayout>
+                    <GridItemsLayout
+                        Orientation="Vertical"
+                        Span="2"
+                        HorizontalItemSpacing="10"
+                        VerticalItemSpacing="10"/>
+                </CollectionView.ItemsLayout>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Button
+                            Text="{Binding .}"
+                            Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:QuizViewModel}}, Path=GiveAnswerCommand}"
+                            CommandParameter="{Binding .}"/>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
 
         </Grid>
 
@@ -26,6 +48,6 @@
             Text="Játék!"
             HorizontalOptions="Center"
             Command="{Binding GetQuizCommand}"
-            IsVisible="{Binding IsNotLoaded}"/>
+            />
     </VerticalStackLayout>
 </ContentPage>

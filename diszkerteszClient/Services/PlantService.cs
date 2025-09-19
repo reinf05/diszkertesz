@@ -55,6 +55,7 @@ namespace diszkerteszClient.Services
             if (response.IsSuccessStatusCode)
             {
                 var quiz = await response.Content.ReadFromJsonAsync<Quiz>();
+                quiz.Correct = quiz.Names[0];
                 return quiz;
             }
             return null;
