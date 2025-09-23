@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:model="clr-namespace:diszkerteszClient.Models"
+             x:Class="diszkerteszClient.View.IdentifyPage"
+             Title="{Binding Title}">
+    <Grid
+        RowDefinitions="*, Auto"
+        RowSpacing="10"> 
+        <toolkit:CameraView
+            Grid.Row="0"
+            Grid.RowSpan="2"
+            x:Name="Camera"
+            IsVisible="{Binding IsNotLoaded}"/>
+        <Button Command="{Binding CaptureCommand}"
+                CommandParameter="{x:Reference Camera}"
+                MaximumWidthRequest="80"
+                MaximumHeightRequest="80"
+                MinimumHeightRequest="80"
+                MinimumWidthRequest="80"
+                BorderColor="White"
+                BorderWidth="10"
+                CornerRadius="80"
+                BackgroundColor="Transparent"
+                Grid.Row="1"
+                IsVisible="{Binding IsNotLoaded}"/>
+        <Image
+            Aspect="AspectFill"
+            HorizontalOptions="Fill"
+            VerticalOptions="Fill"
+            Source="{Binding Image}"
+            IsVisible="{Binding IsLoaded}"/>
+        <Grid
+            IsVisible="{Binding IsLoaded}"
+            Grid.Row="1"
+            ColumnDefinitions="*,*"
+            ColumnSpacing="10">
+            <Button
+                Text="Új kép"
+                Command="{Binding NewImageCommand}"
+                Grid.Column="0"/>
+            <Button
+                Text="Azonosítás"
+                Command="{Binding IdentifyCommand}"
+                Grid.Column="1"
+                IsVisible="{Binding IsNotIdentified}"/>
+
+            <Border 
+                Grid.Column="1"
+                Padding="20"
+                IsVisible="{Binding IsIdentified}">
+                <VerticalStackLayout 
+                        Spacing="10">
+
+                    <Label Text="{Binding IdentificationShow.Scientific}" 
+                           FontSize="24" 
+                           FontAttributes="Bold"/>
+
+                    <Label Text="{Binding IdentificationShow.Percent, StringFormat='{0}%'}" 
+                           FontSize="18" />
+
+                    <CollectionView 
+                            ItemsSource="{Binding IdentificationShow.CommonNames}">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Label Text="{Binding .}" 
+                                           FontSize="16" />
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
+    </Grid>
+</ContentPage>

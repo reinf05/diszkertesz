@@ -8,11 +8,14 @@
 
     <TabBar>
         <ShellContent
-            Title="Homepage"
+            Title="Kezdőlap"
             ContentTemplate="{DataTemplate view:MainPage}"/>
         <ShellContent
             Title="Játék"
             ContentTemplate="{DataTemplate view:QuizPage}"/>
+        <ShellContent
+            Title="Azonosítás"
+            ContentTemplate="{DataTemplate view:IdentifyPage}"/>
     </TabBar>   
 
 </Shell>

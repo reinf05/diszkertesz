@@ -60,5 +60,26 @@ namespace diszkerteszClient.Services
             }
             return null;
         }
+
+        public async Task<string> Identify(byte[] imageBytes, string organ)
+        {
+            string URL = baseURL + "identify";
+
+            MultipartFormDataContent form = new();
+
+            var imageContent = new ByteArrayContent(imageBytes);
+            imageContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("image/jpeg");
+            form.Add(imageContent, "images", "image.jpeg");
+            form.Add(new StringContent(organ), "organs");
+
+
+            var response = await httpClient.PostAsync(URL, form);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadAsStringAsync();
+            }
+            return $"Error {response.StatusCode}\n{response.Content.ReadAsStringAsync()}";
+        }
     }
 }

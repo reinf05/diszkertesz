@@ -6,45 +6,49 @@
              Title="{Binding Title}">
 
     <VerticalStackLayout>
-        <HorizontalStackLayout 
-            Padding="10"
-            Spacing="10"    
-            VerticalOptions="Center"
-            HorizontalOptions="Center"
-            Grid.Column="0">
+        <ScrollView
+            Orientation="Horizontal"
+            HorizontalOptions="Fill"
+            VerticalOptions="Center">
+            <HorizontalStackLayout 
+                Padding="10"
+                Spacing="10"    
+                VerticalOptions="Center"
+                HorizontalOptions="Start">
 
-            <Image
-            Source="{Binding FullPlant.Imagepath, StringFormat='{0}/1.jpeg'}"
-            WidthRequest="125"
-            HeightRequest="125"
-            Aspect="AspectFill"
-            Grid.Column="0"/>
-            <Image
-            Source="{Binding FullPlant.Imagepath, StringFormat='{0}/2.jpeg'}"
-            WidthRequest="125"
-            HeightRequest="125"
-            Aspect="AspectFill"
-            Grid.Column="0"/>
-            <Image
-            Source="{Binding FullPlant.Imagepath, StringFormat='{0}/3.jpeg'}"
-            WidthRequest="125"
-            HeightRequest="125"
-            Aspect="AspectFill"
-            Grid.Column="0"/>
-            <Image
-            Source="{Binding FullPlant.Imagepath, StringFormat='{0}/4.jpeg'}"
-            WidthRequest="125"
-            HeightRequest="125"
-            Aspect="AspectFill"
-            Grid.Column="0"/>
-            <Image
-            Source="{Binding FullPlant.Imagepath, StringFormat='{0}/5.jpeg'}"
-            WidthRequest="125"
-            HeightRequest="125"
-            Aspect="AspectFill"
-            Grid.Column="0"/>
+                <Image
+                Source="{Binding FullPlant.Imagepath, StringFormat='{0}/1.jpeg'}"
+                WidthRequest="125"
+                HeightRequest="125"
+                Aspect="AspectFill"
+                Grid.Column="0"/>
+                <Image
+                Source="{Binding FullPlant.Imagepath, StringFormat='{0}/2.jpeg'}"
+                WidthRequest="125"
+                HeightRequest="125"
+                Aspect="AspectFill"
+                Grid.Column="0"/>
+                <Image
+                Source="{Binding FullPlant.Imagepath, StringFormat='{0}/3.jpeg'}"
+                WidthRequest="125"
+                HeightRequest="125"
+                Aspect="AspectFill"
+                Grid.Column="0"/>
+                <Image
+                Source="{Binding FullPlant.Imagepath, StringFormat='{0}/4.jpeg'}"
+                WidthRequest="125"
+                HeightRequest="125"
+                Aspect="AspectFill"
+                Grid.Column="0"/>
+                <Image
+                Source="{Binding FullPlant.Imagepath, StringFormat='{0}/5.jpeg'}"
+                WidthRequest="125"
+                HeightRequest="125"
+                Aspect="AspectFill"
+                Grid.Column="0"/>
 
-        </HorizontalStackLayout>
+            </HorizontalStackLayout>
+        </ScrollView>
         <VerticalStackLayout
                 Spacing="10"
                 HorizontalOptions="Center">
