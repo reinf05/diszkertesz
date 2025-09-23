@@ -31,7 +31,7 @@ namespace diszkerteszClient.Viewmodels
         public bool IsNotIdentified => !IsIdentified;
 
         [ObservableProperty]
-        private IdentificationShow identificationShow = new IdentificationShow();
+        private IdentificationShow identificationShow;
 
         public IdentifyViewModel(PlantService plantService)
         {
@@ -75,10 +75,12 @@ namespace diszkerteszClient.Viewmodels
                 string result = await plantService.Identify(imageBytes, organ);
                 IdentificationResult data = JsonSerializer.Deserialize<IdentificationResult>(result);
 
-                
-                IdentificationShow.Percent = data.results[0].score * 100;
-                IdentificationShow.Scientific = data.results[0].species.scientificNameWithoutAuthor;
-                IdentificationShow.CommonNames = data.results[0].species.commonNames;
+                IdentificationShow temp = new();
+                temp.Percent = data.results[0].score * 100;
+                temp.Scientific = data.results[0].species.scientificNameWithoutAuthor;
+                temp.CommonNames = data.results[0].species.commonNames;
+
+                IdentificationShow = temp;
 
                 IsIdentified = true;
             }

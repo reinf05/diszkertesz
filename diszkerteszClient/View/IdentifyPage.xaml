@@ -6,7 +6,7 @@
              x:Class="diszkerteszClient.View.IdentifyPage"
              Title="{Binding Title}">
     <Grid
-        RowDefinitions="*, Auto"
+        RowDefinitions="*, Auto, Auto"
         RowSpacing="10"> 
         <toolkit:CameraView
             Grid.Row="0"
@@ -72,6 +72,20 @@
 
                 </VerticalStackLayout>
             </Border>
+        </Grid>
+        <Grid
+            Grid.Row="2"
+            ColumnDefinitions="*,auto">
+            <Label
+                Text="The image-based plant species identification service used, is based on the Pl@ntNet recognition API, regularly updated and accessible through the site https://my.plantnet.org/"
+                Grid.Column="0"
+                FontSize="8"/>
+            <Image
+                Source="plantnet.png"
+                WidthRequest="100"
+                HeightRequest="50"
+                Aspect="AspectFit"
+                Grid.Column="1"/>
         </Grid>
     </Grid>
 </ContentPage>
