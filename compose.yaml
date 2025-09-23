@@ -22,12 +22,13 @@ services:
     depends_on:
       - postgres
   webapi:
-    image: rferko/diszkerteszapi:1.4
+    image: rferko/diszkerteszapi:1.6
     restart: always
     ports:
       - "5000:8080"
     environment:
       ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=diszkertesz;Username=feri;Password=feri"
+      API-KEY: "2b10bevNdWpLYF5EY0wxdMqv2O"
     volumes:
       - /etc/diszkertesz_images:/app/images
 
