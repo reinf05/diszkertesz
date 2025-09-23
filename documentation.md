@@ -45,6 +45,7 @@ Létre hozzuk az API endpointokat:
 /plant/fullplants: Visszaad egy listát az összes növényről, amely a növények összes adatát tartalmazza.
 /plant/quiz: Visszaad egy Quiz adattípust, amely tartalmaz egy képet és négy nevet, amelyből az első (index 0) a képen látható növény neve.
 /plant/fullpants/{id}: Visszaad egy növényt minden adatával együtt.
+/plant/identify: Bekér egy MultipartFromDataContent típusú változót, amelyet majd átad a PlantNet API-nak, ami elvégzi a növény felismerést, majd visszaadja a legvalószínűbb növényt. Az API kulcsot a Docker compoose fájl segítségével adjuk át a webAPI-nak.
 
 Miután ezek elkészültek, egy Docker image-be csomagolom a programot, és feltelepítem a szerverre, majd frissítem a compose.yaml fájlt, így a Docker Compose ezt a szolgáltatást is el tudja indítani a többivel együtt.
 
@@ -65,5 +66,9 @@ A Services mappában létrehozom a PlantService.cs fájlt, amely felelős lesz a
 GetAllPlants visszaadja az összes növényt (szimpla Plant formátumban), GetPlantById visszaad egy adott növényt (FullPlant formátumban).
 
 Az AppShell.xaml fájlban létre hozok egy menüt, aminek segítségével lehet lépni a különböző lapok között. Ehhez TabBar-t használok.
-
+### Quiz
 A Quiz logikához szükség lesz egy Quiz modelre, amelynek három propertyje lesz, egy ImagePath, ami a kérdéses növény képének elérési útja, egy string[] amelyben 4 növény neve lesz tárolva, valamint egy Correct, ami a helyes választ fogja tárolni. Ezután a PlantService-ben létrehozok egy új functiont, amely felelős lesz a webAPI kommunikációért, és visszaad egy Quiz típust. Ezt fogja meghívni egy gomb nyomásra a felhasználó a viewmodel-en keresztül. A UI egy IsLoaded observableProperty-től függően fog változni, ami a sikeres/sikertelen betöltést jelöli. Ha nincs betöltve játékmenet, akkor csak egy Játék! gomb jelenik meg a képernyőn, ami eltűnik ha betöltött a játék, és megjelennek a játék UI elemei. Ha a játék sikeresen betöltött, akkor látni fog a felhasználó egy képet, és 4 gombot, mindegyik egy egy növény nevével, de csak az egyik, random helyen elhelyezkedő lesz a megfelelő válasz. Minden gomb megnyomása meghív egy másik RelayCommand-ot, amely megnézi, hogy a válasz helyes e (összeveti a Correct és az adott választ), majd tudatja a felhasználóval és autómatikusan egy új játékot tölt be.
+
+### Növény felismerés
+Először a különböző platformokon az engedélyeket kell módosítani, hogy legyen hozzáférésünk az adott eszköz kamerájához.
+A .NET MAUI-ban, hogy kamerát lehessen használni, telepíteni kell a projekten belül a CommunityToolkit.Maui.Camera NuGet csomagot. Ezután a MauiProgram.cs-t ki kell egészíteni, a .UseMauiCommunityToolkitCamera() sorral. Ezután az adott oldalon definiálni kell a toolkit-et, `xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"`, ezután tudjuk használni a CameraView-t. 
