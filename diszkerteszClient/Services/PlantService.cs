@@ -12,7 +12,7 @@ namespace diszkerteszClient.Services
     {
         private HttpClient httpClient;
         private List<Plant> plants = new();
-        private string baseURL = "http://192.168.1.151:5000/Plant/";
+        private string baseURL = "https://ca-diszkertesz-gerwest-dev-001.politeocean-b59cb8a8.westeurope.azurecontainerapps.io/Plant/";
 
         public PlantService()
         {

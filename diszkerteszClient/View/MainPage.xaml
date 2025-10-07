@@ -29,7 +29,7 @@
                         Padding="10"
                         ColumnSpacing="20">
                             <Image
-                            Source="{Binding Imagepath, StringFormat='{0}/1.jpeg'}"
+                            Source="{Binding Imagepath, StringFormat='{0}1.jpeg'}"
                             WidthRequest="125"
                             HeightRequest="125"
                             Aspect="AspectFill"
@@ -52,6 +52,7 @@
 
         <Button
             Grid.Row="1"
+            Grid.ColumnSpan="2"
             Margin="10"
             Text="Betöltés"
             Command="{Binding GetPlantsCommand}"
@@ -59,16 +60,29 @@
 
         </Button>
 
-        <ActivityIndicator
-            Grid.ColumnSpan="2"
+        <Grid
             Grid.RowSpan="2"
-            HorizontalOptions="Center"
-            VerticalOptions="Center"
-            IsVisible="{Binding IsBusy}"
-            IsRunning="{Binding IsBusy}"
-            Scale="2">
-            
-        </ActivityIndicator>
+            Grid.ColumnSpan="2"
+            BackgroundColor="Black"
+            IsVisible="{Binding IsBusy}">
+            <VerticalStackLayout
+                HorizontalOptions="Center"
+                VerticalOptions="Center">
+
+                <Label
+                    Text="Betöltés"
+                    FontSize="20"
+                    FontAttributes="Bold"
+                    Margin="20"/>
+                <ActivityIndicator
+                    Grid.ColumnSpan="2"
+                    Grid.RowSpan="2"
+                    IsRunning="{Binding IsBusy}"
+                    Scale="2">
+                </ActivityIndicator>
+                
+            </VerticalStackLayout>
+        </Grid>
     </Grid>
 
 </ContentPage>

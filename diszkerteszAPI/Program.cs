@@ -18,7 +18,12 @@ namespace diszkerteszAPI
             //builder.WebHost.UseUrls("http://0.0.0.0:8080");
 
             //Add Db connection
-            builder.Services.AddDbContext<diszkerteszDbContext>(options => options.UseNpgsql(connectionString));
+            //Base code for on-premises PostgreSQL
+            //builder.Services.AddDbContext<diszkerteszDbContext>(options => options.UseNpgsql(connectionString));
+
+            //Used for Azure SQL
+            var sqlConnectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+            builder.Services.AddDbContext<diszkerteszDbContext>(options => options.UseAzureSql(sqlConnectionString));
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -27,11 +32,11 @@ namespace diszkerteszAPI
 
             var app = builder.Build();
 
-            app.UseStaticFiles(new StaticFileOptions
-            {
-                FileProvider = new PhysicalFileProvider("/app/images"),
-                RequestPath = "/images"
-            });
+            //app.UseStaticFiles(new StaticFileOptions
+            //{
+            //    FileProvider = new PhysicalFileProvider("/app/images"),
+            //    RequestPath = "/images"
+            //});
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())

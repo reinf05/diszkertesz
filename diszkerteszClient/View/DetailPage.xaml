@@ -5,11 +5,13 @@
              x:Class="diszkerteszClient.View.DetailPage"
              Title="{Binding Title}">
 
-    <VerticalStackLayout>
+    <Grid
+        RowDefinitions="Auto, Auto, *">
         <ScrollView
             Orientation="Horizontal"
             HorizontalOptions="Fill"
-            VerticalOptions="Center">
+            VerticalOptions="Center"
+            Grid.Row="0">
             <HorizontalStackLayout 
                 Padding="10"
                 Spacing="10"    
@@ -17,65 +19,90 @@
                 HorizontalOptions="Start">
 
                 <Image
-                Source="{Binding FullPlant.Imagepath, StringFormat='{0}/1.jpeg'}"
-                WidthRequest="125"
-                HeightRequest="125"
-                Aspect="AspectFill"
-                Grid.Column="0"/>
+                    Source="{Binding FullPlant.Imagepath, StringFormat='{0}1.jpeg'}"
+                    WidthRequest="125"
+                    HeightRequest="125"
+                    Aspect="AspectFill"
+                    Grid.Column="0"/>
                 <Image
-                Source="{Binding FullPlant.Imagepath, StringFormat='{0}/2.jpeg'}"
-                WidthRequest="125"
-                HeightRequest="125"
-                Aspect="AspectFill"
-                Grid.Column="0"/>
+                    Source="{Binding FullPlant.Imagepath, StringFormat='{0}2.jpeg'}"
+                    WidthRequest="125"
+                    HeightRequest="125"
+                    Aspect="AspectFill"
+                    Grid.Column="0"/>
                 <Image
-                Source="{Binding FullPlant.Imagepath, StringFormat='{0}/3.jpeg'}"
-                WidthRequest="125"
-                HeightRequest="125"
-                Aspect="AspectFill"
-                Grid.Column="0"/>
+                    Source="{Binding FullPlant.Imagepath, StringFormat='{0}3.jpeg'}"
+                    WidthRequest="125"
+                    HeightRequest="125"
+                    Aspect="AspectFill"
+                    Grid.Column="0"/>
                 <Image
-                Source="{Binding FullPlant.Imagepath, StringFormat='{0}/4.jpeg'}"
-                WidthRequest="125"
-                HeightRequest="125"
-                Aspect="AspectFill"
-                Grid.Column="0"/>
+                    Source="{Binding FullPlant.Imagepath, StringFormat='{0}4.jpeg'}"
+                    WidthRequest="125"
+                    HeightRequest="125"
+                    Aspect="AspectFill"
+                    Grid.Column="0"/>
                 <Image
-                Source="{Binding FullPlant.Imagepath, StringFormat='{0}/5.jpeg'}"
-                WidthRequest="125"
-                HeightRequest="125"
-                Aspect="AspectFill"
-                Grid.Column="0"/>
+                    Source="{Binding FullPlant.Imagepath, StringFormat='{0}5.jpeg'}"
+                    WidthRequest="125"
+                    HeightRequest="125"
+                    Aspect="AspectFill"
+                    Grid.Column="0"/>
 
             </HorizontalStackLayout>
         </ScrollView>
+        
         <VerticalStackLayout
-                Spacing="10"
-                HorizontalOptions="Center">
+            Spacing="10"
+            HorizontalOptions="Center"
+            Grid.Row="1">
             <Label Text="{Binding FullPlant.Namel}"
                 FontSize="20"
                 FontAttributes="Bold"/>
             <Label Text="{Binding FullPlant.Nameh}"/>
             <Label Text="{Binding FullPlant.Type}"/>
         </VerticalStackLayout>
-        <Label 
-            Text="{Binding FullPlant.Description}"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-        <Label 
-            Text="{Binding FullPlant.Usage}"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-        <Label 
-            Text="{Binding FullPlant.Pathogens}"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-        <Label 
-            Text="{Binding FullPlant.Propagation}"
-            VerticalOptions="Center"
-            HorizontalOptions="Center"/>
+        
+        <ScrollView
+            Orientation="Vertical"
+            HorizontalOptions="Center"
+            VerticalOptions="Fill"
+            Grid.Row="2">
+            <VerticalStackLayout
+                HorizontalOptions="Fill"
+                VerticalOptions="Start">
+                
+                <Label
+                    Text="Általános jellemzők"
+                    FontAttributes="Bold"
+                    FontSize="20"/>
+                <Label 
+                    Text="{Binding FullPlant.Description}"/>
+                
+                <Label
+                    Text="&#x0a;Felhasználás"
+                    FontAttributes="Bold"
+                    FontSize="20"/>
+                <Label 
+                    Text="{Binding FullPlant.Usage}"/>
 
-    <ActivityIndicator
+                <Label
+                    Text="&#x0a;Növényvédelem"
+                    FontAttributes="Bold"
+                    FontSize="20"/>
+                <Label 
+                    Text="{Binding FullPlant.Pathogens}" />
+
+                <Label
+                    Text="&#x0a;Szaporítás"
+                    FontAttributes="Bold"
+                    FontSize="20"/>
+                <Label 
+                    Text="{Binding FullPlant.Propagation}"/>
+            </VerticalStackLayout>
+        </ScrollView>
+        
+        <ActivityIndicator
         HorizontalOptions="Center"
         VerticalOptions="Center"
         IsVisible="{Binding IsBusy}"
@@ -83,5 +110,5 @@
         Scale="2">
 
     </ActivityIndicator>
-    </VerticalStackLayout>
+    </Grid>
 </ContentPage>

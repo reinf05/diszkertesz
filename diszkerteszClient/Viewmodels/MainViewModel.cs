@@ -17,6 +17,7 @@ namespace diszkerteszClient.Viewmodels
         private PlantService plantService;
         public ObservableCollection<Plant> PlantList { get; } = new();
         private FullPlant fullPlant;
+        private readonly string baseURL = "https://stdiszkerteszgerdev001.blob.core.windows.net/images/";
         public MainViewModel(PlantService plantService)
         {
             this.Title = "Dísznövények";
@@ -29,6 +30,7 @@ namespace diszkerteszClient.Viewmodels
             //AppShell.xaml.cs-ben regisztrálni kell a DetailPage-t routeként
             if (plant is null) return;
             await GetFullPlantAsync(plant.Id);
+            if (fullPlant is null) return;
             await Shell.Current.GoToAsync(nameof(DetailPage), true, new Dictionary<string, object>
              {
                  {"fullPlant", fullPlant }
@@ -52,8 +54,6 @@ namespace diszkerteszClient.Viewmodels
                 {
                     PlantList.Clear();
                 }
-
-                string baseURL = "http://192.168.1.151:5000/images/";
 
                 foreach(var plant in plants)
                 {
@@ -85,14 +85,14 @@ namespace diszkerteszClient.Viewmodels
             {
                 IsBusy = true;
                 var plant = await plantService.GetFullPlantById(plantId);
+                fullPlant = null!;
 
                 if (plant == null)
                 {
-                    await Shell.Current.DisplayAlert("Error", "No plant found.", "OK");
+                    await Shell.Current.DisplayAlert("Error", "A növény nem található", "OK");
                     return;
                 }
 
-                string baseURL = "http://192.168.1.151:5000/images/";
                 fullPlant = new FullPlant()
                 {
                     Id = plant.Id,
@@ -105,7 +105,20 @@ namespace diszkerteszClient.Viewmodels
                     Pathogens = plant.Pathogens,
                     Propagation = plant.Propagation
                 };
-                return;
+                //try
+                //{
+                //    using var http = new HttpClient();
+                //    string url = $"{fullPlant.Imagepath}1.jpeg";
+                //    var res = await http.GetAsync(url);
+                //    Console.WriteLine($"Status: {res.StatusCode}");
+                //    var contentType = res.Content.Headers.ContentType?.ToString();
+                //    Console.WriteLine($"Content-Type: {contentType}");
+                //}
+                //catch (Exception ex)
+                //{
+                //    Console.WriteLine(ex.Message);
+                //}
+                //return;
             }
             catch (Exception ex)
             {

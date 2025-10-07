@@ -20,7 +20,7 @@ namespace diszkerteszClient.Viewmodels
 
         partial void OnFullPlantChanged(FullPlant value)
         {
-            Title = value?.Namel;
+            Title = value?.Namel!;
         }
     }
 

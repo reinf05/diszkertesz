@@ -139,7 +139,7 @@ namespace diszkerteszAPI.Controllers
 
             string project = "all";
             string apiKey = Environment.GetEnvironmentVariable("API-KEY");
-            if(apiKey == null)
+            if (apiKey == null)
             {
                 return "Error: API key not found";
             }
