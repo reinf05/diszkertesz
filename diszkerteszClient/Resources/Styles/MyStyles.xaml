@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<?xaml-comp compile="true" ?>
+<ResourceDictionary 
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+
+    <Style TargetType="Shell"
+           ApplyToDerivedTypes="True">
+        <Setter Property="Shell.TitleColor" Value="{StaticResource TextDark}"/>
+        <Setter Property="Shell.UnselectedColor" Value="{AppThemeBinding Dark={StaticResource SecondaryDark}, Light={StaticResource SecondaryLight}}"/>
+        <Setter Property="Shell.BackgroundColor" Value="{AppThemeBinding Dark={StaticResource PrimaryDark}, Light={StaticResource Primary}}"/>
+
+        <Setter Property="Shell.TabBarBackgroundColor" Value="{AppThemeBinding Dark={StaticResource PrimaryDark}, Light={StaticResource Primary}}"/>
+        <Setter Property="Shell.TabBarTitleColor" Value="{AppThemeBinding Dark={StaticResource Primary}, Light={StaticResource PrimaryDark}}"/>
+        <Setter Property="Shell.TabBarUnselectedColor" Value="{AppThemeBinding Dark={StaticResource SecondaryDark}, Light={StaticResource SecondaryLight}}"/>
+    </Style>
+
+    <Style TargetType="Button"
+           BasedOn="{StaticResource BaseButton}">
+        <Setter Property="BackgroundColor" Value="{StaticResource AccentOrange}"/>
+        <Setter Property="TextColor" Value="{StaticResource Black}"/>
+    </Style>
+
+    <Style TargetType="ActivityIndicator">
+        <Setter Property="Color" Value="{AppThemeBinding Dark={StaticResource SecondaryLight}, Light={StaticResource SecondaryDark}}"/>
+    </Style>
+
+    <Style TargetType="Label">
+        <Setter Property="TextColor" Value="{AppThemeBinding Dark={StaticResource TextLight}, Light={StaticResource TextDark}}"/>
+        <Setter Property="Padding" Value="5"/>
+    </Style>
+
+    <Style TargetType="Label"
+           x:Key="TextBold">
+        <Setter Property="FontAttributes" Value="Bold"/>
+        <Setter Property="FontSize" Value="20"/>
+        <Setter Property="FontSize" Value="20"/>
+    </Style>
+
+    <Style TargetType="Border"
+           BasedOn="{StaticResource BaseBorder}">
+        <Setter Property="Stroke" Value="{StaticResource TextLight}"/>
+        <Setter Property="StrokeShape" Value="30"/>
+        <Setter Property="Padding" Value="10"/>
+        <Setter Property="BackgroundColor" Value="{StaticResource SecondaryDark}"/>
+    </Style>
+
+    <Style TargetType="Image"
+           x:Key="Thumbnail">
+        <Setter Property="WidthRequest" Value="125"/>
+        <Setter Property="HeightRequest" Value="125"/>
+        <Setter Property="Aspect" Value="AspectFill"/>
+    </Style>
+
+
+</ResourceDictionary>

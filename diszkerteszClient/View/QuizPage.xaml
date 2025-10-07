@@ -5,7 +5,8 @@
              xmlns:model="clr-namespace:diszkerteszClient.Models"
              xmlns:viewmodel="clr-namespace:diszkerteszClient.Viewmodels"
              Title="{Binding Title}">
-    <VerticalStackLayout>
+    <VerticalStackLayout
+        Background="{AppThemeBinding Dark={StaticResource BackgroundDark}, Light={StaticResource SecondaryDark}}">
         <Grid
             ColumnDefinitions="*,*"
             RowDefinitions="*,*,*"

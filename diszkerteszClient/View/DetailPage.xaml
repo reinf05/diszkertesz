@@ -6,7 +6,8 @@
              Title="{Binding Title}">
 
     <Grid
-        RowDefinitions="Auto, Auto, *">
+        RowDefinitions="Auto, Auto, *"
+        Background="{AppThemeBinding Dark={StaticResource BackgroundDark}, Light={StaticResource SecondaryDark}}">
         <ScrollView
             Orientation="Horizontal"
             HorizontalOptions="Fill"
@@ -16,37 +17,27 @@
                 Padding="10"
                 Spacing="10"    
                 VerticalOptions="Center"
-                HorizontalOptions="Start">
+                HorizontalOptions="Center">
 
                 <Image
                     Source="{Binding FullPlant.Imagepath, StringFormat='{0}1.jpeg'}"
-                    WidthRequest="125"
-                    HeightRequest="125"
-                    Aspect="AspectFill"
+                    Style="{StaticResource Thumbnail}"
                     Grid.Column="0"/>
                 <Image
                     Source="{Binding FullPlant.Imagepath, StringFormat='{0}2.jpeg'}"
-                    WidthRequest="125"
-                    HeightRequest="125"
-                    Aspect="AspectFill"
+                    Style="{StaticResource Thumbnail}"
                     Grid.Column="0"/>
                 <Image
                     Source="{Binding FullPlant.Imagepath, StringFormat='{0}3.jpeg'}"
-                    WidthRequest="125"
-                    HeightRequest="125"
-                    Aspect="AspectFill"
+                    Style="{StaticResource Thumbnail}"
                     Grid.Column="0"/>
                 <Image
                     Source="{Binding FullPlant.Imagepath, StringFormat='{0}4.jpeg'}"
-                    WidthRequest="125"
-                    HeightRequest="125"
-                    Aspect="AspectFill"
+                    Style="{StaticResource Thumbnail}"
                     Grid.Column="0"/>
                 <Image
                     Source="{Binding FullPlant.Imagepath, StringFormat='{0}5.jpeg'}"
-                    WidthRequest="125"
-                    HeightRequest="125"
-                    Aspect="AspectFill"
+                    Style="{StaticResource Thumbnail}"
                     Grid.Column="0"/>
 
             </HorizontalStackLayout>
@@ -57,8 +48,7 @@
             HorizontalOptions="Center"
             Grid.Row="1">
             <Label Text="{Binding FullPlant.Namel}"
-                FontSize="20"
-                FontAttributes="Bold"/>
+                Style="{StaticResource TextBold}"/>
             <Label Text="{Binding FullPlant.Nameh}"/>
             <Label Text="{Binding FullPlant.Type}"/>
         </VerticalStackLayout>
@@ -74,41 +64,29 @@
                 
                 <Label
                     Text="Általános jellemzők"
-                    FontAttributes="Bold"
-                    FontSize="20"/>
+                    Style="{StaticResource TextBold}"/>
                 <Label 
                     Text="{Binding FullPlant.Description}"/>
                 
                 <Label
-                    Text="&#x0a;Felhasználás"
-                    FontAttributes="Bold"
-                    FontSize="20"/>
+                    Text="Felhasználás"
+                    Style="{StaticResource TextBold}"/>
                 <Label 
                     Text="{Binding FullPlant.Usage}"/>
 
                 <Label
-                    Text="&#x0a;Növényvédelem"
-                    FontAttributes="Bold"
-                    FontSize="20"/>
+                    Text="Növényvédelem"
+                    Style="{StaticResource TextBold}"/>
                 <Label 
                     Text="{Binding FullPlant.Pathogens}" />
 
                 <Label
-                    Text="&#x0a;Szaporítás"
-                    FontAttributes="Bold"
-                    FontSize="20"/>
+                    Text="Szaporítás"
+                    Style="{StaticResource TextBold}"/>
                 <Label 
                     Text="{Binding FullPlant.Propagation}"/>
             </VerticalStackLayout>
         </ScrollView>
         
-        <ActivityIndicator
-        HorizontalOptions="Center"
-        VerticalOptions="Center"
-        IsVisible="{Binding IsBusy}"
-        IsRunning="{Binding IsBusy}"
-        Scale="2">
-
-    </ActivityIndicator>
     </Grid>
 </ContentPage>

@@ -9,7 +9,8 @@
 
     <Grid
         ColumnDefinitions="*, *"
-        RowDefinitions="*, Auto">
+        RowDefinitions="*, Auto"
+        BackgroundColor="{StaticResource BackgroundDark}">
         <CollectionView
             Grid.ColumnSpan="2"
             ItemsSource="{Binding PlantList}"
@@ -18,34 +19,37 @@
             <CollectionView.ItemTemplate>
                 <DataTemplate
                     x:DataType="{x:Type model:Plant}">
-                    <Border>
+                    <VerticalStackLayout Padding="5">
+                        
+                    <Border
+                        HorizontalOptions="Center">
                         <Border.GestureRecognizers>
                             <TapGestureRecognizer
                                     Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:MainViewModel}}, Path=GoToDetailsCommand}"
                                     CommandParameter="{Binding .}"/>
                         </Border.GestureRecognizers>
+
+
                         <Grid
-                        ColumnDefinitions="125,*"
-                        Padding="10"
-                        ColumnSpacing="20">
-                            <Image
-                            Source="{Binding Imagepath, StringFormat='{0}1.jpeg'}"
-                            WidthRequest="125"
-                            HeightRequest="125"
-                            Aspect="AspectFill"
-                            Grid.Column="0"/>
+                            ColumnDefinitions="125,200"
+                            Padding="10"
+                            ColumnSpacing="20">
+                                <Image
+                                    Source="{Binding Imagepath, StringFormat='{0}1.jpeg'}"
+                                    Style="{StaticResource Thumbnail}"
+                                    Grid.Column="0"/>
                             <VerticalStackLayout
-                            Grid.Column="1"
-                            Spacing="10"
-                            VerticalOptions="Center">
+                                    Grid.Column="1"
+                                    Spacing="10"
+                                    VerticalOptions="Center">
                                 <Label Text="{Binding Namel}"
-                                   FontSize="20"
-                                   FontAttributes="Bold"/>
+                                       Style="{StaticResource TextBold}"/>
                                 <Label Text="{Binding Nameh}"/>
                                 <Label Text="{Binding Type}"/>
                             </VerticalStackLayout>
                         </Grid>
                     </Border>
+                    </VerticalStackLayout>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>
@@ -63,7 +67,7 @@
         <Grid
             Grid.RowSpan="2"
             Grid.ColumnSpan="2"
-            BackgroundColor="Black"
+            Background="{StaticResource BackgroundDark}"
             IsVisible="{Binding IsBusy}">
             <VerticalStackLayout
                 HorizontalOptions="Center"
@@ -73,7 +77,8 @@
                     Text="Betöltés"
                     FontSize="20"
                     FontAttributes="Bold"
-                    Margin="20"/>
+                    Margin="20"
+                    TextColor="{AppThemeBinding Dark={StaticResource SecondaryLight}, Light={StaticResource SecondaryDark}}"/>
                 <ActivityIndicator
                     Grid.ColumnSpan="2"
                     Grid.RowSpan="2"
