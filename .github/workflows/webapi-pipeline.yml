@@ -53,9 +53,13 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         shell: powershell
         run: |
+          Write-Host "=== SonarScanner BEGIN ==="
           ${{ runner.temp }}\scanner\dotnet-sonarscanner begin /k:"reinf05_diszkertesz" /o:"reinf05" /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+          Write-Host "=== PROJECT BUILD ==="
           dotnet build
+          Write-Host "=== SonarScanner  END ==="
           ${{ runner.temp }}\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+          Write-Host "=== END FINISHED ==="
           
       - name: Debug – find report-task.txt
         shell: powershell
