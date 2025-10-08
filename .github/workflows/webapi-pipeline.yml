@@ -52,16 +52,17 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         shell: powershell
         run: |
-          cd diszkerteszAPI
-          ${{ runner.temp }}\scanner\dotnet-sonarscanner begin /k:"reinf05_diszkertesz" /o:"reinf05" /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+          ${{ runner.temp }}\scanner\dotnet-sonarscanner begin /k:"reinf05_diszkertesz" /o:"reinf05" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.projectBaseDir="diszkerteszAPI"
           dotnet build
           ${{ runner.temp }}\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
-          cd ..
           
-      - name: Debug Sonar report file location
+      - name: Debug – find report-task.txt
         shell: powershell
         run: |
-          Get-ChildItem -Recurse -Filter report-task.txt
+          Write-Host "Current directory: $PWD"
+          Get-ChildItem -Path $PWD -Recurse -Filter report-task.txt | ForEach-Object {
+            Write-Host "Found file at: $($_.FullName)"
+          }
       
       - name: "Set up Quality Gate"
         uses: SonarSource/sonarqube-quality-gate-action@cf038b0e0cdecfa9e56c198bbb7d21d751d62c3b
