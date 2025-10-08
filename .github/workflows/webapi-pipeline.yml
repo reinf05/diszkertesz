@@ -1,0 +1,30 @@
+name: WebAPI Pipeline
+
+on:
+  push:
+    branches:
+      - dev
+    paths:
+      - 'diszkerteszAPI/**'
+
+jobs:
+  sonar:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: "Checkout code"
+        uses: actions/checkout@v5.0.0
+        with:
+          #Useful for SonarQube
+          fetch-depth: 0
+
+      - name: "SonarQube Scan"
+        uses: SonarSource/sonarqube-scan-action@v4.2.2
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      - name: "Set up Quality Gate"
+        uses: SonarSource/sonarqube-quality-gate-action@v1.2.0
+
+      - name: "Example show SonarQube Quality Gate Status value"
+        run: echo "The Quality Gate status is ${{ steps.sonarqube-quality-gate-check.outputs.quality-gate-status }}"
