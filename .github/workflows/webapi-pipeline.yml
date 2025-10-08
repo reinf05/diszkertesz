@@ -62,6 +62,8 @@ jobs:
         id: sonarqube-quality-gate-check
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          scanMetadataReportFile: diszkerteszAPI/.scannerwork/report-task.txt
 
       - name: "Example show SonarQube Quality Gate Status value"
         if: always()
