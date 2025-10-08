@@ -48,11 +48,12 @@ jobs:
           dotnet tool update dotnet-sonarscanner --tool-path ${{ runner.temp }}\scanner
           
       - name: Build and analyze
+        working-directory: diszkerteszAPI
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         shell: powershell
         run: |
-          ${{ runner.temp }}\scanner\dotnet-sonarscanner begin /k:"reinf05_diszkertesz" /o:"reinf05" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.projectBaseDir="diszkerteszAPI"
+          ${{ runner.temp }}\scanner\dotnet-sonarscanner begin /k:"reinf05_diszkertesz" /o:"reinf05" /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
           dotnet build
           ${{ runner.temp }}\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
           
