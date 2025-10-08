@@ -57,6 +57,11 @@ jobs:
           dotnet build
           ${{ runner.temp }}\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
           
+      - name: Debug Sonar report file location
+        shell: powershell
+        run: |
+          Get-ChildItem -Recurse -Filter report-task.txt
+      
       - name: "Set up Quality Gate"
         uses: SonarSource/sonarqube-quality-gate-action@cf038b0e0cdecfa9e56c198bbb7d21d751d62c3b
         id: sonarqube-quality-gate-check
