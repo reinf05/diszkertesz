@@ -52,7 +52,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         shell: powershell
         run: |
-          ${{ runner.temp }}\scanner\dotnet-sonarscanner begin /k:"reinf05_diszkertesz" /o:"reinf05" /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+          ${{ runner.temp }}\scanner\dotnet-sonarscanner begin /k:"reinf05_diszkertesz" /o:"reinf05" /d:sonar.token="${{ secrets.SONAR_TOKEN }}"  /d:sonar.projectBaseDir="diszkerteszAPI"
           dotnet build
           ${{ runner.temp }}\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
           
