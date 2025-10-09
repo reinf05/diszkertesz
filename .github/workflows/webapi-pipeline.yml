@@ -73,7 +73,7 @@ jobs:
           scanMetadataReportFile: diszkerteszAPI/.sonarqube/out/.sonar/report-task.txt
         
   docker:
-    runs-on: linux-latest
+    runs-on: ubuntu-latest
     steps:
     
       - name: "Checkout code"
