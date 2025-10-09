@@ -26,13 +26,6 @@ jobs:
           #Useful for SonarQube
           fetch-depth: 0
 
-      #- name: Cache SonarQube Cloud packages
-       # uses: actions/cache@v4
-        #with:
-         # path: ~\sonar\cache
-          #key: ${{ runner.os }}-sonar
-          #restore-keys: ${{ runner.os }}-sonar
-
       - name: Cache SonarQube Cloud packages
         uses: actions/cache@v4
         with:
@@ -40,13 +33,6 @@ jobs:
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
           
-     # - name: Cache SonarQube Cloud scanner
-      #  id: cache-sonar-scanner
-       # uses: actions/cache@v4
-        #with:
-         #path: ${{ runner.temp }}\scanner
-          #key: ${{ runner.os }}-sonar-scanner
-          #restore-keys: ${{ runner.os }}-sonar-scanner
 
       - name: Cache SonarQube Cloud scanner
         id: cache-sonar-scanner
@@ -85,3 +71,37 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
           scanMetadataReportFile: diszkerteszAPI/.sonarqube/out/.sonar/report-task.txt
+  docker:
+    runs-on: linux-latest
+    steps:
+      - name: "Checkout code"
+        uses: actions/checkout@v5
+        
+      - name: "Docker login"
+        uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: "Set up Docker Builder"
+        uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435
+
+      - name: "Build Image"
+        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83
+        with:
+          push: false
+          context: ./diszkerteszAPI
+          tags: ${{ secrets.DOCKER_USERNAME }}/diszkerteszAPI:pipeline
+
+      - name: "Docker Scout"
+        uses: docker/scout-action@f8c776824083494ab0d56b8105ba2ca85c86e4de
+        with:
+          command: quickview,cves
+          only-severities: critical,high
+
+
+
+
+
+        
+        
