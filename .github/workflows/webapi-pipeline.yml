@@ -8,6 +8,7 @@ on:
     #paths:
       #- 'diszkerteszAPI/**'
 
+
 jobs:
   sonar:
     runs-on: windows-latest
