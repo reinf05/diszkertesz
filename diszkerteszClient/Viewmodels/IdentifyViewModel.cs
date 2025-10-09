@@ -57,12 +57,13 @@ namespace diszkerteszClient.Viewmodels
         }
 
         [RelayCommand]
-        private async Task NewImageAsync()
+        private Task NewImage()
         {
             Image = null;
             imageBytes = null;
             IsLoaded = false;
             IsIdentified = false;
+            return Task.CompletedTask;
         }
 
         [RelayCommand]
