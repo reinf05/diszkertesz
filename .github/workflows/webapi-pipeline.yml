@@ -77,13 +77,6 @@ jobs:
           ${{ runner.temp }}\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
           Write-Host "=== END FINISHED ==="
           
-      - name: Debug – find report-task.txt
-        shell: powershell
-        run: |
-          Write-Host "Current directory: $PWD"
-          Get-ChildItem -Path $PWD -Recurse -Filter report-task.txt | ForEach-Object {
-            Write-Host "Found file at: $($_.FullName)"
-          }
       
       - name: "Set up Quality Gate"
         uses: SonarSource/sonarqube-quality-gate-action@cf038b0e0cdecfa9e56c198bbb7d21d751d62c3b
@@ -92,8 +85,3 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
           scanMetadataReportFile: diszkerteszAPI/.sonarqube/out/.sonar/report-task.txt
-
-      - name: "Example show SonarQube Quality Gate Status value"
-        if: always()
-        run: echo "The Quality Gate status is ${{ steps.sonarqube-quality-gate-check.outputs.quality-gate-status }}"
-
