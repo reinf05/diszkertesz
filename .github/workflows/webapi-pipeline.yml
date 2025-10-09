@@ -71,9 +71,11 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
           scanMetadataReportFile: diszkerteszAPI/.sonarqube/out/.sonar/report-task.txt
+        
   docker:
     runs-on: linux-latest
     steps:
+    
       - name: "Checkout code"
         uses: actions/checkout@v5
         
