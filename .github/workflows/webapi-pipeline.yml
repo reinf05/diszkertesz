@@ -94,7 +94,7 @@ jobs:
         with:
           push: false
           context: ./diszkerteszAPI
-          tags: ${{ secrets.DOCKER_USERNAME }}/diszkerteszAPI:pipeline
+          tags: ${{ secrets.DOCKER_USERNAME }}/diszkerteszapi:pipeline
 
       - name: "Docker Scout"
         uses: docker/scout-action@f8c776824083494ab0d56b8105ba2ca85c86e4de
