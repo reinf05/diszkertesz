@@ -74,12 +74,13 @@ namespace diszkerteszClient.Services
 
 
             var response = await httpClient.PostAsync(URL, form);
+            var responseString = await response.Content.ReadAsStringAsync();
 
-            if (response.IsSuccessStatusCode)
-            {
-                return await response.Content.ReadAsStringAsync();
+            if (response.IsSuccessStatusCode && !responseString.StartsWith("Error"))
+            { 
+                return responseString;
             }
-            return $"Error {response.StatusCode}\n{response.Content.ReadAsStringAsync()}";
+            return $"Error {response.StatusCode}\n{responseString}";
         }
     }
 }

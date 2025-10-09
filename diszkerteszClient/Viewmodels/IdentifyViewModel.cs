@@ -20,7 +20,7 @@ namespace diszkerteszClient.Viewmodels
         private PlantService plantService;
 
         [ObservableProperty]
-        private ImageSource image;
+        private ImageSource? image;
 
         private byte[]? imageBytes;
 
@@ -31,7 +31,7 @@ namespace diszkerteszClient.Viewmodels
         public bool IsNotIdentified => !IsIdentified;
 
         [ObservableProperty]
-        private IdentificationShow identificationShow;
+        private IdentificationShow? identificationShow;
 
         public IdentifyViewModel(PlantService plantService)
         {
@@ -73,15 +73,37 @@ namespace diszkerteszClient.Viewmodels
             string organ = "auto";
             if (imageBytes != null)
             {
+
                 string result = await plantService.Identify(imageBytes, organ);
-                IdentificationResult data = JsonSerializer.Deserialize<IdentificationResult>(result);
 
-                IdentificationShow temp = new();
-                temp.Percent = data.results[0].score * 100;
-                temp.Scientific = data.results[0].species.scientificNameWithoutAuthor;
-                temp.CommonNames = data.results[0].species.commonNames;
+                if (result.StartsWith("Error"))
+                {
+                    string errorMessage = string.Empty;
+                    if(result.Contains("NotFound"))
+                    {
+                        errorMessage = "Nem ismerhető fel a növény";
+                    }
+                    await Shell.Current.DisplayAlert("Hiba", "Azonosítási hiba: " + errorMessage, "OK");
+                    await NewImage();
+                    return;
+                }
+                try
+                {
+                    IdentificationResult data = JsonSerializer.Deserialize<IdentificationResult>(result);
+                    IdentificationShow temp = new();
+                    temp.Percent = data.results[0].score * 100;
+                    temp.Scientific = data.results[0].species.scientificNameWithoutAuthor;
+                    temp.CommonNames = data.results[0].species.commonNames;
 
-                IdentificationShow = temp;
+                    IdentificationShow = temp;
+                }
+                catch (Exception ex)
+                {
+                    await Shell.Current.DisplayAlert("Hiba", "Azonosítási hiba: " + ex.Message, "OK");
+                    return;
+                }
+
+
 
                 IsIdentified = true;
             }
