@@ -31,7 +31,6 @@ namespace diszkerteszAPI.Controllers
             return await _context.Plants.FindAsync(id);
         }
 
-
         //[HttpGet("details")]
         //public async Task<IEnumerable<Detail>> GetDetails()
         //{
