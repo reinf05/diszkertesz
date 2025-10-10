@@ -68,7 +68,6 @@ jobs:
           
       - name: Debug Quality Gate Check
         run: |
-          set -x # Print the command being executed
           curl -u "${{ secrets.SONAR_TOKEN }}:" "https://sonarcloud.io/api/qualitygates/project_status?projectKey=reinf05_diszkertesz"
       
       - name: "Set up Quality Gate"
