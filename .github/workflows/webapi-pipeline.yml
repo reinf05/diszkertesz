@@ -139,7 +139,7 @@ jobs:
       - name: "Get current git tag"
         id: tag
         uses: devops-actions/action-get-tag@4e13c4ea459efa2988a10d5ff0f252bb097929ef
-              
+        
       - name: "Save tag"
         run: echo "TAG=${{ steps.tag.outputs.tag }}" >> $GITHUB_ENV
 
