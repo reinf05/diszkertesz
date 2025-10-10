@@ -6,6 +6,7 @@ on:
       - dev
     paths:
       - 'diszkerteszAPI/**'
+  workflow_dispatch:
 
 jobs:
   sonar:
