@@ -4,10 +4,8 @@ on:
   push:
     branches:
       - dev
-      - main
-  workflow_dispatch:
-    #paths:
-      #- 'diszkerteszAPI/**'
+    paths:
+      - 'diszkerteszAPI/**'
 
 
 jobs:
