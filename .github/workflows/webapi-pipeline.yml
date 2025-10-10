@@ -58,6 +58,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         shell: powershell
         run: |
+          $tag_name = "${{ github.ref_name }}"
           Write-Host "=== SonarScanner BEGIN ==="
           ${{ runner.temp }}\scanner\dotnet-sonarscanner begin /k:"reinf05_diszkertesz" /o:"reinf05" /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
           Write-Host "=== PROJECT BUILD ==="
@@ -68,7 +69,7 @@ jobs:
           
       - name: Debug Quality Gate Check
         run: |
-          curl -u "${{ secrets.SONAR_TOKEN }}:" "https://sonarcloud.io/api/qualitygates/project_status?projectKey=reinf05_diszkertesz"
+          curl -u "${{ secrets.SONAR_TOKEN }}:" "https://sonarcloud.io/api/qualitygates/project_status?projectKey=reinf05_diszkertesz&branch=${{ github.ref_name }}"
       
       - name: "Set up Quality Gate"
         uses: SonarSource/sonarqube-quality-gate-action@cf038b0e0cdecfa9e56c198bbb7d21d751d62c3b
@@ -77,6 +78,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
           scanMetadataReportFile: diszkerteszAPI/.sonarqube/out/.sonar/report-task.txt
+          
         
   docker:
     runs-on: ubuntu-latest
