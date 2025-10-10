@@ -1,0 +1,135 @@
+name: WebAPI Pipeline
+
+on:
+  push:
+    branches:
+      - dev
+    paths:
+      - 'diszkerteszAPI/**'
+
+
+jobs:
+  sonar:
+    runs-on: windows-latest
+    steps:
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: 'zulu' # Alternative distribution options are available
+
+      - name: "Checkout code"
+        uses: actions/checkout@v5
+        with:
+          #Useful for SonarQube
+          fetch-depth: 0
+
+      - name: Cache SonarQube Cloud packages
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.home }}/sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+          
+
+      - name: Cache SonarQube Cloud scanner
+        id: cache-sonar-scanner
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}/scanner
+          key: ${{ runner.os }}-sonar-scanner
+          restore-keys: ${{ runner.os }}-sonar-scanner
+          
+      - name: Install SonarQube Cloud scanner
+        if: steps.cache-sonar-scanner.outputs.cache-hit != 'true'
+        shell: powershell
+        run: |
+          New-Item -Path ${{ runner.temp }}\scanner -ItemType Directory
+          dotnet tool update dotnet-sonarscanner --tool-path ${{ runner.temp }}\scanner
+          
+      - name: Build and analyze
+        working-directory: diszkerteszAPI
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        shell: powershell
+        run: |
+          Write-Host "=== SonarScanner BEGIN ==="
+          ${{ runner.temp }}\scanner\dotnet-sonarscanner begin /k:"reinf05_diszkertesz" /o:"reinf05" /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+          Write-Host "=== PROJECT BUILD ==="
+          dotnet build
+          Write-Host "=== SonarScanner  END ==="
+          ${{ runner.temp }}\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+          Write-Host "=== END FINISHED ==="
+          
+      
+      - name: "Set up Quality Gate"
+        uses: SonarSource/sonarqube-quality-gate-action@cf038b0e0cdecfa9e56c198bbb7d21d751d62c3b
+        id: sonarqube-quality-gate-check
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          scanMetadataReportFile: diszkerteszAPI/.sonarqube/out/.sonar/report-task.txt
+        
+  docker:
+    runs-on: ubuntu-latest
+    needs: sonar
+    steps:
+    
+      - name: "Checkout code"
+        uses: actions/checkout@v5
+        
+      - name: "Docker login"
+        uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: "Set up Docker Builder"
+        uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435
+
+      - name: "Build Image"
+        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83
+        with:
+          push: false
+          context: ./diszkerteszAPI
+          tags: ${{ secrets.DOCKER_USERNAME }}/diszkerteszapi:pipeline
+
+      - name: "Docker Scout"
+        uses: docker/scout-action@f8c776824083494ab0d56b8105ba2ca85c86e4de
+        with:
+          command: quickview,cves
+          only-severities: critical,high
+
+      - name: "Push image to DockerHub"
+        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83
+        with:
+          load: true
+          push: true
+          context: ./diszkerteszAPI
+          tags: ${{ secrets.DOCKER_USERNAME }}/diszkerteszapi:${GITHUB_REF##*/}
+        
+
+  deploy:
+    runs-on: windows-latest
+    needs: [sonar,docker]
+    env:
+      REGISTRY_URL: docker.io
+    steps:
+
+      - name: "Azure Login"
+        uses: Azure/login@v2.3.0
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: "Deploy Container App to Azure"
+        uses: Azure/container-apps-deploy-action@8dff69dac3367c32ceb2690d8f13adbeab462703
+        with:
+          registryUrl: ${{ env.REGISTRY_URL }}
+          registryUsername: ${{ secrets.DOCKER_USERNAME }}
+          registryPassword: ${{ secrets.DOCKER_PASSWORD }}
+          imageToDeploy: ${{ env.REGISTRY_URL }}/${{ secrets.DOCKER_USERNAME }}/diszkerteszapi:pipeline
+          containerAppName: ca-diszkertesz-gerwest-dev-001
+          resourceGroup: rg-diszkertesz-gerwest-dev-001
+          containerAppEnvironment: caenv-diszkertesz-gerwest-dev-001
+                
