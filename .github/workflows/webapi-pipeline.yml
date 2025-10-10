@@ -116,7 +116,7 @@ jobs:
     runs-on: windows-latest
     needs: [sonar,docker]
     env:
-      REGISTRY_URL: https://hub.docker.com/
+      REGISTRY_URL: docker.io
     steps:
 
       - name: "Azure Login"
