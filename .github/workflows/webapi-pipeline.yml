@@ -6,8 +6,6 @@ on:
       - dev
     paths:
       - 'diszkerteszAPI/**'
-  workflow_dispatch:
-
 
 jobs:
   sonar:
@@ -70,7 +68,7 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
-          scanMetadataReportFile: .sonarqube/out/.sonar/report-task.txt
+          scanMetadataReportFile: diszkerteszAPI/.sonarqube/out/.sonar/report-task.txt
         
   docker:
     runs-on: ubuntu-latest
