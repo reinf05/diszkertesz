@@ -93,6 +93,9 @@ jobs:
         id: tag
         uses: devops-actions/action-get-tag@4e13c4ea459efa2988a10d5ff0f252bb097929ef
 
+      - name: "Write tag"
+        run: echo ${{ steps.tag.outputs.tag }}
+
       - name: "Build Image"
         uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83
         with:
