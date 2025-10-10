@@ -136,13 +136,17 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
+      - name: "Get current git tag"
+        id: tag
+        uses: devops-actions/action-get-tag@4e13c4ea459efa2988a10d5ff0f252bb097929ef
+
       - name: "Deploy Container App to Azure"
         uses: Azure/container-apps-deploy-action@8dff69dac3367c32ceb2690d8f13adbeab462703
         with:
           registryUrl: ${{ env.REGISTRY_URL }}
           registryUsername: ${{ secrets.DOCKER_USERNAME }}
           registryPassword: ${{ secrets.DOCKER_PASSWORD }}
-          imageToDeploy: ${{ env.REGISTRY_URL }}/${{ secrets.DOCKER_USERNAME }}/diszkerteszapi:${{ env.TAG }}
+          imageToDeploy: ${{ env.REGISTRY_URL }}/${{ secrets.DOCKER_USERNAME }}/diszkerteszapi:${{ steps.tag.outputs.tag }}
           containerAppName: ca-diszkertesz-gerwest-dev-001
           resourceGroup: rg-diszkertesz-gerwest-dev-001
           containerAppEnvironment: caenv-diszkertesz-gerwest-dev-001
