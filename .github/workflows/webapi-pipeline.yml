@@ -107,7 +107,7 @@ jobs:
           load: true
           push: true
           context: ./diszkerteszAPI
-          tags: ${{ secrets.DOCKER_USERNAME }}/diszkerteszapi:pipeline
+          tags: ${{ secrets.DOCKER_USERNAME }}/diszkerteszapi:${GITHUB_REF##*/}
         
 
   deploy:
