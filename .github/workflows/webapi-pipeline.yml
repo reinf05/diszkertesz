@@ -59,9 +59,8 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         shell: powershell
         run: |
-          $tag_name = "${{ github.ref_name }}"
           Write-Host "=== SonarScanner BEGIN ==="
-          ${{ runner.temp }}\scanner\dotnet-sonarscanner begin /k:"reinf05_diszkertesz" /o:"reinf05" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.branch.name="$ref_name"
+          ${{ runner.temp }}\scanner\dotnet-sonarscanner begin /k:"reinf05_diszkertesz" /o:"reinf05" /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
           Write-Host "=== PROJECT BUILD ==="
           dotnet build
           Write-Host "=== SonarScanner  END ==="
