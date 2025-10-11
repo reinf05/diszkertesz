@@ -94,7 +94,7 @@ jobs:
 
       - name: "Get short SHA"
         run: |
-          SHORT_SHA ="${{ github.sha }}:0:7"
+          SHORT_SHA="${{ github.sha }}:0:7"
           echo "commit_sha=$SHORT_SHA" >> $GITHUB_OUTPUT
 
       - name: "Build Image"
@@ -139,7 +139,7 @@ jobs:
 
       - name: "Get short SHA"
         run: |
-          SHORT_SHA ="${{ github.sha }}:0:7"
+          SHORT_SHA="${{ github.sha }}:0:7"
           echo "commit_sha=$SHORT_SHA" >> $GITHUB_OUTPUT
 
       - name: "Deploy Container App to Azure"
