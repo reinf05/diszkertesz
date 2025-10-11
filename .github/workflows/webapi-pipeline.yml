@@ -133,7 +133,7 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: "Get meta"
+      - name: "Docker meta"
         uses: docker/metadata-action@c1e51972afc2121e065aed6d45c65596fe445f3f
         id: metadata
         tags: |
