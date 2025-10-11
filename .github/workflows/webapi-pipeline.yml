@@ -1,12 +1,18 @@
 name: WebAPI Pipeline
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - dev
-    paths:
-      - 'diszkerteszAPI/**'
-  workflow_dispatch:
+      - main
+    #paths:
+     # - 'diszkerteszAPI/**'
+    tags:
+      - '*'
+env:
+    TAG: latest_pipeline
+
 
 jobs:
   sonar:
@@ -62,6 +68,9 @@ jobs:
           ${{ runner.temp }}\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
           Write-Host "=== END FINISHED ==="
           
+      - name: Debug Quality Gate Check
+        run: |
+          curl -u "${{ secrets.SONAR_TOKEN }}:" "https://sonarcloud.io/api/qualitygates/project_status?projectKey=reinf05_diszkertesz&branch=${{ github.ref_name }}"
       
       - name: "Set up Quality Gate"
         uses: SonarSource/sonarqube-quality-gate-action@cf038b0e0cdecfa9e56c198bbb7d21d751d62c3b
@@ -70,6 +79,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
           scanMetadataReportFile: diszkerteszAPI/.sonarqube/out/.sonar/report-task.txt
+          
         
   docker:
     runs-on: ubuntu-latest
@@ -88,12 +98,19 @@ jobs:
       - name: "Set up Docker Builder"
         uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435
 
+      - name: "Docker meta"
+        uses: docker/metadata-action@c1e51972afc2121e065aed6d45c65596fe445f3f
+        id: metadata
+
       - name: "Build Image"
         uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83
         with:
           push: false
           context: ./diszkerteszAPI
-          tags: ${{ secrets.DOCKER_USERNAME }}/diszkerteszapi:pipeline
+          tags: ${{ secrets.DOCKER_USERNAME }}/diszkerteszapi:${{ steps.metadata.outputs.tags }}
+
+      - name: "Write tag"
+        run: echo ${{ steps.metadata.outputs.tags }}
 
       - name: "Docker Scout"
         uses: docker/scout-action@f8c776824083494ab0d56b8105ba2ca85c86e4de
@@ -107,11 +124,11 @@ jobs:
           load: true
           push: true
           context: ./diszkerteszAPI
-          tags: ${{ secrets.DOCKER_USERNAME }}/diszkerteszapi:${GITHUB_REF##*/}
+          tags: ${{ secrets.DOCKER_USERNAME }}/diszkerteszapi:${{ steps.metadata.outputs.tags }}
         
 
   deploy:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     needs: [sonar,docker]
     env:
       REGISTRY_URL: docker.io
@@ -122,18 +139,19 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
+      - name: "Get meta"
+        uses: docker/metadata-action@c1e51972afc2121e065aed6d45c65596fe445f3f
+        id: metadata
+
       - name: "Deploy Container App to Azure"
         uses: Azure/container-apps-deploy-action@8dff69dac3367c32ceb2690d8f13adbeab462703
         with:
           registryUrl: ${{ env.REGISTRY_URL }}
           registryUsername: ${{ secrets.DOCKER_USERNAME }}
           registryPassword: ${{ secrets.DOCKER_PASSWORD }}
-          imageToDeploy: ${{ env.REGISTRY_URL }}/${{ secrets.DOCKER_USERNAME }}/diszkerteszapi:pipeline
+          imageToDeploy: ${{ env.REGISTRY_URL }}/${{ secrets.DOCKER_USERNAME }}/diszkerteszapi:${{ steps.metadata.outputs.tags }}
           containerAppName: ca-diszkertesz-gerwest-dev-001
           resourceGroup: rg-diszkertesz-gerwest-dev-001
           containerAppEnvironment: caenv-diszkertesz-gerwest-dev-001
+          
                 
-
-
-        
-        
