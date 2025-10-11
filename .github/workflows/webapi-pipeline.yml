@@ -145,7 +145,7 @@ jobs:
       - name: "Deploy Container App to Azure"
         uses: Azure/container-apps-deploy-action@8dff69dac3367c32ceb2690d8f13adbeab462703
         with:
-          imageToDeploy: ${{ env.REGISTRY_URL }}/${{ secrets.DOCKER_USERNAME }}/diszkerteszapi:${{ steps.short_sha.outputs.short }}
+          imageToDeploy: ${{ env.REGISTRY_URL }}/${{ secrets.DOCKER_USERNAME }}/diszkerteszapi:${{ steps.metadata.outputs.version }}
           containerAppName: ca-diszkertesz-gerwest-dev-001
           resourceGroup: rg-diszkertesz-gerwest-dev-001
           containerAppEnvironment: caenv-diszkertesz-gerwest-dev-001
