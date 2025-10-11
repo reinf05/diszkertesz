@@ -92,18 +92,12 @@ jobs:
       - name: "Set up Docker Builder"
         uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435
 
-      - name: "Get short SHA"
-        run: |
-          SHORT_SHA=${${{ github.sha }}:0:7}
-          echo "commit_sha=$SHORT_SHA" >> $GITHUB_OUTPUT
-          echo $commit_sha
-
       - name: "Build Image"
         uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83
         with:
           push: false
           context: ./diszkerteszAPI
-          tags: ${{ secrets.DOCKER_USERNAME }}/diszkerteszapi:${{ steps.short_sha.outputs.short }}
+          tags: ${{ secrets.DOCKER_USERNAME }}/diszkerteszapi:${{ github.sha }}
 
       - name: "Docker Scout"
         uses: docker/scout-action@f8c776824083494ab0d56b8105ba2ca85c86e4de
@@ -117,7 +111,7 @@ jobs:
           load: true
           push: true
           context: ./diszkerteszAPI
-          tags: ${{ secrets.DOCKER_USERNAME }}/diszkerteszapi:${{ steps.short_sha.outputs.short }}
+          tags: ${{ secrets.DOCKER_USERNAME }}/diszkerteszapi:${{ github.sha }}
         
 
   deploy:
@@ -138,15 +132,10 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: "Get short SHA"
-        run: |
-          SHORT_SHA="${{ github.sha }}:0:7"
-          echo "commit_sha=$SHORT_SHA" >> $GITHUB_OUTPUT
-
       - name: "Deploy Container App to Azure"
         uses: Azure/container-apps-deploy-action@8dff69dac3367c32ceb2690d8f13adbeab462703
         with:
-          imageToDeploy: ${{ env.REGISTRY_URL }}/${{ secrets.DOCKER_USERNAME }}/diszkerteszapi:${{ steps.metadata.outputs.version }}
+          imageToDeploy: ${{ env.REGISTRY_URL }}/${{ secrets.DOCKER_USERNAME }}/diszkerteszapi:${{ github.sha }}
           containerAppName: ca-diszkertesz-gerwest-dev-001
           resourceGroup: rg-diszkertesz-gerwest-dev-001
           containerAppEnvironment: caenv-diszkertesz-gerwest-dev-001
