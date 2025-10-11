@@ -99,6 +99,9 @@ jobs:
          tags: |
             type=ref,event=branch
             type=ref,event=tag
+      
+      - name: "Debug"
+        run: echo ${{ steps.metadata.outputs.tags }}
 
       - name: "Build Image"
         uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83
@@ -112,6 +115,9 @@ jobs:
         with:
           command: quickview,cves
           only-severities: critical,high
+
+      - name: "Debug"
+        run: echo ${{ steps.metadata.outputs.tags }}
 
       - name: "Push image to DockerHub"
         uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83
