@@ -96,6 +96,7 @@ jobs:
         run: |
           SHORT_SHA=${${{ github.sha }}:0:7}
           echo "commit_sha=$SHORT_SHA" >> $GITHUB_OUTPUT
+          echo $commit_sha
 
       - name: "Build Image"
         uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83
