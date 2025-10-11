@@ -68,9 +68,6 @@ jobs:
           ${{ runner.temp }}\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
           Write-Host "=== END FINISHED ==="
           
-      - name: Debug Quality Gate Check
-        run: |
-          curl -u "${{ secrets.SONAR_TOKEN }}:" "https://sonarcloud.io/api/qualitygates/project_status?projectKey=reinf05_diszkertesz&branch=${{ github.ref_name }}"
       
       - name: "Set up Quality Gate"
         uses: SonarSource/sonarqube-quality-gate-action@cf038b0e0cdecfa9e56c198bbb7d21d751d62c3b
@@ -123,7 +120,7 @@ jobs:
           load: true
           push: true
           context: ./diszkerteszAPI
-          tags: ${{ secrets.DOCKER_USERNAME }}/diszkerteszapi:${{ steps.metadata.outputs.tags }}
+          tags: ${{ secrets.DOCKER_USERNAME }}/diszkerteszapi:${{ github.sha }}
         
 
   deploy:
@@ -148,7 +145,7 @@ jobs:
           registryUrl: ${{ env.REGISTRY_URL }}
           registryUsername: ${{ secrets.DOCKER_USERNAME }}
           registryPassword: ${{ secrets.DOCKER_PASSWORD }}
-          imageToDeploy: ${{ env.REGISTRY_URL }}/${{ secrets.DOCKER_USERNAME }}/diszkerteszapi:${{ steps.metadata.outputs.version }}
+          imageToDeploy: ${{ env.REGISTRY_URL }}/${{ secrets.DOCKER_USERNAME }}/diszkerteszapi:${{ github.sha }}
           containerAppName: ca-diszkertesz-gerwest-dev-001
           resourceGroup: rg-diszkertesz-gerwest-dev-001
           containerAppEnvironment: caenv-diszkertesz-gerwest-dev-001
