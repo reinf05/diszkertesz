@@ -6,8 +6,8 @@ on:
     branches:
       - dev
       - main
-    paths:
-      - 'diszkerteszAPI/**'
+    #paths:
+      #- 'diszkerteszAPI/**'
     tags:
       - '*'
 
@@ -149,4 +149,3 @@ jobs:
           containerAppName: ca-diszkertesz-gerwest-dev-001
           resourceGroup: rg-diszkertesz-gerwest-dev-001
           containerAppEnvironment: caenv-diszkertesz-gerwest-dev-001
-          
