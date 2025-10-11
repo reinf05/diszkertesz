@@ -95,6 +95,9 @@ jobs:
       - name: "Docker meta"
         uses: docker/metadata-action@c1e51972afc2121e065aed6d45c65596fe445f3f
         id: metadata
+        tags: |
+          type=ref,event=branch
+          type=ref,event=tag
 
       - name: "Build Image"
         uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83
@@ -133,6 +136,9 @@ jobs:
       - name: "Get meta"
         uses: docker/metadata-action@c1e51972afc2121e065aed6d45c65596fe445f3f
         id: metadata
+        tags: |
+          type=ref,event=branch
+          type=ref,event=tag
 
       - name: "Docker login"
         uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef
