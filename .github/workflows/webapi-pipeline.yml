@@ -10,8 +10,6 @@ on:
       - 'diszkerteszAPI/**'
     tags:
       - '*'
-env:
-    TAG: latest_pipeline
 
 
 jobs:
