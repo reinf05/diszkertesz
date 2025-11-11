@@ -9,6 +9,7 @@ using diszkerteszClient.Services;
 using System.Diagnostics;
 using CommunityToolkit.Mvvm.Input;
 using diszkerteszClient.View;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace diszkerteszClient.Viewmodels
 {
@@ -20,6 +21,9 @@ namespace diszkerteszClient.Viewmodels
         public ObservableCollection<Plant> PlantList { get; } = new();
         private FullPlant fullPlant;
         private readonly string baseURL = "https://stdiszkerteszgerdev001.blob.core.windows.net/images/";
+
+        [ObservableProperty] //Does not stall UI, but stalls not needed invocations of functions
+        public bool isBusyMore = false;
         public MainViewModel(PlantService plantService)
         {
             this.Title = "Dísznövények";
@@ -84,17 +88,20 @@ namespace diszkerteszClient.Viewmodels
         //    }
         //}
 
-        [RelayCommand]
+
+        public bool CanLoadMore => !IsBusy && !IsBusyMore && _canLoadNextPage; //Helper function
+        //This will stop the user from scrolling more when there is data loading
+        [RelayCommand(CanExecute = nameof(CanLoadMore))]
         async Task GetMorePageAsync()
         {
-            if (IsBusy)
+            if (IsBusy || IsBusyMore || !_canLoadNextPage)
             {
                 return;
             }
             try
             {
-                LoadPageAsync();
-
+                IsBusyMore = true;
+                await LoadPageAsync();
             }
 
             catch (Exception ex)
@@ -104,11 +111,9 @@ namespace diszkerteszClient.Viewmodels
             }
             finally
             {
-                if (_canLoadNextPage)
-                {
-                    _currentPage++;
-                }
+                IsBusyMore = false;
             }
+
         }
 
 
@@ -137,15 +142,12 @@ namespace diszkerteszClient.Viewmodels
             finally
             {
                 IsBusy = false;
-                if (_canLoadNextPage)
-                {
-                    _currentPage++;
-                }
             }
         }
 
         private async Task LoadPageAsync()
         {
+
             var page = await plantService.GetPlantPageAsync(_currentPage);
 
             foreach (var plant in page.Items)
@@ -155,6 +157,10 @@ namespace diszkerteszClient.Viewmodels
                 PlantList.Add(plant);
             }
             _canLoadNextPage = page.HasNextPage;
+            if (_canLoadNextPage)
+            {
+                _currentPage++;
+            }
         }
 
         //[RelayCommand]

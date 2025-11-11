@@ -15,7 +15,7 @@
             Grid.ColumnSpan="2"
             ItemsSource="{Binding PlantList}"
             SelectionMode="None"
-            RemainingItemsThreshold="5"
+            RemainingItemsThreshold="3"
             RemainingItemsThresholdReachedCommand="{Binding GetMorePageCommand}">
 
             <CollectionView.ItemTemplate>
