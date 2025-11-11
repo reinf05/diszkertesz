@@ -23,7 +23,6 @@ namespace diszkerteszAPI
 
             //Used for Azure SQL
             var sqlConnectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-            sqlConnectionString = "Server=tcp:sqlserver-diszkertesz-001.database.windows.net,1433;Initial Catalog=sqldb-diszkertesz-001;Persist Security Info=False;User ID=feri;Password=Nyul9ag6l3?;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
             builder.Services.AddDbContext<diszkerteszDbContext>(options => options.UseAzureSql(sqlConnectionString));
 
             builder.Services.AddControllers();
