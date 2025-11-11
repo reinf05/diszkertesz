@@ -28,19 +28,30 @@ namespace diszkerteszAPI.Controllers
         }
 
         [HttpGet("plants/{pageNum}")]
-        public async Task<ActionResult<Plant>> GetPlantByPage(int pageNum = 1)
+        public async Task<Page> GetPlantByPage(int pageNum = 1)
         {
-            if(pageNum < 1) pageNum = 1;
-            int MaxPage = (int)Math.Ceiling((double) _context.Plants.Count() / pageSize);
-            if (pageNum > MaxPage) pageNum = MaxPage;
+            if(pageNum < 1)
+            {
+                pageNum = 1;
+            }
+            int totalCount = await _context.Plants.CountAsync();
+            int totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
 
-            var page = await _context.Plants
+            if(pageNum > totalPages) pageNum = totalPages;
+
+            var plants = await _context.Plants
                 .OrderBy(p => p.ID)
                 .Skip((pageNum - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
 
-            return Ok(page);
+            return new Page()
+            {
+                Plants = plants,
+                PageNumber = pageNum,
+                TotalPages = totalPages,
+                TotalCount = totalCount
+            };
         }
 
 
@@ -138,40 +149,40 @@ namespace diszkerteszAPI.Controllers
             return returnquiz;
         }
 
-        [HttpPost("identify")]
-        public async Task<string> Identify([FromForm] IFormFile images, [FromForm] string organs)
-        {
+        //[HttpPost("identify")]
+        //public async Task<string> Identify([FromForm] IFormFile images, [FromForm] string organs)
+        //{
 
-            if (images == null || string.IsNullOrEmpty(organs))
-                return "Error: missing data";
+        //    if (images == null || string.IsNullOrEmpty(organs))
+        //        return "Error: missing data";
 
-            var stream = images.OpenReadStream();
-            var content = new MultipartFormDataContent();
-            content.Add(new StreamContent(stream), "images", "image.jpeg");
-            content.Add(new StringContent(organs), "organs");
+        //    var stream = images.OpenReadStream();
+        //    var content = new MultipartFormDataContent();
+        //    content.Add(new StreamContent(stream), "images", "image.jpeg");
+        //    content.Add(new StringContent(organs), "organs");
 
-            string project = "all";
-            string apiKey = Environment.GetEnvironmentVariable("API-KEY");
-            if (apiKey == null)
-            {
-                return "Error: API key not found";
-            }
-            string URL = $"https://my-api.plantnet.org/v2/identify/{project}?api-key={apiKey}";
+        //    string project = "all";
+        //    string apiKey = Environment.GetEnvironmentVariable("API-KEY");
+        //    if (apiKey == null)
+        //    {
+        //        return "Error: API key not found";
+        //    }
+        //    string URL = $"https://my-api.plantnet.org/v2/identify/{project}?api-key={apiKey}";
 
-            HttpClient client = new HttpClient();
+        //    HttpClient client = new HttpClient();
 
-            var response = await client.PostAsync(URL, content);
+        //    var response = await client.PostAsync(URL, content);
 
-            if (response.IsSuccessStatusCode)
-            {
-                var jsonResponse = await response.Content.ReadAsStringAsync();
-                return jsonResponse;
-            }
-            else
-            {
-                return $"Error: {response.StatusCode}";
-            }
-        }
+        //    if (response.IsSuccessStatusCode)
+        //    {
+        //        var jsonResponse = await response.Content.ReadAsStringAsync();
+        //        return jsonResponse;
+        //    }
+        //    else
+        //    {
+        //        return $"Error: {response.StatusCode}";
+        //    }
+        //}
 
     }
 }

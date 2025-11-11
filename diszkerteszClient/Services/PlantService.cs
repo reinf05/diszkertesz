@@ -19,31 +19,33 @@ namespace diszkerteszClient.Services
             httpClient = new();
         }
 
-        public async Task<List<Plant>> GetAllPlants()
-        {
-            if(plants.Count > 0)
-            {
-                return plants;
-            }
+        //public async Task<List<Plant>> GetAllPlants()
+        //{
+        //    if(plants.Count > 0)
+        //    {
+        //        return plants;
+        //    }
 
-            string URL = baseURL + "plants";
-            var response = await httpClient.GetAsync(URL);
-            if (response.IsSuccessStatusCode)
-            {
-                plants = await response.Content.ReadFromJsonAsync<List<Plant>>();
-                return plants;
-            }
-            return null;
-        }
+        //    string URL = baseURL + "plants";
+        //    var response = await httpClient.GetAsync(URL);
+        //    if (response.IsSuccessStatusCode)
+        //    {
+        //        plants = await response.Content.ReadFromJsonAsync<List<Plant>>();
+        //        return plants;
+        //    }
+        //    return null;
+        //}
 
-        public async Task<List<Plant>> GetPlantPageAsync(int pageNum)
+        public async Task<Page<Plant>> GetPlantPageAsync(int pageNum)
         {
             string URL = baseURL + "plants/" + pageNum;
             var response = await httpClient.GetAsync(URL);
 
             if (response.IsSuccessStatusCode)
             {
-                return await response.Content.ReadFromJsonAsync<List<Plant>>();
+                //Problem here
+                var asd = await response.Content.ReadFromJsonAsync<Page<Plant>>();
+                return asd;
             }
             return null;
         }

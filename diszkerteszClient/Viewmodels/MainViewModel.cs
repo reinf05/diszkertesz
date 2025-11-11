@@ -16,6 +16,7 @@ namespace diszkerteszClient.Viewmodels
     {
         private PlantService plantService;
         private int _currentPage = 1;
+        private bool _canLoadNextPage = true;
         public ObservableCollection<Plant> PlantList { get; } = new();
         private FullPlant fullPlant;
         private readonly string baseURL = "https://stdiszkerteszgerdev001.blob.core.windows.net/images/";
@@ -38,8 +39,53 @@ namespace diszkerteszClient.Viewmodels
              });
         }
 
+        //[RelayCommand]
+        //async Task GetPageAsync(bool first = false)
+        //{
+        //    if (IsBusy)
+        //    {
+        //        return;
+        //    }
+        //    try
+        //    {
+        //        if (first)
+        //        {
+        //            IsBusy = true;
+        //        }
+        //        if (_canLoadNextPage)
+        //        {
+        //            var page = await plantService.GetPlantPageAsync(_currentPage);
+
+        //            foreach (var plant in page.Items)
+        //            {
+        //                string path = plant.Imagepath;
+        //                plant.Imagepath = baseURL + path;
+        //                PlantList.Add(plant);
+        //            }
+        //            _canLoadNextPage = page.HasNextPage;
+        //        }
+
+        //        IsLoaded = true;
+
+        //    }
+
+        //    catch (Exception ex)
+        //    {
+        //        Debug.WriteLine(ex);
+        //        await Shell.Current.DisplayAlert("Error", ex.Message, "OK");
+        //    }
+        //    finally
+        //    {
+        //        IsBusy = false;
+        //        if (_canLoadNextPage) 
+        //        { 
+        //            _currentPage++;
+        //        }
+        //    }
+        //}
+
         [RelayCommand]
-        async Task GetPageAsync(bool first = false)
+        async Task GetMorePageAsync()
         {
             if (IsBusy)
             {
@@ -47,19 +93,38 @@ namespace diszkerteszClient.Viewmodels
             }
             try
             {
-                if (first)
-                {
-                    IsBusy = true;
-                }
-                var plants = await plantService.GetPlantPageAsync(_currentPage);
+                LoadPageAsync();
 
-                foreach (var plant in plants)
+            }
+
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex);
+                await Shell.Current.DisplayAlert("Error", ex.Message, "OK");
+            }
+            finally
+            {
+                if (_canLoadNextPage)
                 {
-                    string path = plant.Imagepath;
-                    plant.Imagepath = baseURL + path;
-                    PlantList.Add(plant);
+                    _currentPage++;
                 }
-                
+            }
+        }
+
+
+        [RelayCommand]
+        async Task GetFirstPageAsync()
+        {
+            if (IsBusy)
+            {
+                return;
+            }
+            try
+            {
+                IsBusy = true;
+
+                await LoadPageAsync();
+
                 IsLoaded = true;
 
             }
@@ -72,8 +137,24 @@ namespace diszkerteszClient.Viewmodels
             finally
             {
                 IsBusy = false;
-                _currentPage++;
+                if (_canLoadNextPage)
+                {
+                    _currentPage++;
+                }
             }
+        }
+
+        private async Task LoadPageAsync()
+        {
+            var page = await plantService.GetPlantPageAsync(_currentPage);
+
+            foreach (var plant in page.Items)
+            {
+                string path = plant.Imagepath;
+                plant.Imagepath = baseURL + path;
+                PlantList.Add(plant);
+            }
+            _canLoadNextPage = page.HasNextPage;
         }
 
         //[RelayCommand]
