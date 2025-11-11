@@ -12,6 +12,8 @@ namespace diszkerteszAPI.Controllers
     [Route("[controller]")]
     public class PlantController : ControllerBase
     {
+        private readonly int pageSize = 10;
+
         private readonly diszkerteszDbContext _context;
         public PlantController(diszkerteszDbContext context)
         {
@@ -25,10 +27,20 @@ namespace diszkerteszAPI.Controllers
 
         }
 
-        [HttpGet("plants/{id}")]
-        public async Task<ActionResult<Plant>> GetPlantById(int id)
+        [HttpGet("plants/{pageNum}")]
+        public async Task<ActionResult<Plant>> GetPlantByPage(int pageNum = 1)
         {
-            return await _context.Plants.FindAsync(id);
+            if(pageNum < 1) pageNum = 1;
+            int MaxPage = (int)Math.Ceiling((double) _context.Plants.Count() / pageSize);
+            if (pageNum > MaxPage) pageNum = MaxPage;
+
+            var page = await _context.Plants
+                .OrderBy(p => p.ID)
+                .Skip((pageNum - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return Ok(page);
         }
 
 
