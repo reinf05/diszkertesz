@@ -1,9 +1,12 @@
 # Megvalósítás
 ## Szerver
+**A fizikai szervert felváltotta egy felhőn alapuló megoldás. Lásd serverdocumentation.md**
+
 A szervert egy itthoni számítógép fogja futtatni, amelyre telepítettem az UbuntuServer x.x verzióját.
 A könnyebb fejlesztés, debugolás, mobilitás valamint scalelés miatt a szolgáltatások Docker konténerekben fognak futni, amelyeket egy Docker Compose fájl ofg összefogni. Ehhez telepítettem a szerverre a Docker Engine-t, ahogy a dokumentáció írja.
 
 Mivel minden szolgáltatás Docker Compose által fut, ezért létre hoztam egy compose.yaml fájlt, amelyben deklaráltam a különböző szolgáltatásokat (postgres, pgadmin4, webapi) és azok szükséges konfigurációit.
+
 ### Adatbázis
 Az adatbázis megvalósításához telepítettem a postgres Docker konténerét, hogy azt tudjam futtatni Docker Compose fájl segítségével.
 
@@ -17,9 +20,7 @@ Hogy az adatbázist könnyebb legyen konfigurálni és adatokkal feltölteni, te
 
 Portok: 8080:80
 
-ENVIRONMENTAL VARIABLES:
-PGADMIN_DEFAULT_EMAIL: rferko@gmail.com
-PGADMIN_DEFAULT_PASSWORD: feri
+Környezeti változókban meg kell adni: PGADMIN_DEFAULT_EMAIL, PGADMIN_DEFAULT_PASSWORD
 
 Ezután beléptem a pgadmin-ba (192.168.1.151:8080), és létre hoztam az adatbázist, valamint a táblákat.
 <img width="644" height="452" alt="image" src="https://github.com/user-attachments/assets/ba8a42c1-b250-4ca7-ad77-4460883f77bc" />
@@ -38,42 +39,59 @@ Először a kapcsolatot létesítjük az adatbázis szerverrel, ehhez NuGet csom
 Létre hoztam még két modelt, hogy az API endpointok könnyebben tudjanak visszaadni különböző típusú adatot, a különböző igényekhez. Ez a Fullplant.cs, ahol egy növény összes adata (a két tábla: Plants és Details) megtalálható, valamint egy Quiz.cs fájlt, amely a növényfelismerésben fog segíteni.
 
 Létre hozzuk az API endpointokat:
-/plant/plants: Visszaad egy listát az összes növényről a Plants táblában.
-/plant/plants/{id}: Visszaad egy növényt a Plants táblából.
-/plant/details: Visszaad egy listát az összes növényről a Details táblában.
+/plant/plants/{page}: Visszaad egy listányi (pageSize változóval változtatható a lista mérete) növényt a Plants táblából.
 /plant/details/{id}: Visszaad egy növény leírását a Details táblából.
-/plant/fullplants: Visszaad egy listát az összes növényről, amely a növények összes adatát tartalmazza.
 /plant/quiz: Visszaad egy Quiz adattípust, amely tartalmaz egy képet és négy nevet, amelyből az első (index 0) a képen látható növény neve.
 /plant/fullpants/{id}: Visszaad egy növényt minden adatával együtt.
 /plant/identify: Bekér egy MultipartFromDataContent típusú változót, amelyet majd átad a PlantNet API-nak, ami elvégzi a növény felismerést, majd visszaadja a legvalószínűbb növényt. Az API kulcsot a Docker compoose fájl segítségével adjuk át a webAPI-nak.
 
 Miután ezek elkészültek, egy Docker image-be csomagolom a programot, és feltelepítem a szerverre, majd frissítem a compose.yaml fájlt, így a Docker Compose ezt a szolgáltatást is el tudja indítani a többivel együtt.
+**GithubActions CI/CD pipeline automatikusan elkészíti a Docker image-t és deployolja Azureba. Lásd: serverdocumentation.md**
 
 ## Kliens
 A kliens alapját egy .NET MAUI applikáció fogja adni, amelynek a felépítésében az MVVM struktúrát használom. Hogy a kódom ne legyen túl nagy, és segítsem a munkámat, telepítem a projektbe az MVVM Community Toolkit nevű NuGet packaget, amely segíteni fog nekem bizonyos kódrészek automatikus legenerálásban. Ezután előkészítettem a projekt mappa struktúráját.
 <img width="388" height="392" alt="image" src="https://github.com/user-attachments/assets/0c48ee03-6f5c-4784-b1f8-5f21cc51e88e" />
 
-Ezután először a Main Page viewt fogom megcsinálni, ahol látható lesz egy lista a növényekről. Ehhez először csinálok egy modellt (Plant.cs). Ezután a MainPage.XAML fájlban megcsinálom a UI-t.
-A Detail Page view fog felelni azért, hogy ha kiválasztunk egy adott növényt, akkor a részletes adatait megjelenítse. Ehhez szükségünk lesz egy FullPlant.cs modellre.
+### Models
+A modellek fognak segíteni abban, hogy az adatokat helyesen tudjam tárolni és megjeleníteni.
 
-A viewmodelekhez csinálok először egy BaseViewModel.cs osztályt, ami az összes többi ViewModelnek az alapja lesz. Ebben olyan tulajdonságok vannak, amelyek közösek lesznek a ViewModellek között. 
-A MainViewModel a MainPage viewmodelje. Ebben létrehozunk egy ObservableCollection, amely arra jó, hogy nem csak tárolja a növények adatait, hanem ha változás van bennük, akkor tudja értesíteni a MainPage viewt is, és tudja frissíteni azt. Dependency injection-nel átadjuk a konstruktoron keresztül a PlantService-t (amely felel a WebAPI kommunikációért), majd létre hozunk egy GetPlantsAsync() Task-ot, amelyet az MVVM Community Toolkit segítségével egy egyszerű tag-el ([RelayCommand]) Command-ra Generálunk, ezt fogja tudni meghívni a View.
-Ahhoz hogy átirányítsunk egy Detail nézetre, konfigurálnunk kell egy új Task-ot (GoToDetailsCommand), majd ezt hozzá kell kötnünk a MainView.xaml fájlban a Grid-hez, amely egy egy növény kártyáját fogja egybe. Ehhez GestureRecogniser-t használok, és ide beállítok egy CommandParameter-t is, ami át fogja adni a Detail viewnak az adott növényt, amiről több részletet akarunk látni. Hogy működjön is ez a navigáció, regisztrálni kell egy Route-ot az AppShell.xaml.cs fájlban. Ahhoz, hogy a megfelelő növény adatait átadjuk a DetailPage-nek, a MainViewModel-ben készítettem egy privát Task-ot, ami lekéri az adott növény teljes verzióját (FullPlant) és azt adja át a view-nak. Egy QueryProperty segítségével Shell navigáción keresztül át is lehet adni paraméterként, így a view be tudja tölteni és meg tudja jeleníteni.
+- Plant.cs: Ez az alapja az összes növény objektumnak.
+- FullPlant.cs: Ez egy adott növény részletes nézetéhez szükséges.
+- Page.cs: Ez az API pagination miatt fontos, ez teszi lehetővé, hogy ne az összes növényt egyszerre kérjük le, ezzel kizárva a hosszú várakozási időt.
+- Quiz.cs: Ez a quiz logikában használt adattípushoz fontos.
+- IdentificationResult.cs: Több osztályt foglal magába, amik szükségesek a harmadik fél álltal biztosított API válasz feldolgozásában.
 
-Hogy összekössük a view-t a viewmodel-el, az adott View mögötti C# kódban a konstruktorban Dependency injection-nel át kell adni a view modelt, majd egy BindingContext-et beállítani hozzá.
+### Views
+A view-k felelnek az applikáció kinézetéért.
 
-A Services mappában létrehozom a PlantService.cs fájlt, amely felelős lesz a kommunikációért a szerverrel az API hívásokon keresztül.
-GetAllPlants visszaadja az összes növényt (szimpla Plant formátumban), GetPlantById visszaad egy adott növényt (FullPlant formátumban).
+- MainPage.xaml: A lista nézet. Magába foglal egy CollectionView-t, amely megjeleníti magát a listát, valamint gondoskodik a folyamatos betöltésről is (*RemainingItemsThreshold* segítségével). Amíg nincs betöltve egy növény sem, addig jelen van egy gomb, amely lehetőséget ad arra, hogy betöltsük az első page-t. Töltés közben megjelenik egy töltő képernyő is.
+- DetailPage.xaml: Egy növény részletes nézete. Megjeleníti a rendelkezésre álló képeket egy *ScrollView*-ban, illetve a rendelkezésre álló adatokat a képek alatt.
+- QuizPage.xaml: Felel a játék megjelenítéséért. 1 képet és 4 választ jelenít meg, valamint tartalmazza külön mezőben a helyes megoldást.
+- IdentifyPage.xaml: Alap esetben megjeleníti a kamerát, egy gombot amellyel el lehet készíteni a képet. Ha van elkészített kép, akkor megjeleníti azt, valamint két gombot, az egyikkel új képet lehet készíteni, a másikkal pedig el lehet küldeni azonosításra. Ha sikeres volt az azonosítás, akkor megjelenik a kép, alatta a latin neve a növénynek, egy százalékos szint, amely jelöli a model pontosságát, valamint hétköznapi nevek. 
 
+Minden view *code behind* fájljában a konstuktorban átadom *dependency injection*-el a megfelelő *viewmodel*-t, majd beállítom *BindingContext*-nek őket.
+
+### Plant Service
+Ez felel a szerverrel való kommunikációért. Itt vannak megadva azok a függvények, amelyek elhagyhatatlanok a WebAPI és a kliens közti kommunikáció létrejöttéhez.
+
+### Base ViewModel
+Az összes többi *viewmodel* alapja. Olyan figyelhető tuladjonságokat tartalmaz, mint például az *isBusy*, *title*, *isLoaded*, *IsNotLoaded*, *IsNotBusy* amelyek az összes többi oldalon használva vannak.
+
+A *RelayCommand* kulcsszót használom a függvények előtt, így az *MVVM Community Toolkit* NuGet package legenerálja a szükséges kódot, hogy tudjak rájuk hivatkozni a nézetekben *Command* kulcsszóval.
+
+### Main ViewModel
+Megadunk benne *RelayCommand*-okat, amelyek segítségével el tudjuk választani a *View* és a *ViewModel* szintjét egymástól, mivel egyszerűen a *Command* paraméterrel tudunk majd rájuk hivatkozni a nézeteknél. *LoadPageAsync* egy segítő függvény, amely feltölti a növény listát, amely egy figyelhető tulajdonság, így valós időben megjelenik az applikációban is. *GetFirstPageAsync*, *GetMorePAgeAsync* a növények betöltéséért felel. *GetFullPlantAsync* egy segítő függvény, amely lekéri a kiválasztott növény összes adatát, a *GoToDetailsAsync* függvény hívja meg, majd tovább is lép a megfelelő nézetre. Ez a viewmodel felelős azért is, hogy ha nincs több elérhető adat az adatbázisban, akkor meg se próbáljon lekérni több adatot.
+
+### Detail ViewModel
+Egyetlen szerepe annyi, hogy megváltoztassa a nézet címét. Jövőben lehetőséget ad a fejlesztéshez.
+
+### Quiz ViewModel
+A kvíz játéklogikát tartalmazza. Gombnyomásra lekéri az első kvízt, majd minden válaszadás után lekéri a következőt. Visszajelzést ad a felhasználónak a válasz helyességéről.
+
+### Identify ViewModel
+Implementálja a kép készítést (*CaptureAsync* relay command), az új kép készítése (*NewImage*) valamint a felismeréshez szükséges funkciókat. *IdentifyAsync* elküldi a képet *ByteStream* formátumban, megvárja a választ majd megjelenítetti a visszakapott adatokat.
+
+### Navigation
 Az AppShell.xaml fájlban létre hozok egy menüt, aminek segítségével lehet lépni a különböző lapok között. Ehhez TabBar-t használok.
-### Quiz
-A Quiz logikához szükség lesz egy Quiz modelre, amelynek három propertyje lesz, egy ImagePath, ami a kérdéses növény képének elérési útja, egy string[] amelyben 4 növény neve lesz tárolva, valamint egy Correct, ami a helyes választ fogja tárolni. Ezután a PlantService-ben létrehozok egy új functiont, amely felelős lesz a webAPI kommunikációért, és visszaad egy Quiz típust. Ezt fogja meghívni egy gomb nyomásra a felhasználó a viewmodel-en keresztül. A UI egy IsLoaded observableProperty-től függően fog változni, ami a sikeres/sikertelen betöltést jelöli. Ha nincs betöltve játékmenet, akkor csak egy Játék! gomb jelenik meg a képernyőn, ami eltűnik ha betöltött a játék, és megjelennek a játék UI elemei. Ha a játék sikeresen betöltött, akkor látni fog a felhasználó egy képet, és 4 gombot, mindegyik egy egy növény nevével, de csak az egyik, random helyen elhelyezkedő lesz a megfelelő válasz. Minden gomb megnyomása meghív egy másik RelayCommand-ot, amely megnézi, hogy a válasz helyes e (összeveti a Correct és az adott választ), majd tudatja a felhasználóval és autómatikusan egy új játékot tölt be.
 
-### Növény felismerés
-Először a különböző platformokon az engedélyeket kell módosítani, hogy legyen hozzáférésünk az adott eszköz kamerájához.
-A .NET MAUI-ban, hogy kamerát lehessen használni, telepíteni kell a projekten belül a CommunityToolkit.Maui.Camera NuGet csomagot. Ezután a MauiProgram.cs-t ki kell egészíteni, a .UseMauiCommunityToolkitCamera() sorral. Ezután az adott oldalon definiálni kell a toolkit-et, `xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"`, ezután tudjuk használni a CameraView-t.
-A PlantService.cs fájlban létre kell hozni egy Identify POST requestet is, amely majd továbbküldi az adatokat a webAPI-nak (ez a lépés azért fontos, mert így nem kell a kliensnek átadni az API kulcsot). Ez a metódus bekér egy byte tömböt (ami a képet jelzi) és egy organ stringet (később lehet adni a felhasználónak választást, hogy milyen szerv alapján akarja beazonosítani a növényt, most alapból auto értéken van), majd ezeket alakítja egy MultipartFormDataContent típussá (ami kell majd a PlantNet API-nak). Ezután szimplán meghívja a megfelelő endpointot a szerveren futó webAPI-ban.
-A viewmodel-ben létrehozunk egy Capture RelayCommand-ot, ami elkészíti a képet, átmásolja a memoriába, innen pedig elmenti egy byte tömbbe (amit később közvetlen át tudunk adni a PlantService-nek) és egy ImageSource típusba (amivel könnyebb a megjelenítés), ezután az IsLoaded property segítségével váltunk az UI-on.
-Létrehozunk egy NewImage RelayCommand-ot is, amely csak lenullázza a szükséges tulajdonságokat, így vissza is vált a UI a kamera nézetre.
-Az Identify RelayCommand fog segíteni abban, hogy gombnyomásra elindítsuk az azonosítást, valamint ha sikerült, akkor az IsIdentified tulajdonság segítségével váltunk megint az UI-on, és megjelenítjük a legvalószínűbb egyezést, valamint a sikeresség valószínűségét. Ahhoz hogy az adatokat kinyerjük a visszakapott JSON fájlból, létrehozunk egy fájlt, amely 3 egymásra épülő classt foglal magába - IdentificationResult.cs (IdentificationResult, Result, Species) és egy különállót, amely a könnyebb megjelenítést szolgálja (IdentificationShow). Ennek segítségével könnyen ki tudjuk nyerni a legvalószínűbb növényt, annak a valószínűségét, valamit a hétköznapi neveit.
-Az azonosítás után látszani fog a kép, egy gomb, hogy új képet tudjunk készíteni és az információk a legvalószínűbb egyezésről.
+
