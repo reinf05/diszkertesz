@@ -14,7 +14,9 @@
         <CollectionView
             Grid.ColumnSpan="2"
             ItemsSource="{Binding PlantList}"
-            SelectionMode="None">
+            SelectionMode="None"
+            RemainingItemsThreshold="5"
+            RemainingItemsThresholdReachedCommand="{Binding GetPageCommand}">
 
             <CollectionView.ItemTemplate>
                 <DataTemplate
@@ -59,7 +61,8 @@
             Grid.ColumnSpan="2"
             Margin="10"
             Text="Betöltés"
-            Command="{Binding GetPlantsCommand}"
+            Command="{Binding GetPageCommand}"
+            CommandParameter="true"
             IsVisible="{Binding IsNotLoaded}">
 
         </Button>

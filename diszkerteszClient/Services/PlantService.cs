@@ -36,6 +36,18 @@ namespace diszkerteszClient.Services
             return null;
         }
 
+        public async Task<List<Plant>> GetPlantPageAsync(int pageNum)
+        {
+            string URL = baseURL + "plants/" + pageNum;
+            var response = await httpClient.GetAsync(URL);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadFromJsonAsync<List<Plant>>();
+            }
+            return null;
+        }
+
         public async Task<FullPlant> GetFullPlantById(int id)
         {
             string URL = baseURL + "fullplants/" + id;

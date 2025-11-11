@@ -15,6 +15,7 @@ namespace diszkerteszClient.Viewmodels
     public partial class MainViewModel : BaseViewModel
     {
         private PlantService plantService;
+        private int _currentPage = 1;
         public ObservableCollection<Plant> PlantList { get; } = new();
         private FullPlant fullPlant;
         private readonly string baseURL = "https://stdiszkerteszgerdev001.blob.core.windows.net/images/";
@@ -38,31 +39,31 @@ namespace diszkerteszClient.Viewmodels
         }
 
         [RelayCommand]
-        async Task GetPlantsAsync()
+        async Task GetPageAsync(bool first = false)
         {
             if (IsBusy)
             {
                 return;
             }
-
             try
             {
-                IsBusy = true;
-                var plants = await plantService.GetAllPlants();
-
-                if (PlantList.Count != 0)
+                if (first)
                 {
-                    PlantList.Clear();
+                    IsBusy = true;
                 }
+                var plants = await plantService.GetPlantPageAsync(_currentPage);
 
-                foreach(var plant in plants)
+                foreach (var plant in plants)
                 {
                     string path = plant.Imagepath;
                     plant.Imagepath = baseURL + path;
                     PlantList.Add(plant);
                 }
+                
                 IsLoaded = true;
+
             }
+
             catch (Exception ex)
             {
                 Debug.WriteLine(ex);
@@ -71,8 +72,46 @@ namespace diszkerteszClient.Viewmodels
             finally
             {
                 IsBusy = false;
+                _currentPage++;
             }
         }
+
+        //[RelayCommand]
+        //async Task GetPlantsAsync()
+        //{
+        //    if (IsBusy)
+        //    {
+        //        return;
+        //    }
+
+        //    try
+        //    {
+        //        IsBusy = true;
+        //        var plants = await plantService.GetAllPlants();
+
+        //        if (PlantList.Count != 0)
+        //        {
+        //            PlantList.Clear();
+        //        }
+
+        //        foreach (var plant in plants)
+        //        {
+        //            string path = plant.Imagepath;
+        //            plant.Imagepath = baseURL + path;
+        //            PlantList.Add(plant);
+        //        }
+        //        IsLoaded = true;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Debug.WriteLine(ex);
+        //        await Shell.Current.DisplayAlert("Error", ex.Message, "OK");
+        //    }
+        //    finally
+        //    {
+        //        IsBusy = false;
+        //    }
+        //}
 
         private async Task GetFullPlantAsync(int plantId)
         {
