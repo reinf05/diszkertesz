@@ -149,40 +149,40 @@ namespace diszkerteszAPI.Controllers
             return returnquiz;
         }
 
-        //[HttpPost("identify")]
-        //public async Task<string> Identify([FromForm] IFormFile images, [FromForm] string organs)
-        //{
+        [HttpPost("identify")]
+        public async Task<string> Identify([FromForm] IFormFile images, [FromForm] string organs)
+        {
 
-        //    if (images == null || string.IsNullOrEmpty(organs))
-        //        return "Error: missing data";
+            if (images == null || string.IsNullOrEmpty(organs))
+                return "Error: missing data";
 
-        //    var stream = images.OpenReadStream();
-        //    var content = new MultipartFormDataContent();
-        //    content.Add(new StreamContent(stream), "images", "image.jpeg");
-        //    content.Add(new StringContent(organs), "organs");
+            var stream = images.OpenReadStream();
+            var content = new MultipartFormDataContent();
+            content.Add(new StreamContent(stream), "images", "image.jpeg");
+            content.Add(new StringContent(organs), "organs");
 
-        //    string project = "all";
-        //    string apiKey = Environment.GetEnvironmentVariable("API-KEY");
-        //    if (apiKey == null)
-        //    {
-        //        return "Error: API key not found";
-        //    }
-        //    string URL = $"https://my-api.plantnet.org/v2/identify/{project}?api-key={apiKey}";
+            string project = "all";
+            string apiKey = Environment.GetEnvironmentVariable("API-KEY");
+            if (apiKey == null)
+            {
+                return "Error: API key not found";
+            }
+            string URL = $"https://my-api.plantnet.org/v2/identify/{project}?api-key={apiKey}";
 
-        //    HttpClient client = new HttpClient();
+            HttpClient client = new HttpClient();
 
-        //    var response = await client.PostAsync(URL, content);
+            var response = await client.PostAsync(URL, content);
 
-        //    if (response.IsSuccessStatusCode)
-        //    {
-        //        var jsonResponse = await response.Content.ReadAsStringAsync();
-        //        return jsonResponse;
-        //    }
-        //    else
-        //    {
-        //        return $"Error: {response.StatusCode}";
-        //    }
-        //}
+            if (response.IsSuccessStatusCode)
+            {
+                var jsonResponse = await response.Content.ReadAsStringAsync();
+                return jsonResponse;
+            }
+            else
+            {
+                return $"Error: {response.StatusCode}";
+            }
+        }
 
     }
 }
