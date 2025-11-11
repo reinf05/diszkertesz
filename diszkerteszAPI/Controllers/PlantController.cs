@@ -20,15 +20,15 @@ namespace diszkerteszAPI.Controllers
             _context = context;
         }
 
-        [HttpGet("plants")]
-        public async Task<IEnumerable<Plant>> GetPlants()
-        {
-            return await _context.Plants.OrderBy(p => p.ID).ToListAsync();
+        //[HttpGet("plants")]
+        //public async Task<IEnumerable<Plant>> GetPlants()
+        //{
+        //    return await _context.Plants.OrderBy(p => p.ID).ToListAsync();
 
-        }
+        //}
 
         [HttpGet("plants/{pageNum}")]
-        public async Task<Page> GetPlantByPage(int pageNum = 1)
+        public async Task<Page<Plant>> GetPlantByPage(int pageNum = 1)
         {
             if(pageNum < 1)
             {
@@ -45,9 +45,9 @@ namespace diszkerteszAPI.Controllers
                 .Take(pageSize)
                 .ToListAsync();
 
-            return new Page()
+            return new Page<Plant>()
             {
-                Plants = plants,
+                Items = plants,
                 PageNumber = pageNum,
                 TotalPages = totalPages,
                 TotalCount = totalCount
