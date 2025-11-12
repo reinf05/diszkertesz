@@ -152,7 +152,7 @@ namespace diszkerteszAPI.Controllers
         [HttpPost("identify")]
         public async Task<string> Identify([FromForm] IFormFile images, [FromForm] string organs)
         {
-
+            string language = "hu";
             if (images == null || string.IsNullOrEmpty(organs))
                 return "Error: missing data";
 
@@ -167,7 +167,7 @@ namespace diszkerteszAPI.Controllers
             {
                 return "Error: API key not found";
             }
-            string URL = $"https://my-api.plantnet.org/v2/identify/{project}?api-key={apiKey}";
+            string URL = $"https://my-api.plantnet.org/v2/identify/{project}?api-key={apiKey}&lang={language}";
 
             HttpClient client = new HttpClient();
 
