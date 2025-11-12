@@ -3,15 +3,8 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using diszkerteszClient.Models;
 using diszkerteszClient.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Metadata.Ecma335;
-using System.Security.Principal;
-using System.Text;
 using System.Text.Json;
-using System.Text.Json.Nodes;
-using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace diszkerteszClient.Viewmodels
 {
@@ -73,39 +66,63 @@ namespace diszkerteszClient.Viewmodels
             string organ = "auto";
             if (imageBytes != null)
             {
+                Microsoft.Maui.Graphics.IImage image;
 
-                string result = await plantService.Identify(imageBytes, organ);
-
-                if (result.StartsWith("Error"))
+                using (Stream stream = new MemoryStream(imageBytes))
                 {
-                    string errorMessage = string.Empty;
-                    if(result.Contains("NotFound"))
+
+                    image = Microsoft.Maui.Graphics.Platform.PlatformImage.FromStream(stream);
+
+                }
+
+
+                if (image != null)
+                {
+                    Microsoft.Maui.Graphics.IImage smallImage = image.Resize(900, 900);
+                    var smallImageStream = new MemoryStream();
+                    smallImage.Save(smallImageStream, ImageFormat.Jpeg, 0.7f);
+                    var smallImageBytes = smallImageStream.ToArray();
+
+
+                    string result = await plantService.Identify(smallImageBytes, organ);
+
+
+                    if (result.StartsWith("Error"))
                     {
-                        errorMessage = "Nem ismerhető fel a növény";
+                        string errorMessage = string.Empty;
+                        if (result.Contains("NotFound"))
+                        {
+                            errorMessage = "Nem ismerhető fel a növény";
+                        }
+                        await Shell.Current.DisplayAlert("Hiba", "Azonosítási hiba: " + errorMessage, "OK");
+                        await NewImage();
+                        return;
                     }
-                    await Shell.Current.DisplayAlert("Hiba", "Azonosítási hiba: " + errorMessage, "OK");
-                    await NewImage();
-                    return;
+                    try
+                    {
+                        IdentificationResult data = JsonSerializer.Deserialize<IdentificationResult>(result);
+                        IdentificationShow temp = new();
+                        temp.Percent = data.results[0].score * 100;
+                        temp.Scientific = data.results[0].species.scientificNameWithoutAuthor;
+                        temp.CommonNames = data.results[0].species.commonNames;
+
+                        IdentificationShow = temp;
+                    }
+                    catch (Exception ex)
+                    {
+                        await Shell.Current.DisplayAlert("Hiba", "Azonosítási hiba: " + ex.Message, "OK");
+                        return;
+                    }
+
+
+
+                    IsIdentified = true;
+
                 }
-                try
+                else
                 {
-                    IdentificationResult data = JsonSerializer.Deserialize<IdentificationResult>(result);
-                    IdentificationShow temp = new();
-                    temp.Percent = data.results[0].score * 100;
-                    temp.Scientific = data.results[0].species.scientificNameWithoutAuthor;
-                    temp.CommonNames = data.results[0].species.commonNames;
-
-                    IdentificationShow = temp;
+                    await Shell.Current.DisplayAlert("Hiba", "Átméretezési hiba", "OK");
                 }
-                catch (Exception ex)
-                {
-                    await Shell.Current.DisplayAlert("Hiba", "Azonosítási hiba: " + ex.Message, "OK");
-                    return;
-                }
-
-
-
-                IsIdentified = true;
             }
             return;
         }
