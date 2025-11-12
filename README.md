@@ -1,5 +1,5 @@
 # Dísznövénykertész tanulás segítő app
-
+**A szerver időnként leáll, így indításnál lehet, hogy várni kell mire az infrastruktúra felkel.**
 # Cél
 Ennek a projektnek a célja az, hogy a MAGYULA Dísznövénykertész képzésén a dísznövények tanulását könnyebbé tegye, valamint egyféle centralizált tudástárként szolgáljon.
 
