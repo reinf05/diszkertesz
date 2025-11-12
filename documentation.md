@@ -1,6 +1,7 @@
 # Megvalósítás
 ## Szerver
 **A fizikai szervert felváltotta egy felhőn alapuló megoldás. Lásd serverdocumentation.md**
+**A szerver időnként leáll, így indításnál lehet, hogy várni kell mire az infrastruktúra felkel.**
 
 A szervert egy itthoni számítógép fogja futtatni, amelyre telepítettem az UbuntuServer x.x verzióját.
 A könnyebb fejlesztés, debugolás, mobilitás valamint scalelés miatt a szolgáltatások Docker konténerekben fognak futni, amelyeket egy Docker Compose fájl ofg összefogni. Ehhez telepítettem a szerverre a Docker Engine-t, ahogy a dokumentáció írja.
@@ -12,9 +13,7 @@ Az adatbázis megvalósításához telepítettem a postgres Docker konténerét,
 
 Portok: 5432:5432
 
-ENVIRONMENTAL VARIABLES:
-POSTGRES_USER: feri
-POSTGRES_PASSWORD: feri
+Környezeti változókat is meg kell adni: POSTGRES_USER, POSTGRES_PASSWORD.
 
 Hogy az adatbázist könnyebb legyen konfigurálni és adatokkal feltölteni, telepítettem a pgadmin4 szolgáltatást is, amely egy egyszerű regisztráció után már enged is belépni a postgresql szerverünkbe, és egy GUI által konfigurálni azt.
 
