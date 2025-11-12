@@ -12,30 +12,54 @@ namespace diszkerteszAPI.Controllers
     [Route("[controller]")]
     public class PlantController : ControllerBase
     {
+        private readonly int pageSize = 10;
+
         private readonly diszkerteszDbContext _context;
         public PlantController(diszkerteszDbContext context)
         {
             _context = context;
         }
 
-        [HttpGet("plants")]
-        public async Task<IEnumerable<Plant>> GetPlants()
-        {
-            return await _context.Plants.OrderBy(p => p.ID).ToListAsync();
+        //[HttpGet("plants")]
+        //public async Task<IEnumerable<Plant>> GetPlants()
+        //{
+        //    return await _context.Plants.OrderBy(p => p.ID).ToListAsync();
 
+        //}
+
+        [HttpGet("plants/{pageNum}")]
+        public async Task<Page<Plant>> GetPlantByPage(int pageNum = 1)
+        {
+            if(pageNum < 1)
+            {
+                pageNum = 1;
+            }
+            int totalCount = await _context.Plants.CountAsync();
+            int totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
+
+            if(pageNum > totalPages) pageNum = totalPages;
+
+            var plants = await _context.Plants
+                .OrderBy(p => p.ID)
+                .Skip((pageNum - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return new Page<Plant>()
+            {
+                Items = plants,
+                PageNumber = pageNum,
+                TotalPages = totalPages,
+                TotalCount = totalCount
+            };
         }
 
-        [HttpGet("plants/{id}")]
-        public async Task<ActionResult<Plant>> GetPlantById(int id)
-        {
-            return await _context.Plants.FindAsync(id);
-        }
 
-        [HttpGet("details")]
-        public async Task<IEnumerable<Detail>> GetDetails()
-        {
-            return await _context.Details.OrderBy(d => d.Plant_ID).ToListAsync();
-        }
+        //[HttpGet("details")]
+        //public async Task<IEnumerable<Detail>> GetDetails()
+        //{
+        //    return await _context.Details.OrderBy(d => d.Plant_ID).ToListAsync();
+        //}
 
         [HttpGet("details/{id}")]
         public async Task<ActionResult<Detail>> GetDetailById(int id)
@@ -43,33 +67,33 @@ namespace diszkerteszAPI.Controllers
             return await _context.Details.FindAsync(id);
         }
 
-        [HttpGet("fullplants")]
-        public async Task<IEnumerable<object>> GetFullPlants(){
-            List<Plant> plantlist = (List<Plant>)await GetPlants();
-            List<Detail> detaillist = (List<Detail>)await GetDetails();
+        //[HttpGet("fullplants")]
+        //public async Task<IEnumerable<object>> GetFullPlants(){
+        //    List<Plant> plantlist = (List<Plant>)await GetPlants();
+        //    List<Detail> detaillist = (List<Detail>)await GetDetails();
 
-            List<Fullplant> returnlist = new List<Fullplant>();
+        //    List<Fullplant> returnlist = new List<Fullplant>();
 
-            int count = 0;
-            while (count < plantlist.Count)
-            {
-                int id = plantlist[count].ID;
-                returnlist.Add(new Fullplant());
-                returnlist[count].ID = id;
-                returnlist[count].Type = plantlist[count].Type;
-                returnlist[count].Namel = plantlist[count].Namel;
-                returnlist[count].Nameh = plantlist[count].Nameh;
-                returnlist[count].Imagepath = plantlist[count].Imagepath;
-                returnlist[count].Description = detaillist[count].Description;
-                returnlist[count].Usage = detaillist[count].Usage;
-                returnlist[count].Pathogens = detaillist[count].Pathogens;
-                returnlist[count].Propagation = detaillist[count].Propagation;
+        //    int count = 0;
+        //    while (count < plantlist.Count)
+        //    {
+        //        int id = plantlist[count].ID;
+        //        returnlist.Add(new Fullplant());
+        //        returnlist[count].ID = id;
+        //        returnlist[count].Type = plantlist[count].Type;
+        //        returnlist[count].Namel = plantlist[count].Namel;
+        //        returnlist[count].Nameh = plantlist[count].Nameh;
+        //        returnlist[count].Imagepath = plantlist[count].Imagepath;
+        //        returnlist[count].Description = detaillist[count].Description;
+        //        returnlist[count].Usage = detaillist[count].Usage;
+        //        returnlist[count].Pathogens = detaillist[count].Pathogens;
+        //        returnlist[count].Propagation = detaillist[count].Propagation;
 
-                count++;
-            }
+        //        count++;
+        //    }
 
-            return returnlist;
-        }
+        //    return returnlist;
+        //}
 
         [HttpGet("fullplants/{id}")]
         public async Task<ActionResult<Fullplant>> GetFullplantById(int id)
@@ -128,7 +152,7 @@ namespace diszkerteszAPI.Controllers
         [HttpPost("identify")]
         public async Task<string> Identify([FromForm] IFormFile images, [FromForm] string organs)
         {
-
+            string language = "hu";
             if (images == null || string.IsNullOrEmpty(organs))
                 return "Error: missing data";
 
@@ -143,7 +167,7 @@ namespace diszkerteszAPI.Controllers
             {
                 return "Error: API key not found";
             }
-            string URL = $"https://my-api.plantnet.org/v2/identify/{project}?api-key={apiKey}";
+            string URL = $"https://my-api.plantnet.org/v2/identify/{project}?api-key={apiKey}&lang={language}";
 
             HttpClient client = new HttpClient();
 

@@ -19,19 +19,33 @@ namespace diszkerteszClient.Services
             httpClient = new();
         }
 
-        public async Task<List<Plant>> GetAllPlants()
-        {
-            if(plants.Count > 0)
-            {
-                return plants;
-            }
+        //public async Task<List<Plant>> GetAllPlants()
+        //{
+        //    if(plants.Count > 0)
+        //    {
+        //        return plants;
+        //    }
 
-            string URL = baseURL + "plants";
+        //    string URL = baseURL + "plants";
+        //    var response = await httpClient.GetAsync(URL);
+        //    if (response.IsSuccessStatusCode)
+        //    {
+        //        plants = await response.Content.ReadFromJsonAsync<List<Plant>>();
+        //        return plants;
+        //    }
+        //    return null;
+        //}
+
+        public async Task<Page<Plant>> GetPlantPageAsync(int pageNum)
+        {
+            string URL = baseURL + "plants/" + pageNum;
             var response = await httpClient.GetAsync(URL);
+
             if (response.IsSuccessStatusCode)
             {
-                plants = await response.Content.ReadFromJsonAsync<List<Plant>>();
-                return plants;
+                //Problem here
+                var asd = await response.Content.ReadFromJsonAsync<Page<Plant>>();
+                return asd;
             }
             return null;
         }
@@ -74,12 +88,13 @@ namespace diszkerteszClient.Services
 
 
             var response = await httpClient.PostAsync(URL, form);
+            var responseString = await response.Content.ReadAsStringAsync();
 
-            if (response.IsSuccessStatusCode)
-            {
-                return await response.Content.ReadAsStringAsync();
+            if (response.IsSuccessStatusCode && !responseString.StartsWith("Error"))
+            { 
+                return responseString;
             }
-            return $"Error {response.StatusCode}\n{response.Content.ReadAsStringAsync()}";
+            return $"Error {response.StatusCode}\n{responseString}";
         }
     }
 }

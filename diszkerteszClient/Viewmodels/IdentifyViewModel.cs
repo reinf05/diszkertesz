@@ -3,15 +3,8 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using diszkerteszClient.Models;
 using diszkerteszClient.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Metadata.Ecma335;
-using System.Security.Principal;
-using System.Text;
 using System.Text.Json;
-using System.Text.Json.Nodes;
-using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace diszkerteszClient.Viewmodels
 {
@@ -20,7 +13,7 @@ namespace diszkerteszClient.Viewmodels
         private PlantService plantService;
 
         [ObservableProperty]
-        private ImageSource image;
+        private ImageSource? image;
 
         private byte[]? imageBytes;
 
@@ -31,7 +24,7 @@ namespace diszkerteszClient.Viewmodels
         public bool IsNotIdentified => !IsIdentified;
 
         [ObservableProperty]
-        private IdentificationShow identificationShow;
+        private IdentificationShow? identificationShow;
 
         public IdentifyViewModel(PlantService plantService)
         {
@@ -57,12 +50,13 @@ namespace diszkerteszClient.Viewmodels
         }
 
         [RelayCommand]
-        private async Task NewImageAsync()
+        private Task NewImage()
         {
             Image = null;
             imageBytes = null;
             IsLoaded = false;
             IsIdentified = false;
+            return Task.CompletedTask;
         }
 
         [RelayCommand]
@@ -72,17 +66,63 @@ namespace diszkerteszClient.Viewmodels
             string organ = "auto";
             if (imageBytes != null)
             {
-                string result = await plantService.Identify(imageBytes, organ);
-                IdentificationResult data = JsonSerializer.Deserialize<IdentificationResult>(result);
+                Microsoft.Maui.Graphics.IImage image;
 
-                IdentificationShow temp = new();
-                temp.Percent = data.results[0].score * 100;
-                temp.Scientific = data.results[0].species.scientificNameWithoutAuthor;
-                temp.CommonNames = data.results[0].species.commonNames;
+                using (Stream stream = new MemoryStream(imageBytes))
+                {
 
-                IdentificationShow = temp;
+                    image = Microsoft.Maui.Graphics.Platform.PlatformImage.FromStream(stream);
 
-                IsIdentified = true;
+                }
+
+
+                if (image != null)
+                {
+                    Microsoft.Maui.Graphics.IImage smallImage = image.Resize(900, 900);
+                    var smallImageStream = new MemoryStream();
+                    smallImage.Save(smallImageStream, ImageFormat.Jpeg, 0.7f);
+                    var smallImageBytes = smallImageStream.ToArray();
+
+
+                    string result = await plantService.Identify(smallImageBytes, organ);
+
+
+                    if (result.StartsWith("Error"))
+                    {
+                        string errorMessage = string.Empty;
+                        if (result.Contains("NotFound"))
+                        {
+                            errorMessage = "Nem ismerhető fel a növény";
+                        }
+                        await Shell.Current.DisplayAlert("Hiba", "Azonosítási hiba: " + errorMessage, "OK");
+                        await NewImage();
+                        return;
+                    }
+                    try
+                    {
+                        IdentificationResult data = JsonSerializer.Deserialize<IdentificationResult>(result);
+                        IdentificationShow temp = new();
+                        temp.Percent = data.results[0].score * 100;
+                        temp.Scientific = data.results[0].species.scientificNameWithoutAuthor;
+                        temp.CommonNames = data.results[0].species.commonNames;
+
+                        IdentificationShow = temp;
+                    }
+                    catch (Exception ex)
+                    {
+                        await Shell.Current.DisplayAlert("Hiba", "Azonosítási hiba: " + ex.Message, "OK");
+                        return;
+                    }
+
+
+
+                    IsIdentified = true;
+
+                }
+                else
+                {
+                    await Shell.Current.DisplayAlert("Hiba", "Átméretezési hiba", "OK");
+                }
             }
             return;
         }
