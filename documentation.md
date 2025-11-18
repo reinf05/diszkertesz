@@ -66,12 +66,16 @@ A view-k felelnek az applikáció kinézetéért.
 - MainPage.xaml: A lista nézet. Magába foglal egy CollectionView-t, amely megjeleníti magát a listát, valamint gondoskodik a folyamatos betöltésről is (*RemainingItemsThreshold* segítségével). Amíg nincs betöltve egy növény sem, addig jelen van egy gomb, amely lehetőséget ad arra, hogy betöltsük az első page-t. Töltés közben megjelenik egy töltő képernyő is.
 - DetailPage.xaml: Egy növény részletes nézete. Megjeleníti a rendelkezésre álló képeket egy *ScrollView*-ban, illetve a rendelkezésre álló adatokat a képek alatt.
 - QuizPage.xaml: Felel a játék megjelenítéséért. 1 képet és 4 választ jelenít meg, valamint tartalmazza külön mezőben a helyes megoldást.
-- IdentifyPage.xaml: Alap esetben megjeleníti a kamerát, egy gombot amellyel el lehet készíteni a képet. Ha van elkészített kép, akkor megjeleníti azt, valamint két gombot, az egyikkel új képet lehet készíteni, a másikkal pedig el lehet küldeni azonosításra. Ha sikeres volt az azonosítás, akkor megjelenik a kép, alatta a latin neve a növénynek, egy százalékos szint, amely jelöli a model pontosságát, valamint hétköznapi nevek. 
+- IdentifyPage.xaml: Alap esetben megjeleníti a kamerát, egy gombot amellyel el lehet készíteni a képet. Ha van elkészített kép, akkor megjeleníti azt, valamint két gombot, az egyikkel új képet lehet készíteni, a másikkal pedig el lehet küldeni azonosításra. Ha sikeres volt az azonosítás, akkor megjelenik a kép, alatta a latin neve a növénynek, egy százalékos szint, amely jelöli a model pontosságát, valamint hétköznapi nevek.
+- ProfilePage.xaml: Ha a felhasználó nincs bejelentkezve, akkor két gomb látszik, bejelentkezés és regisztráció. Ha bejelentkezett a felhasználó, akkor a profilját látja.
 
 Minden view *code behind* fájljában a konstuktorban átadom *dependency injection*-el a megfelelő *viewmodel*-t, majd beállítom *BindingContext*-nek őket.
 
 ### Plant Service
 Ez felel a szerverrel való kommunikációért. Itt vannak megadva azok a függvények, amelyek elhagyhatatlanok a WebAPI és a kliens közti kommunikáció létrejöttéhez.
+
+### Authentication Service
+Ez felel a kommunikációért a Microsoft Entra External ID-vel, amely az authentikációt intézi.
 
 ### Base ViewModel
 Az összes többi *viewmodel* alapja. Olyan figyelhető tuladjonságokat tartalmaz, mint például az *isBusy*, *title*, *isLoaded*, *IsNotLoaded*, *IsNotBusy* amelyek az összes többi oldalon használva vannak.
