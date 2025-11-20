@@ -75,7 +75,10 @@ Minden view *code behind* fájljában a konstuktorban átadom *dependency inject
 Ez felel a szerverrel való kommunikációért. Itt vannak megadva azok a függvények, amelyek elhagyhatatlanok a WebAPI és a kliens közti kommunikáció létrejöttéhez.
 
 ### Authentication Service
-Ez felel a kommunikációért a Microsoft Entra External ID-vel, amely az authentikációt intézi.
+Ez felel a kommunikációért a Microsoft Entra External ID-vel, amely az authentikációt intézi. *SignInAync* és *SignOutAsync* függvények felelnek a be és kijelentkezésért, a *GetAccessTokenAsync* felel a token megújításáért ha szükséges.
+
+### Authentication for Android
+Az Android operációs rendszerhez több módosítást is végre kell hajtani, hogy megfelelően működjön az authentikáció. A *Platforms/Android* mappában az új *MsalActivity.cs* szükséges ahhoz, hogy megfelelően vissza tudjon irányítani minket a belépés után az appra, ezt az activity-t regisztrálni kell a *MainActivity.cs*-ben is.
 
 ### Base ViewModel
 Az összes többi *viewmodel* alapja. Olyan figyelhető tuladjonságokat tartalmaz, mint például az *isBusy*, *title*, *isLoaded*, *IsNotLoaded*, *IsNotBusy* amelyek az összes többi oldalon használva vannak.
@@ -95,6 +98,9 @@ A kvíz játéklogikát tartalmazza. Gombnyomásra lekéri az első kvízt, majd
 ### Identify ViewModel
 Implementálja a kép készítést (*CaptureAsync* relay command), az új kép készítése (*NewImage*) valamint a felismeréshez szükséges funkciókat. *IdentifyAsync* elküldi a képet *ByteStream* formátumban, megvárja a választ majd megjelenítetti a visszakapott adatokat.
 A gyorsabb válasz miatt a képeket átméretezzük mielőtt elküldjük a harmadik fél (*PlantNet*) számára. Az *IdentifyAsync* függvényen belül betöltjük egy *IImage* formátumba, a beépített függvényekkel átméretezzük, majd elmentjük (kissé rontott minőségben) egy *MemoryStream*-be, amelyet átalakítunk egy *byte* tömbbe. Ezt a kisebb, rosszabb minőségű képet adjuk át a *PlantService*-nek, hogy minél kevesebb időt vegyen el a kép feltöltése először a saját API-nak, majd onnan a harmadik fél API-hoz.
+
+### Profile ViewModel
+Meghívja az *AuthenticationService* függvényeit, átalakítja a visszakapott adatokat a megfelelő formára, hogy a *ProfilePage* meg tudja jeleníteni. Kezeli a változókat amik alapján változik a hozzátartozó nézet.
 
 ### Navigation
 Az AppShell.xaml fájlban létre hozok egy menüt, aminek segítségével lehet lépni a különböző lapok között. Ehhez TabBar-t használok.
