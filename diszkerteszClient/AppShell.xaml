@@ -16,6 +16,9 @@
         <ShellContent
             Title="Azonosítás"
             ContentTemplate="{DataTemplate view:IdentifyPage}"/>
+        <ShellContent
+            Title="Profil"
+            ContentTemplate="{DataTemplate view:ProfilePage}"/>
     </TabBar>   
 
 </Shell>

@@ -66,7 +66,7 @@ namespace diszkerteszClient.Viewmodels
             string organ = "auto";
             if (imageBytes != null)
             {
-                Microsoft.Maui.Graphics.IImage image;
+                Microsoft.Maui.Graphics.IImage image; 
 
                 using (Stream stream = new MemoryStream(imageBytes))
                 {

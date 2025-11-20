@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodel="clr-namespace:diszkerteszClient.Viewmodels"
+             x:Class="diszkerteszClient.View.ProfilePage"
+             Title="ProfilePage"
+             x:DataType="viewmodel:ProfileViewModel">
+    <Grid
+        ColumnDefinitions="*"
+        RowDefinitions="*">
+
+        <Grid
+            Grid.ColumnSpan="1"
+            Grid.RowSpan="1"
+            RowDefinitions="*,*"
+            IsVisible="{Binding IsNotLoaded}">
+
+            <Button
+                Grid.Row="0"
+                Margin="10"
+                Text="Bejelentkezés"
+                Command="{Binding SignInCommand}"/>
+
+            <Button
+                Grid.Row="1"
+                Margin="10"
+                Text="Regisztráció"
+                Command="{Binding SignOutCommand}"/>
+
+        </Grid>
+
+        <Grid
+            Grid.ColumnSpan="1"
+            Grid.RowSpan="1"
+            IsVisible="{Binding IsLoaded}">
+            <Label
+                Text="Sikeres bejelentkezés!"
+                HorizontalOptions="Center"
+                VerticalOptions="Center"/>
+
+        </Grid>
+
+    </Grid>
+</ContentPage>
