@@ -33,18 +33,30 @@ Beállítottam egy Trigger functiont is, amely annyit csinál, hogy ha létrehoz
 ### API kezelés
 A kommunikáció a szerver és a kliens között API hívásokkal lesz megoldva, ehhez futni fog a szerveren egy Docker konténerben egy ASP.NET Core WebAPI alkalmazás.
 
-Először a kapcsolatot létesítjük az adatbázis szerverrel, ehhez NuGet csomagokat telepítünk (PostgreSQL és EF.Tools). Ezután létre hozunk egy diszkertDbContext fájlt, amely felelős a kapcsolatért az adatbázissal. Létre hozunk két modelt a két táblánkhoz, Plant.cs és Detail.cs. Ahhoz, hogy csatlakozni tudjon az alkalmazás az adatbázishoz, szükségünk lesz egy úgynevezett ConnectionStringre, amit az appsettings.json fáljban deklarálunk. Ezután konfiguráljuk a Program.cs fáljban. 
+A *diszkerteszDbContext* osztály határozza meg az adatbázis kontextusát, magába foglalja a táblákat.
 
-Létre hoztam még két modelt, hogy az API endpointok könnyebben tudjanak visszaadni különböző típusú adatot, a különböző igényekhez. Ez a Fullplant.cs, ahol egy növény összes adata (a két tábla: Plants és Details) megtalálható, valamint egy Quiz.cs fájlt, amely a növényfelismerésben fog segíteni.
+#### Models
+A modellek szükségesek ahhoz, hogy az adatok a megfelelő formában legyenek mielőtt feldolgozásra kerülnek.
+- Detail.cs: Egy növény részletes adatait reprezentálja.
+- Fullplant.cs: Egy növény összes adatát (benne a részletes adatokkal) reprezentálja.
+- Page.cs: A lapozáshoz szükséges adat modell.
+- Plant.cs: Egy növény egyszerűsített adatait reprezentálja.
+- Quiz.cs: A játéklogikához szükséges adat modell.
+- User.cs: Egy felhasználó adat modellje.
+- UsersShared.cs: Egy sor a *UsersShared* táblában.
 
-Létre hozzuk az API endpointokat:
-/plant/plants/{page}: Visszaad egy listányi (pageSize változóval változtatható a lista mérete) növényt a Plants táblából.
-/plant/details/{id}: Visszaad egy növény leírását a Details táblából.
-/plant/quiz: Visszaad egy Quiz adattípust, amely tartalmaz egy képet és négy nevet, amelyből az első (index 0) a képen látható növény neve.
-/plant/fullpants/{id}: Visszaad egy növényt minden adatával együtt.
-/plant/identify: Bekér egy MultipartFromDataContent típusú változót, amelyet majd átad a PlantNet API-nak, ami elvégzi a növény felismerést, majd visszaadja a legvalószínűbb növényt. Az API kulcsot a Docker compoose fájl segítségével adjuk át a webAPI-nak.
 
-Miután ezek elkészültek, egy Docker image-be csomagolom a programot, és feltelepítem a szerverre, majd frissítem a compose.yaml fájlt, így a Docker Compose ezt a szolgáltatást is el tudja indítani a többivel együtt.
+#### API Endpoints
+Alap működéshez szükséges endpointok:
+- /plant/plants/{page}: Visszaad egy listányi (pageSize változóval változtatható a lista mérete) növényt a Plants táblából.
+- /plant/details/{id}: Visszaad egy növény leírását a Details táblából.
+- /plant/quiz: Visszaad egy Quiz adattípust, amely tartalmaz egy képet és négy nevet, amelyből az első (index 0) a képen látható növény neve.
+- /plant/fullpants/{id}: Visszaad egy növényt minden adatával együtt.
+- /plant/identify: Bekér egy MultipartFromDataContent típusú változót, amelyet majd átad a PlantNet API-nak, ami elvégzi a növény felismerést, majd visszaadja a legvalószínűbb növényt. Az API kulcsot a Docker compoose fájl segítségével adjuk át a webAPI-nak.
+
+Authentikációhoz kötött endpointok:
+- Implementálás alatt.
+
 **GithubActions CI/CD pipeline automatikusan elkészíti a Docker image-t és deployolja Azureba. Lásd: serverdocumentation.md**
 
 ## Kliens
