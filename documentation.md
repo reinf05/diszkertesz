@@ -55,7 +55,10 @@ Alap működéshez szükséges endpointok:
 - /plant/identify: Bekér egy MultipartFromDataContent típusú változót, amelyet majd átad a PlantNet API-nak, ami elvégzi a növény felismerést, majd visszaadja a legvalószínűbb növényt. Az API kulcsot a Docker compoose fájl segítségével adjuk át a webAPI-nak.
 
 Authentikációhoz kötött endpointok:
-- Implementálás alatt.
+- /user/create-user: Ellenőrzi, hogy a felhasználó már benne van e az SQL táblában, illetve van e Blob konténere. Bármelyik hiányában javítja azokat.
+- /user/user-list: Visszaadja az adott felhasználóhoz tartozó bejegyzéseket.
+- /user/upload-image: Feltölti a képet a Blob konténerbe, visszaadja az URL-t.
+- /user/post-list: Feltölti az adatbázisba a bejegyzést.
 
 **GithubActions CI/CD pipeline automatikusan elkészíti a Docker image-t és deployolja Azureba. Lásd: serverdocumentation.md**
 
