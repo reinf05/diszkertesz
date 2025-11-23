@@ -20,12 +20,6 @@ namespace diszkerteszAPI.Controllers
             _context = context;
         }
 
-        //[HttpGet("plants")]
-        //public async Task<IEnumerable<Plant>> GetPlants()
-        //{
-        //    return await _context.Plants.OrderBy(p => p.ID).ToListAsync();
-
-        //}
 
         [HttpGet("plants/{pageNum}")]
         public async Task<Page<Plant>> GetPlantByPage(int pageNum = 1)
@@ -55,45 +49,11 @@ namespace diszkerteszAPI.Controllers
         }
 
 
-        //[HttpGet("details")]
-        //public async Task<IEnumerable<Detail>> GetDetails()
-        //{
-        //    return await _context.Details.OrderBy(d => d.Plant_ID).ToListAsync();
-        //}
-
         [HttpGet("details/{id}")]
         public async Task<ActionResult<Detail>> GetDetailById(int id)
         {
             return await _context.Details.FindAsync(id);
         }
-
-        //[HttpGet("fullplants")]
-        //public async Task<IEnumerable<object>> GetFullPlants(){
-        //    List<Plant> plantlist = (List<Plant>)await GetPlants();
-        //    List<Detail> detaillist = (List<Detail>)await GetDetails();
-
-        //    List<Fullplant> returnlist = new List<Fullplant>();
-
-        //    int count = 0;
-        //    while (count < plantlist.Count)
-        //    {
-        //        int id = plantlist[count].ID;
-        //        returnlist.Add(new Fullplant());
-        //        returnlist[count].ID = id;
-        //        returnlist[count].Type = plantlist[count].Type;
-        //        returnlist[count].Namel = plantlist[count].Namel;
-        //        returnlist[count].Nameh = plantlist[count].Nameh;
-        //        returnlist[count].Imagepath = plantlist[count].Imagepath;
-        //        returnlist[count].Description = detaillist[count].Description;
-        //        returnlist[count].Usage = detaillist[count].Usage;
-        //        returnlist[count].Pathogens = detaillist[count].Pathogens;
-        //        returnlist[count].Propagation = detaillist[count].Propagation;
-
-        //        count++;
-        //    }
-
-        //    return returnlist;
-        //}
 
         [HttpGet("fullplants/{id}")]
         public async Task<ActionResult<Fullplant>> GetFullplantById(int id)

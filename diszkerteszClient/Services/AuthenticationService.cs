@@ -13,7 +13,7 @@ namespace diszkerteszClient.Services
     {
         private const string ClientId = "ee879ed8-b52e-4100-9d08-0a530ca01dab";
         private const string TenantName = "diszkerteszentra";
-        private const string PolicySingInSingUp = "singin_signup";
+        private const string PolicySignInSignUp = "singin_signup";
         private object? ParentWindow;
         public static object? ParentActivity { get; set; }
 
@@ -30,20 +30,10 @@ namespace diszkerteszClient.Services
 
             application = PublicClientApplicationBuilder
                 .Create(ClientId)
-                .WithAuthority($"https://{TenantName}.ciamlogin.com/{TenantName}.onmicrosoft.com/{PolicySingInSingUp}")
+                .WithAuthority($"https://{TenantName}.ciamlogin.com/{TenantName}.onmicrosoft.com/{PolicySignInSignUp}")
                 .WithRedirectUri($"msal{ClientId}://auth")
                 .Build();
 
-        }
-
-        private object? GetParentWindow()
-        {
-#if ANDROID
-            // For Android, return the current activity
-            var activity = Microsoft.Maui.ApplicationModel.Platform.CurrentActivity;
-            return activity;
-#endif
-            return null;
         }
 
         public async Task<AuthenticationResult?> SignInAsync()

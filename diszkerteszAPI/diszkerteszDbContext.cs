@@ -10,5 +10,7 @@ namespace diszkerteszAPI
         }
         public DbSet<Plant> Plants { get; set; }
         public DbSet<Detail> Details { get; set; }
+        public DbSet<User> Users { get; set; }
+        public DbSet<UsersShared> UsersShared { get; set; }
     }
 }
