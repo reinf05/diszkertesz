@@ -7,6 +7,7 @@
             InitializeComponent();
 
             Routing.RegisterRoute(nameof(View.DetailPage), typeof(View.DetailPage));
+            Routing.RegisterRoute(nameof(View.AddPage), typeof(View.AddPage));
         }
     }
 }

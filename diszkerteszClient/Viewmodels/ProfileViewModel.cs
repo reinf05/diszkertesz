@@ -4,6 +4,7 @@ using diszkerteszClient.Models;
 using diszkerteszClient.Services;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -29,7 +30,6 @@ namespace diszkerteszClient.Viewmodels
             if(authResult is not null)
             {
                 await Shell.Current.DisplayAlert("Success", $"Welcome {authResult.Account.Username}!", "OK");
-                await LoadUserList();
                 IsLoaded = true;
             }
         }
@@ -53,9 +53,19 @@ namespace diszkerteszClient.Viewmodels
             IsLoaded = false;
         }
 
-
-        private async Task<bool> LoadUserList()
+        [RelayCommand]
+        public async Task GoToAddPageAsync()
         {
+            await Shell.Current.GoToAsync(nameof(View.AddPage));
+        }
+
+        [RelayCommand]
+        public async Task<bool> LoadUserList()
+        {
+            if (IsNotLoaded)
+            {
+                return false;
+            }
             try
             {
                 var userList = await authenticationService.GetCurrentUserList();

@@ -236,5 +236,53 @@ namespace diszkerteszClient.Services
             }
             throw new Exception("Failed to retrieve user list.");
         }
+
+        public async Task<bool> UploadItemAsync(UserItem userItem)
+        {
+            string URL = BaseUrl + "post-list";
+
+            try
+            {
+                await GetHeaderAsync();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"UploadItemAsync Failed: {ex.Message}");
+                return false;
+            }
+
+            string userItemJson = System.Text.Json.JsonSerializer.Serialize(userItem);
+
+            var response = await httpClient.PostAsync(URL, new StringContent(userItemJson, System.Text.Encoding.UTF8, "application/json"));
+            if(response.IsSuccessStatusCode)
+            {
+                return true;
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine($"UploadItemAsync Failed: {response.ReasonPhrase}");
+                return false;
+            }
+        }
+
+        private async Task GetHeaderAsync()
+        {
+            string accessToken = null;
+            try
+            {
+                accessToken = await GetAccessTokenAsync();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"GetCurrentUserList Failed: {ex.Message}");
+            }
+
+            if (accessToken is null)
+            {
+                await SignInAsync();
+            }
+
+            httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
+        }
     }
 }

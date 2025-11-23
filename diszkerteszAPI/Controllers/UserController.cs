@@ -141,10 +141,16 @@ namespace diszkerteszAPI.Controllers
 
             usersSharedPost.Owner = user.Id;
 
+            try
+            {
+                _context.UsersShared.Add(usersSharedPost);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                return StatusCode(500, $"Database update error: {ex.Message}");
+            }
 
-            _context.UsersShared.Add(usersSharedPost);
-
-            await _context.SaveChangesAsync();
             return new OkResult();
         }
 

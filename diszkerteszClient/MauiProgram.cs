@@ -13,6 +13,7 @@ namespace diszkerteszClient
             var builder = MauiApp.CreateBuilder();
             builder
                 .UseMauiApp<App>()
+                .UseMauiCommunityToolkit()
                 .UseMauiCommunityToolkitCamera()
                 .ConfigureFonts(fonts =>
                 {
@@ -32,6 +33,7 @@ namespace diszkerteszClient
             builder.Services.AddTransient<DetailViewModel>();
             builder.Services.AddTransient<QuizViewModel>();
             builder.Services.AddTransient<IdentifyViewModel>();
+            builder.Services.AddTransient<AddViewModel>();
             builder.Services.AddSingleton<ProfileViewModel>();
 
             //Add views
@@ -39,6 +41,7 @@ namespace diszkerteszClient
             builder.Services.AddTransient<DetailPage>();
             builder.Services.AddTransient<QuizPage>();
             builder.Services.AddTransient<IdentifyPage>();
+            builder.Services.AddTransient<AddPage>();
             builder.Services.AddSingleton<ProfilePage>();
 
             return builder.Build();

@@ -2,10 +2,38 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewmodel="clr-namespace:diszkerteszClient.Viewmodels"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              x:Class="diszkerteszClient.View.ProfilePage"
              Title="ProfilePage"
              x:DataType="viewmodel:ProfileViewModel"
-             xmlns:model="clr-namespace:diszkerteszClient.Models">
+             xmlns:model="clr-namespace:diszkerteszClient.Models"
+             x:Name="Profile_Page">
+
+    <ContentPage.Triggers>
+        <DataTrigger
+            TargetType="ContentPage"
+            Binding="{Binding IsNotLoaded}"
+            Value="True">
+            <Setter
+                Property="Title"
+                Value="Azonosítás"/>
+        </DataTrigger>
+        <DataTrigger
+            TargetType="ContentPage"
+            Binding="{Binding IsLoaded}"
+            Value="True">
+            <Setter
+                Property="Title"
+                Value="Profilom"/>
+        </DataTrigger>
+    </ContentPage.Triggers>
+
+    <ContentPage.Behaviors>
+        <toolkit:EventToCommandBehavior
+            EventName="Appearing"
+            Command="{Binding BindingContext.LoadUserListCommand, Source={x:Reference Profile_Page}}"/>
+    </ContentPage.Behaviors>
+
     <Grid
         ColumnDefinitions="*"
         RowDefinitions="*">
@@ -36,7 +64,7 @@
             IsVisible="{Binding IsLoaded}"
             RowDefinitions="*,auto">
 
-            <CollectionView
+        <CollectionView
                 Grid.Row="0"
                 SelectionMode="None"
                 ItemsSource="{Binding UserItems}">
@@ -79,11 +107,21 @@
 
             </CollectionView>
 
-            <Button
+            <HorizontalStackLayout
                 Grid.Row="1"
+                HorizontalOptions="Center"
                 Margin="10"
-                Text="Kijelentkezés"
-                Command="{Binding SignOutCommand}"/>
+                Spacing="20">
+                <Button
+                    Margin="10"
+                    Text="Hozzáadás"
+                    Command="{Binding GoToAddPageCommand}"/>
+
+                <Button
+                    Margin="10"
+                    Text="Kijelentkezés"
+                    Command="{Binding SignOutCommand}"/>
+            </HorizontalStackLayout>
         </Grid>
 
     </Grid>
