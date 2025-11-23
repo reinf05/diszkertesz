@@ -43,7 +43,7 @@ namespace diszkerteszClient.Services
         }
         public async Task<bool> CreateUserAsync()
         {
-            string URL = BaseUrl + "user-list";
+            string URL = BaseUrl + "create-user";
             string accessToken = null;
             try
             {
