@@ -90,7 +90,7 @@ namespace diszkerteszAPI.Controllers
         [HttpGet("user-list")]
         public async Task<List<UsersShared>> GetUserListAsync()
         {
-            var meeid = (_httpContext.HttpContext?.User.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier")) ?? throw new Exception("Meeid not found in token.");
+            var meeid = (_httpContext.HttpContext?.User.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier")) ?? _httpContext.HttpContext?.User.FindFirst("oid") ?? throw new Exception("Meeid not found in token.");
 
             User user = await GetCurrentUserAsync(meeid);
 
@@ -106,7 +106,7 @@ namespace diszkerteszAPI.Controllers
         [HttpPost("upload-image")]
         public async Task<string> UploadImageAsync(IFormFile file)
         {
-            var meeid = (_httpContext.HttpContext?.User.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier")) ?? throw new Exception("Meeid not found in token.");
+            var meeid = (_httpContext.HttpContext?.User.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier")) ?? _httpContext.HttpContext?.User.FindFirst("oid") ?? throw new Exception("Meeid not found in token.");
 
             User user = await GetCurrentUserAsync(meeid);
 
@@ -131,7 +131,7 @@ namespace diszkerteszAPI.Controllers
         [HttpPost("post-list")]
         public async Task<IActionResult> PostUserListAsync([FromBody] UsersShared usersSharedPost)
         {
-            var meeid = (_httpContext.HttpContext?.User.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier")) ?? throw new Exception("Meeid not found in token.");
+            var meeid = (_httpContext.HttpContext?.User.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier")) ?? _httpContext.HttpContext?.User.FindFirst("oid") ?? throw new Exception("Meeid not found in token.");
             User user = await GetCurrentUserAsync(meeid);
 
             usersSharedPost.Owner = user.Id;

@@ -29,8 +29,8 @@ namespace diszkerteszClient.Viewmodels
             if(authResult is not null)
             {
                 await Shell.Current.DisplayAlert("Success", $"Welcome {authResult.Account.Username}!", "OK");
-                IsLoaded = true;
                 await LoadUserList();
+                IsLoaded = true;
             }
         }
 
@@ -49,6 +49,7 @@ namespace diszkerteszClient.Viewmodels
         public async Task SignOutAsync()
         {
             await authenticationService.SignOutAsync();
+            UserItems = null; 
             IsLoaded = false;
         }
 
