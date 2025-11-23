@@ -92,6 +92,9 @@ A kvíz játéklogikát tartalmazza. Gombnyomásra lekéri az első kvízt, majd
 Implementálja a kép készítést (*CaptureAsync* relay command), az új kép készítése (*NewImage*) valamint a felismeréshez szükséges funkciókat. *IdentifyAsync* elküldi a képet *ByteStream* formátumban, megvárja a választ majd megjelenítetti a visszakapott adatokat.
 A gyorsabb válasz miatt a képeket átméretezzük mielőtt elküldjük a harmadik fél (*PlantNet*) számára. Az *IdentifyAsync* függvényen belül betöltjük egy *IImage* formátumba, a beépített függvényekkel átméretezzük, majd elmentjük (kissé rontott minőségben) egy *MemoryStream*-be, amelyet átalakítunk egy *byte* tömbbe. Ezt a kisebb, rosszabb minőségű képet adjuk át a *PlantService*-nek, hogy minél kevesebb időt vegyen el a kép feltöltése először a saját API-nak, majd onnan a harmadik fél API-hoz.
 
+### Profile ViewModel
+Implementálja a bejelentkezést, kijelentkezést és regisztrációt. Gombnyomásra megnyitja a bejelentkezési/regisztrációs felületet (külön böngészőben), majd sikeres bejelentkezés után megváltoztatja a *ProfilePage* nézetet, betölti a bejelentkezett felhasználóhoz tartozó listát (kikeresi az adatbázis táblából a hozzárendelt ID alapján a hozzá tartozó sorokat), hozzáadja őket egy *ObservableProperty*-hez, amelyet meg tud jeleníteni a nézet. Bejelentkezés után megjelenik egy kijelentkezés gomb is, amely vissza állítja az alap nézetet (bejelentkezés és regisztráció gomb), valamint kitöröl minden mentett adatot a listából.
+
 ### Navigation
 Az AppShell.xaml fájlban létre hozok egy menüt, aminek segítségével lehet lépni a különböző lapok között. Ehhez TabBar-t használok.
 
