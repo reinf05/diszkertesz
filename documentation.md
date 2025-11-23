@@ -82,7 +82,8 @@ A view-k felelnek az applikáció kinézetéért.
 - DetailPage.xaml: Egy növény részletes nézete. Megjeleníti a rendelkezésre álló képeket egy *ScrollView*-ban, illetve a rendelkezésre álló adatokat a képek alatt.
 - QuizPage.xaml: Felel a játék megjelenítéséért. 1 képet és 4 választ jelenít meg, valamint tartalmazza külön mezőben a helyes megoldást.
 - IdentifyPage.xaml: Alap esetben megjeleníti a kamerát, egy gombot amellyel el lehet készíteni a képet. Ha van elkészített kép, akkor megjeleníti azt, valamint két gombot, az egyikkel új képet lehet készíteni, a másikkal pedig el lehet küldeni azonosításra. Ha sikeres volt az azonosítás, akkor megjelenik a kép, alatta a latin neve a növénynek, egy százalékos szint, amely jelöli a model pontosságát, valamint hétköznapi nevek.
-- ProfilePage.xaml: Ha a felhasználó nincs bejelentkezve, akkor két gomb látszik, bejelentkezés és regisztráció. Ha bejelentkezett a felhasználó, akkor a profilját látja.
+- ProfilePage.xaml: Ha a felhasználó nincs bejelentkezve, akkor két gomb látszik, bejelentkezés és regisztráció. Ha bejelentkezett a felhasználó, akkor a saját listáját látja.
+- AddPage.xaml: A felhasználó saját listájához bejegyzést készítő nézet. Kép készítését és kép kiválasztását is támogatja.
 
 Minden view *code behind* fájljában a konstuktorban átadom *dependency injection*-el a megfelelő *viewmodel*-t, majd beállítom *BindingContext*-nek őket.
 
@@ -90,7 +91,7 @@ Minden view *code behind* fájljában a konstuktorban átadom *dependency inject
 Ez felel a szerverrel való kommunikációért. Itt vannak megadva azok a függvények, amelyek elhagyhatatlanok a WebAPI és a kliens közti kommunikáció létrejöttéhez.
 
 ### Authentication Service
-Ez felel a kommunikációért a Microsoft Entra External ID-vel, amely az authentikációt intézi. *SignInAync* és *SignOutAsync* függvények felelnek a be és kijelentkezésért, a *GetAccessTokenAsync* felel a token megújításáért ha szükséges.
+Ez felel a kommunikációért a Microsoft Entra External ID-vel, amely az authentikációt intézi. *SignInAync* és *SignOutAsync* függvények felelnek a be és kijelentkezésért, a *GetAccessTokenAsync* felel a token megújításáért ha szükséges. Lekéri a WebAPI-tól az adott felhasználóhoz tartozó listát, valamint kezeli az új bejegyzés feltöltését is. A bejegyzéshez tartozó képet is feltölti.
 
 ### Authentication for Android
 Az Android operációs rendszerhez több módosítást is végre kell hajtani, hogy megfelelően működjön az authentikáció. A *Platforms/Android* mappában az új *MsalActivity.cs* szükséges ahhoz, hogy megfelelően vissza tudjon irányítani minket a belépés után az appra, ezt az activity-t regisztrálni kell a *MainActivity.cs*-ben is.
@@ -116,6 +117,9 @@ A gyorsabb válasz miatt a képeket átméretezzük mielőtt elküldjük a harma
 
 ### Profile ViewModel
 Meghívja az *AuthenticationService* függvényeit, átalakítja a visszakapott adatokat a megfelelő formára, hogy a *ProfilePage* meg tudja jeleníteni. Kezeli a változókat amik alapján változik a hozzátartozó nézet.
+
+### Add ViewModel
+Több változó segítségével változtatja az *AddView* nézetet, attól függően, hogy éppen képet készítene/választana a felhasználó, elkészítette/kiválasztotta a képet, vagy az alap hozzáadás nézetnél marad. Kezeli a kamerát, a kép készítést, a kép kiválasztását *MediaPicker* segítségével, új kép készítését/választását. Gondoskodik a megfelelő formájú feltöltésről, valamint a kép feltöltését is kezdeményezi.
 
 ### Navigation
 Az AppShell.xaml fájlban létre hozok egy menüt, aminek segítségével lehet lépni a különböző lapok között. Ehhez TabBar-t használok.
