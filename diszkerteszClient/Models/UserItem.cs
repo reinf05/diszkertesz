@@ -9,9 +9,9 @@ namespace diszkerteszClient.Models
     public class UserItem
     {
         public int Id { get; set; }
-        public string Owner { get; set; }
+        public int Owner { get; set; }
         public string Name { get; set; }
-        public string Description { get; set; }
-        public string PictureUrl { get; set; }
+        public string? Description { get; set; }
+        public string? Pictureurl { get; set; }
     }
 }

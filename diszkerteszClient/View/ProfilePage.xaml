@@ -38,7 +38,8 @@
 
             <CollectionView
                 Grid.Row="0"
-                SelectionMode="None">
+                SelectionMode="None"
+                ItemsSource="{Binding UserItems}">
 
                 <CollectionView.ItemTemplate>
                     <DataTemplate
@@ -58,7 +59,7 @@
                                     Padding="10"
                                     ColumnSpacing="20">
                                     <Image
-                                        Source="{Binding PictureUrl, StringFormat='{0}1.jpeg'}"
+                                        Source="{Binding Pictureurl, StringFormat='{0}1.jpeg'}"
                                         Style="{StaticResource Thumbnail}"
                                         Grid.Column="0"/>
                                     <VerticalStackLayout

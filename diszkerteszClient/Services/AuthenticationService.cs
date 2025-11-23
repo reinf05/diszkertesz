@@ -223,7 +223,7 @@ namespace diszkerteszClient.Services
 
             if (response.IsSuccessStatusCode)
             {
-                var userList = await response.Content.ReadFromJsonAsync<List<Models.UserItem>>();
+                var userList = await response.Content.ReadFromJsonAsync<List<UserItem>>();
                 if (userList is not null)
                 {
                     return userList;
@@ -234,11 +234,7 @@ namespace diszkerteszClient.Services
                     throw new Exception("User list is null.");
                 }
             }
-            else
-            {
-                System.Diagnostics.Debug.WriteLine($"GetCurrentUserList Failed: {response.ReasonPhrase}");
-            }
-                throw new Exception("Failed to retrieve user list.");
+            throw new Exception("Failed to retrieve user list.");
         }
     }
 }
