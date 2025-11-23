@@ -1,4 +1,6 @@
-﻿using CommunityToolkit.Mvvm.Input;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using diszkerteszClient.Models;
 using diszkerteszClient.Services;
 using System;
 using System.Collections.Generic;
@@ -12,6 +14,9 @@ namespace diszkerteszClient.Viewmodels
     {
         private AuthenticationService authenticationService;
 
+        [ObservableProperty]
+        private List<UserItem> userItems;
+
         public ProfileViewModel(AuthenticationService authenticationService)
         {
             this.authenticationService = authenticationService;
@@ -24,7 +29,19 @@ namespace diszkerteszClient.Viewmodels
             if(authResult is not null)
             {
                 await Shell.Current.DisplayAlert("Success", $"Welcome {authResult.Account.Username}!", "OK");
-                // Handle post sign-in actions (e.g., update UI)
+                IsLoaded = true;
+                await LoadUserList();
+            }
+        }
+
+        [RelayCommand]
+        public async Task SignUpAsync()
+        {
+            var signUpResult = await authenticationService.SignUpAsync();
+            if (signUpResult is not null)
+            {
+                await Shell.Current.DisplayAlert("Success", $"SignUp {signUpResult.Account.Username}!", "OK");
+                IsLoaded = true;
             }
         }
 
@@ -32,8 +49,27 @@ namespace diszkerteszClient.Viewmodels
         public async Task SignOutAsync()
         {
             await authenticationService.SignOutAsync();
-            // Handle post sign-out actions (e.g., update UI)
+            IsLoaded = false;
         }
 
+
+        private async Task<bool> LoadUserList()
+        {
+            try
+            {
+                var userList = await authenticationService.GetCurrentUserList();
+                if (userList is not null)
+                {
+                    UserItems = userList;
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"LoadUserList Failed: {ex.Message}");
+                return false;
+            }
+            return false;
+        }
     }
 }

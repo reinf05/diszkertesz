@@ -1,9 +1,11 @@
-﻿using Microsoft.Identity.Client;
+﻿using diszkerteszClient.Models;
+using Microsoft.Identity.Client;
 using Microsoft.Maui.ApplicationModel;
 using Microsoft.Maui.Controls.PlatformConfiguration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http.Json;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -15,18 +17,22 @@ namespace diszkerteszClient.Services
         private const string TenantName = "diszkerteszentra";
         private const string PolicySignInSignUp = "singin_signup";
         private object? ParentWindow;
+        private const string BaseUrl = "https://ca-diszkertesz-gerwest-dev-001.politeocean-b59cb8a8.westeurope.azurecontainerapps.io/User/";
+        private HttpClient httpClient;
         public static object? ParentActivity { get; set; }
 
         private static readonly string[] Scopes = new string[]
         {
             "openid",
-            "offline_access"
+            "offline_access",
+            "api://0534bddb-0348-4be0-a028-dec801b97388/user_access"
         };
 
         private IPublicClientApplication application;
 
         public AuthenticationService()
         {
+            httpClient = new();
 
             application = PublicClientApplicationBuilder
                 .Create(ClientId)
@@ -34,6 +40,36 @@ namespace diszkerteszClient.Services
                 .WithRedirectUri($"msal{ClientId}://auth")
                 .Build();
 
+        }
+        public async Task<bool> CreateUserAsync()
+        {
+            string URL = BaseUrl + "user-list";
+            string accessToken = null;
+            try
+            {
+                accessToken = await GetAccessTokenAsync();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"GetCurrentUserList Failed: {ex.Message}");
+                return false;
+            }
+
+            if (string.IsNullOrEmpty(accessToken))
+            {
+                return false;
+            }
+
+            httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
+
+            var response = await httpClient.PostAsync(URL, new StringContent(""));
+
+            if (response.IsSuccessStatusCode)
+            {
+                return true;
+
+            }
+            return false;
         }
 
         public async Task<AuthenticationResult?> SignInAsync()
@@ -56,7 +92,6 @@ namespace diszkerteszClient.Services
                     authResult = await application.AcquireTokenInteractive(Scopes)
                         .WithParentActivityOrWindow(ParentActivity)
                         .ExecuteAsync();
-                    await Shell.Current.DisplayAlert("Ok", "ok", "ok");
                 }
                 catch (MsalException ex)
                 {
@@ -69,7 +104,51 @@ namespace diszkerteszClient.Services
                 System.Diagnostics.Debug.WriteLine($"Silent Token Acquisition Failed: {ex.Message}");
             }
 
+            if (authResult is not null)
+            {
+                bool createUser = await CreateUserAsync();
+
+                if (!createUser)
+                {
+                    throw new Exception("Error in registering user in database");
+                }
+            }
+
             return authResult;
+        }
+
+        public async Task<AuthenticationResult?> SignUpAsync()
+        {
+            AuthenticationResult? signUpResult = null;
+            try
+            {
+                // Interactively acquire a token for sign-up
+                signUpResult = await application.AcquireTokenInteractive(Scopes)
+                    .WithParentActivityOrWindow(ParentActivity)
+                    .WithPrompt(Prompt.Create)
+                    .ExecuteAsync();
+            }
+            catch (MsalException ex)
+            {
+                // Handle specific interactive login errors
+                System.Diagnostics.Debug.WriteLine($"Interactive Sign-Up Failed: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Sign-Up Failed: {ex.Message}");
+            }
+
+            if (signUpResult is not null)
+            {
+                bool createUser = await CreateUserAsync();
+
+                if (!createUser)
+                {
+                    throw new Exception("Error in registering user in database");
+                }
+            }
+
+            return signUpResult;
         }
 
         public async Task SignOutAsync()
@@ -118,6 +197,44 @@ namespace diszkerteszClient.Services
                 System.Diagnostics.Debug.WriteLine($"Token Acquisition Silent Failed: {ex.Message}");
                 return null;
             }
+        }
+
+        public async Task<List<UserItem>> GetCurrentUserList()
+        {
+            string URL = BaseUrl + "user-list";
+            string accessToken = null;
+            try
+            {
+                accessToken = await GetAccessTokenAsync();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"GetCurrentUserList Failed: {ex.Message}");
+            }
+
+            if (accessToken is null)
+            {
+                await SignInAsync();
+            }
+
+            httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
+
+            var response = await httpClient.GetAsync(URL);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var userList = await response.Content.ReadFromJsonAsync<List<Models.UserItem>>();
+                if (userList is not null)
+                {
+                    return userList;
+                }
+                else 
+                {
+                    System.Diagnostics.Debug.WriteLine($"GetCurrentUserList Failed: {response.ReasonPhrase}");
+                    throw new Exception("User list is null.");
+                }
+            }
+            throw new Exception("Failed to retrieve user list.");
         }
     }
 }

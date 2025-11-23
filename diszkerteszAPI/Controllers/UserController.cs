@@ -30,7 +30,7 @@ namespace diszkerteszAPI.Controllers
         [HttpPost("create-user")]
         public async Task<User> CreateUserAsync()
         {
-            var meeid = (_httpContext.HttpContext?.User.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier")) ?? throw new Exception("Meeid not found in token.");
+            var meeid = (_httpContext.HttpContext?.User.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier")) ?? _httpContext.HttpContext?.User.FindFirst("oid") ?? throw new Exception("Meeid not found in token.");
 
             var user = await _context.Users
                 .FirstOrDefaultAsync(u => u.Meeid == meeid.Value);

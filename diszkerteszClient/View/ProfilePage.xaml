@@ -4,7 +4,8 @@
              xmlns:viewmodel="clr-namespace:diszkerteszClient.Viewmodels"
              x:Class="diszkerteszClient.View.ProfilePage"
              Title="ProfilePage"
-             x:DataType="viewmodel:ProfileViewModel">
+             x:DataType="viewmodel:ProfileViewModel"
+             xmlns:model="clr-namespace:diszkerteszClient.Models">
     <Grid
         ColumnDefinitions="*"
         RowDefinitions="*">
@@ -25,19 +26,63 @@
                 Grid.Row="1"
                 Margin="10"
                 Text="Regisztráció"
-                Command="{Binding SignOutCommand}"/>
+                Command="{Binding SignUpCommand}"/>
 
         </Grid>
 
         <Grid
             Grid.ColumnSpan="1"
             Grid.RowSpan="1"
-            IsVisible="{Binding IsLoaded}">
-            <Label
-                Text="Sikeres bejelentkezés!"
-                HorizontalOptions="Center"
-                VerticalOptions="Center"/>
+            IsVisible="{Binding IsLoaded}"
+            RowDefinitions="*,auto">
 
+            <CollectionView
+                Grid.Row="0"
+                SelectionMode="None">
+
+                <CollectionView.ItemTemplate>
+                    <DataTemplate
+                    x:DataType="{x:Type model:UserItem}">
+                        <VerticalStackLayout Padding="5">
+
+                            <Border
+                                HorizontalOptions="Center">
+                                <!--Implement gesture recognizer later/ edit page
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer
+                                </Border.GestureRecognizers>-->
+
+
+                                <Grid
+                                    ColumnDefinitions="125,200"
+                                    Padding="10"
+                                    ColumnSpacing="20">
+                                    <Image
+                                        Source="{Binding PictureUrl, StringFormat='{0}1.jpeg'}"
+                                        Style="{StaticResource Thumbnail}"
+                                        Grid.Column="0"/>
+                                    <VerticalStackLayout
+                                        Grid.Column="1"
+                                        Spacing="10"
+                                        VerticalOptions="Center">
+                                        <Label Text="{Binding Name}"
+                                           Style="{StaticResource TextBold}"/>
+                                        <Label Text="{Binding Description}"/>
+                                    </VerticalStackLayout>
+                                </Grid>
+                            </Border>
+                        </VerticalStackLayout>
+                    </DataTemplate>
+
+                </CollectionView.ItemTemplate>
+
+            </CollectionView>
+
+            <Button
+                Grid.Row="1"
+                Margin="10"
+                Text="Kijelentkezés"
+                Command="{Binding SignOutCommand}"/>
         </Grid>
 
     </Grid>
