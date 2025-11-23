@@ -87,7 +87,7 @@
                                     Padding="10"
                                     ColumnSpacing="20">
                                     <Image
-                                        Source="{Binding Pictureurl, StringFormat='{0}1.jpeg'}"
+                                        Source="{Binding Pictureurl}"
                                         Style="{StaticResource Thumbnail}"
                                         Grid.Column="0"/>
                                     <VerticalStackLayout

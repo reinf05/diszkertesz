@@ -1,4 +1,5 @@
-﻿using diszkerteszClient.Models;
+﻿using Android.Service.Autofill;
+using diszkerteszClient.Models;
 using Microsoft.Identity.Client;
 using Microsoft.Maui.ApplicationModel;
 using Microsoft.Maui.Controls.PlatformConfiguration;
@@ -262,6 +263,38 @@ namespace diszkerteszClient.Services
             {
                 System.Diagnostics.Debug.WriteLine($"UploadItemAsync Failed: {response.ReasonPhrase}");
                 return false;
+            }
+        }
+
+        public async Task<string> UploadImageAsync(byte[] imageBytes, string fileName)
+        {
+            string URL = BaseUrl + "upload-image";
+
+            var content = new MultipartFormDataContent();
+            var imageContent = new ByteArrayContent(imageBytes);
+            imageContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("image/jpeg");
+            content.Add(imageContent, "file", fileName);
+
+            try
+            {
+                await GetHeaderAsync();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"UploadImageAsync Failed: {ex.Message}");
+                return string.Empty;
+            }
+
+            var response = await httpClient.PostAsync(URL, content);
+            if (response.IsSuccessStatusCode)
+            {
+                var imageUrl = await response.Content.ReadAsStringAsync();
+                return imageUrl;
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine($"UploadImageAsync Failed: {response.ReasonPhrase}");
+                return string.Empty;
             }
         }
 

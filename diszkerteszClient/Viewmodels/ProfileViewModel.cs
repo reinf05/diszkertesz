@@ -16,7 +16,7 @@ namespace diszkerteszClient.Viewmodels
         private AuthenticationService authenticationService;
 
         [ObservableProperty]
-        private List<UserItem> userItems;
+        private ObservableCollection<UserItem>? userItems;
 
         public ProfileViewModel(AuthenticationService authenticationService)
         {
@@ -24,18 +24,19 @@ namespace diszkerteszClient.Viewmodels
         }
 
         [RelayCommand]
-        public async Task SignInAsync()
+        async Task SignInAsync()
         {
             var authResult = await authenticationService.SignInAsync();
             if(authResult is not null)
             {
                 await Shell.Current.DisplayAlert("Success", $"Welcome {authResult.Account.Username}!", "OK");
                 IsLoaded = true;
+                await LoadUserList();
             }
         }
 
         [RelayCommand]
-        public async Task SignUpAsync()
+        async Task SignUpAsync()
         {
             var signUpResult = await authenticationService.SignUpAsync();
             if (signUpResult is not null)
@@ -46,7 +47,7 @@ namespace diszkerteszClient.Viewmodels
         }
 
         [RelayCommand]
-        public async Task SignOutAsync()
+        async Task SignOutAsync()
         {
             await authenticationService.SignOutAsync();
             UserItems = null; 
@@ -54,13 +55,13 @@ namespace diszkerteszClient.Viewmodels
         }
 
         [RelayCommand]
-        public async Task GoToAddPageAsync()
+        async Task GoToAddPageAsync()
         {
             await Shell.Current.GoToAsync(nameof(View.AddPage));
         }
 
         [RelayCommand]
-        public async Task<bool> LoadUserList()
+        async Task<bool> LoadUserList()
         {
             if (IsNotLoaded)
             {
@@ -68,12 +69,33 @@ namespace diszkerteszClient.Viewmodels
             }
             try
             {
-                var userList = await authenticationService.GetCurrentUserList();
-                if (userList is not null)
+                var fetchedList = await authenticationService.GetCurrentUserList();
+                
+                if(fetchedList is null) { return false; }
+
+                if(UserItems == null)
                 {
-                    UserItems = userList;
+                    UserItems = new ObservableCollection<UserItem>(fetchedList);
                     return true;
                 }
+
+                foreach(var item in UserItems.ToList())
+                {
+                    if(!fetchedList.Any(x => x.Id == item.Id))
+                    {
+                        UserItems.Remove(item);
+                    }
+                }
+
+                foreach (var item in fetchedList)
+                {
+                    if(!UserItems.Any(x => x.Id == item.Id))
+                    {
+                        UserItems.Add(item);
+                    }
+                }
+
+                return true;
             }
             catch (Exception ex)
             {

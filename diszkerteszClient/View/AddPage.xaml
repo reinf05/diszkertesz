@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:diszkerteszClient.Viewmodels"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             x:Class="diszkerteszClient.View.AddPage"
+             Title="AddPage"
+             x:DataType="viewmodels:AddViewModel">
+    <Grid>
+        <Grid
+            RowDefinitions="auto,*,auto"
+            ColumnDefinitions="*,*"
+            IsVisible="{Binding IsNotImage}">
+            <ImageButton
+                Grid.Row="0"
+                Grid.Column="0"
+                BackgroundColor="Green"
+                HorizontalOptions="Start"
+                VerticalOptions="Start"
+                HeightRequest="200"
+                WidthRequest="200"
+                Margin="10,100,0,10"
+                Source="{Binding Image}"
+                Command="{Binding ChangeImageStateCommand}"/>
+
+            <Entry
+                Grid.Row="0"
+                Grid.Column="1"
+                Placeholder="Növény neve"
+                Margin="20,100,0,0"
+                HeightRequest="20"
+                ClearButtonVisibility="WhileEditing"
+                Text="{Binding ItemName}"/>
+
+            <Editor
+                Grid.Row="1"
+                Grid.ColumnSpan="2"
+                Placeholder="Növény leírása"
+                Margin="10"
+                HeightRequest="100"
+                Text="{Binding ItemDescription}"/>
+
+            <Button
+                Grid.Row="2"
+                Grid.ColumnSpan="2"
+                Margin="10"
+                Text="Feltöltés"
+                Command="{Binding SubmitCommand}"/>
+        </Grid>
+
+        <Grid
+            RowDefinitions="*, auto"
+            ColumnDefinitions="*,*"
+            IsVisible="{Binding IsImage}">
+            <toolkit:CameraView
+                Grid.Row="0"
+                
+                Grid.ColumnSpan="2"
+                x:Name="Camera"
+                IsVisible="{Binding HasNotImage}"/>
+            <ImageButton Command="{Binding CaptureCommand}"
+                CommandParameter="{x:Reference Camera}"
+                MaximumWidthRequest="80"
+                MaximumHeightRequest="80"
+                MinimumHeightRequest="80"
+                MinimumWidthRequest="80"
+                BorderColor="White"
+                BorderWidth="10"
+                CornerRadius="80"
+                BackgroundColor="Transparent"
+                Grid.Row="1"
+                Grid.Column="1"
+                IsVisible="{Binding HasNotImage}"/>
+            <ImageButton Command="{Binding PickImageCommand}"
+                MaximumWidthRequest="80"
+                MaximumHeightRequest="80"
+                MinimumHeightRequest="80"
+                MinimumWidthRequest="80"
+                BorderColor="White"
+                BorderWidth="10"
+                CornerRadius="80"
+                BackgroundColor="Red"
+                Grid.Row="1"
+                Grid.Column="0"
+                IsVisible="{Binding HasNotImage}"/>
+            <Image
+                Grid.ColumnSpan="2"
+                Grid.Row="0"
+                Aspect="AspectFill"
+                HorizontalOptions="Fill"
+                VerticalOptions="Fill"
+                Source="{Binding Image}"
+                IsVisible="{Binding HasImage}"/>
+            <Grid
+                IsVisible="{Binding HasImage}"
+                Grid.Row="1"
+                Grid.ColumnSpan="2"
+                ColumnDefinitions="*,*"
+                ColumnSpacing="10"
+                Margin="0,20,0,10">
+                <Button
+                    Text="Új kép"
+                    Command="{Binding NewImageCommand}"
+                    Grid.Column="0"/>
+                <Button
+                    Text="Rendben"
+                    Command="{Binding ChangeImageStateCommand}"
+                    Grid.Column="1"
+                    IsVisible="{Binding HasImage}"/>
+            </Grid>
+        </Grid>
+    </Grid>
+</ContentPage>
