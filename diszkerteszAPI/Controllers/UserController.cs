@@ -76,7 +76,7 @@ namespace diszkerteszAPI.Controllers
             await _context.SaveChangesAsync();
         }
 
-        private async Task<User> GetCurrentUserAsync(string meeid)
+        private async Task<User?> GetCurrentUserAsync(string meeid)
         {
             return await _context.Users
                 .FirstOrDefaultAsync(u => u.Meeid == meeid);
@@ -89,7 +89,7 @@ namespace diszkerteszAPI.Controllers
             {
                 var meeid = (_httpContext.HttpContext?.User.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier")) ?? _httpContext.HttpContext?.User.FindFirst("oid") ?? throw new Exception("Meeid not found in token.");
 
-                User user = await GetCurrentUserAsync(meeid.Value);
+                User? user = await GetCurrentUserAsync(meeid.Value);
 
                 if (user == null)
                 {

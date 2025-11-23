@@ -234,7 +234,11 @@ namespace diszkerteszClient.Services
                     throw new Exception("User list is null.");
                 }
             }
-            throw new Exception("Failed to retrieve user list.");
+            else
+            {
+                System.Diagnostics.Debug.WriteLine($"GetCurrentUserList Failed: {response.ReasonPhrase}");
+            }
+                throw new Exception("Failed to retrieve user list.");
         }
     }
 }
