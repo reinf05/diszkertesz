@@ -76,31 +76,36 @@ namespace diszkerteszAPI.Controllers
             await _context.SaveChangesAsync();
         }
 
-        private async Task<User> GetCurrentUserAsync(Claim meeid)
+        private async Task<User> GetCurrentUserAsync(string meeid)
         {
-            var user = await _context.Users
-                .FirstOrDefaultAsync(u => u.Meeid == meeid.Value);
-            if (user == null)
-            {
-                throw new Exception("User not found.");
-            }
-            return user;
+            return await _context.Users
+                .FirstOrDefaultAsync(u => u.Meeid == meeid);
         }
 
         [HttpGet("user-list")]
-        public async Task<List<UsersShared>> GetUserListAsync()
+        public async Task<IActionResult> GetUserListAsync()
         {
-            var meeid = (_httpContext.HttpContext?.User.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier")) ?? _httpContext.HttpContext?.User.FindFirst("oid") ?? throw new Exception("Meeid not found in token.");
-
-            User user = await GetCurrentUserAsync(meeid);
-
-            List<UsersShared> usersSharedList = new List<UsersShared>();
-            _context.UsersShared.Where(u => u.Owner == user.Id).ToList().ForEach(u =>
+            try
             {
-                usersSharedList.Add(u);
-            });
+                var meeid = (_httpContext.HttpContext?.User.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier")) ?? _httpContext.HttpContext?.User.FindFirst("oid") ?? throw new Exception("Meeid not found in token.");
 
-            return usersSharedList;
+                User user = await GetCurrentUserAsync(meeid.Value);
+
+                if (user == null)
+                {
+                    return NotFound($"User not found with id {meeid.Value}.");
+                }
+
+                var usersSharedList = await _context.UsersShared
+                    .Where(u => u.Owner == user.Id)
+                    .ToListAsync();
+
+                return Ok(usersSharedList);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
 
         [HttpPost("upload-image")]
@@ -108,7 +113,7 @@ namespace diszkerteszAPI.Controllers
         {
             var meeid = (_httpContext.HttpContext?.User.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier")) ?? _httpContext.HttpContext?.User.FindFirst("oid") ?? throw new Exception("Meeid not found in token.");
 
-            User user = await GetCurrentUserAsync(meeid);
+            User user = await GetCurrentUserAsync(meeid.Value);
 
             string containerName = $"user-{user.Id.ToString()}";
             var blobContainerClient = _blobServiceClient.GetBlobContainerClient(containerName);
@@ -132,7 +137,7 @@ namespace diszkerteszAPI.Controllers
         public async Task<IActionResult> PostUserListAsync([FromBody] UsersShared usersSharedPost)
         {
             var meeid = (_httpContext.HttpContext?.User.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier")) ?? _httpContext.HttpContext?.User.FindFirst("oid") ?? throw new Exception("Meeid not found in token.");
-            User user = await GetCurrentUserAsync(meeid);
+            User user = await GetCurrentUserAsync(meeid.Value);
 
             usersSharedPost.Owner = user.Id;
 
