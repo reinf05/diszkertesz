@@ -117,8 +117,8 @@ namespace diszkerteszAPI.Controllers
 
             string containerName = $"user-{user.Id.ToString()}";
             var blobContainerClient = _blobServiceClient.GetBlobContainerClient(containerName);
-            var blobClient = blobContainerClient.GetBlobClient($"{Guid.NewGuid()}-{file.FileName}");
-            
+            var blobClient = blobContainerClient.GetBlobClient(file.FileName);
+
 
             using (var stream = file.OpenReadStream())
             {
@@ -154,7 +154,7 @@ namespace diszkerteszAPI.Controllers
             return new OkResult();
         }
 
-        [HttpDelete("delete-item")]
+        [HttpDelete("delete-item/{id}")]
         public async Task<IActionResult> DeleteUserItemAsync(int id)
         {
             try
@@ -171,7 +171,7 @@ namespace diszkerteszAPI.Controllers
             return new OkResult();
         }
 
-        [HttpGet("get-item")]
+        [HttpGet("get-item/{id}")]
         public async Task<IActionResult> GetUserItemAsync(int id)
         {
             try
@@ -191,7 +191,7 @@ namespace diszkerteszAPI.Controllers
         }
 
         [HttpPut("edit-item")]
-        public async Task<IActionResult> EditUserItemAsync(UsersShared item)
+        public async Task<IActionResult> EditUserItemAsync([FromBody] UsersShared item)
         {
             try
             {
@@ -206,6 +206,25 @@ namespace diszkerteszAPI.Controllers
             catch (DbUpdateException ex)
             {
                 return StatusCode(500, $"Database update error: {ex.Message}");
+            }
+            return new OkResult();
+        }
+
+        [HttpPost("delete-image")]
+        public async Task<IActionResult> DeleteImageAsync([FromQuery] string fileName)
+        {
+            var meeid = (_httpContext.HttpContext?.User.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier")) ?? _httpContext.HttpContext?.User.FindFirst("oid") ?? throw new Exception("Meeid not found in token.");
+            User user = await GetCurrentUserAsync(meeid.Value);
+            string containerName = $"user-{user.Id.ToString()}";
+            var blobContainerClient = _blobServiceClient.GetBlobContainerClient(containerName);
+            var blobClient = blobContainerClient.GetBlobClient(fileName);
+            try
+            {
+                await blobClient.DeleteIfExistsAsync();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error deleting image: {ex.Message}");
             }
             return new OkResult();
         }
