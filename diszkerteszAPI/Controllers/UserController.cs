@@ -117,7 +117,7 @@ namespace diszkerteszAPI.Controllers
 
             string containerName = $"user-{user.Id.ToString()}";
             var blobContainerClient = _blobServiceClient.GetBlobContainerClient(containerName);
-            var blobClient = blobContainerClient.GetBlobClient(file.FileName);
+            var blobClient = blobContainerClient.GetBlobClient($"{Guid.NewGuid()}-{file.FileName}");
             
 
             using (var stream = file.OpenReadStream())
@@ -154,8 +154,60 @@ namespace diszkerteszAPI.Controllers
             return new OkResult();
         }
 
-        //TODO: Include image URL
-        //TODO: Delete user data endpoint
-        //TODO: Edit user data endpoint
+        [HttpDelete("delete-item")]
+        public async Task<IActionResult> DeleteUserItemAsync(int id)
+        {
+            try
+            {
+                await _context.UsersShared
+                    .Where(u => u.Id == id)
+                    .ExecuteDeleteAsync();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Database update error: {ex.Message}");
+            }
+
+            return new OkResult();
+        }
+
+        [HttpGet("get-item")]
+        public async Task<IActionResult> GetUserItemAsync(int id)
+        {
+            try
+            {
+                var item = await _context.UsersShared
+                    .FirstOrDefaultAsync(u => u.Id == id);
+                if (item == null)
+                {
+                    return NotFound($"Item with id {id} not found.");
+                }
+                return Ok(item);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        [HttpPut("edit-item")]
+        public async Task<IActionResult> EditUserItemAsync(UsersShared item)
+        {
+            try
+            {
+                await _context.UsersShared
+                    .Where(u => u.Id == item.Id)
+                    .ExecuteUpdateAsync(u => u
+                        .SetProperty(p => p.Name, item.Name)
+                        .SetProperty(p => p.Description, item.Description)
+                        .SetProperty(p => p.Pictureurl, item.Pictureurl));
+
+            }
+            catch (DbUpdateException ex)
+            {
+                return StatusCode(500, $"Database update error: {ex.Message}");
+            }
+            return new OkResult();
+        }
     }
 }
