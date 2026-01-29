@@ -1,5 +1,4 @@
-﻿using Android.Service.Autofill;
-using diszkerteszClient.Models;
+﻿using diszkerteszClient.Models;
 using Microsoft.Identity.Client;
 using Microsoft.Maui.ApplicationModel;
 using Microsoft.Maui.Controls.PlatformConfiguration;
@@ -18,7 +17,8 @@ namespace diszkerteszClient.Services
         private const string TenantName = "diszkerteszentra";
         private const string PolicySignInSignUp = "singin_signup";
         private object? ParentWindow;
-        private const string BaseUrl = "https://ca-diszkertesz-gerwest-dev-001.politeocean-b59cb8a8.westeurope.azurecontainerapps.io/User/";
+        private const string BaseUrl = "http://localhost:5146/User/";
+        //private const string BaseUrl = "https://ca-diszkertesz-gerwest-dev-001.politeocean-b59cb8a8.westeurope.azurecontainerapps.io/User/";
         private HttpClient httpClient;
         public static object? ParentActivity { get; set; }
 

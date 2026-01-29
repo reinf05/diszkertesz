@@ -43,6 +43,10 @@ At this point I can remove the code part in the webAPI, that is responsible for 
 ## Azure Container Apps
 Azure Container Apps is responsible for running the Docker Image of the webAPI, which is published to a public Docker Hub repository. First of all, I have to create a new Container App Environment for the application, called caenv-diszkertesz-gerwest-dev-001. Inside this environment I can create the application itself called ca-diszkertesz-gerwest-dev-001. I have to specify the deployment source, which will be a container image (this is important for the steps later). Then I specify the image itself, and where to find it. In my case this is a public Docker Hub repository. I selected the smallest possible resources, to save costs. Ingress must be enabled, because this service must be accessible from anywhere by the mobile application. 
 I also need to add any Environmental variables if needed. I can create secrets in the Container App context, so these environmental variables can be hidden, providing more security. After the initial setup and provisioning I can access my webAPI through a link provided by Azure. I can also check the logs in live if something went wrong.
+
+# Production
+All of these resources are created for production environment as well, so that testing and production can be clearly distinguished.
+
 ## GitHub Actions
 ### Detailed plan
 The main purpose of my workflow is going to be to do a Static Application Security Testing (SAST), then build a Docker image, test it, push it to Docker Hub and deploy it to Azure.

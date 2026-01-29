@@ -3,7 +3,6 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using diszkerteszClient.Models;
 using diszkerteszClient.Services;
-using IntelliJ.Lang.Annotations;
 using System;
 using System.Collections.Generic;
 using System.IO;
