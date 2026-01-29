@@ -13,7 +13,7 @@ namespace diszkerteszClient
         protected override void OnCreate(Bundle? savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
-            AuthenticationService.ParentActivity = this;
+            Services.UserService.ParentActivity = this;
         }
 
 

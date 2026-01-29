@@ -26,7 +26,7 @@ namespace diszkerteszClient
 #endif
             //Add services
             builder.Services.AddSingleton<PlantService>();
-            builder.Services.AddSingleton<AuthenticationService>();
+            builder.Services.AddSingleton<UserService>();
 
             //Add viewmodels
             builder.Services.AddSingleton<MainViewModel>();
@@ -34,6 +34,7 @@ namespace diszkerteszClient
             builder.Services.AddTransient<QuizViewModel>();
             builder.Services.AddTransient<IdentifyViewModel>();
             builder.Services.AddTransient<AddViewModel>();
+            builder.Services.AddTransient<EditViewModel>();
             builder.Services.AddSingleton<ProfileViewModel>();
 
             //Add views
@@ -42,6 +43,7 @@ namespace diszkerteszClient
             builder.Services.AddTransient<QuizPage>();
             builder.Services.AddTransient<IdentifyPage>();
             builder.Services.AddTransient<AddPage>();
+            builder.Services.AddTransient<EditPage>();
             builder.Services.AddSingleton<ProfilePage>();
 
             return builder.Build();

@@ -74,12 +74,11 @@
                     x:DataType="{x:Type model:UserItem}">
                         <VerticalStackLayout Padding="5">
 
-                            <Border
-                                HorizontalOptions="Center">
-                                <!--Implement gesture recognizer later/ edit page
+                            <Border HorizontalOptions="Center">
                                 <Border.GestureRecognizers>
-                                    <TapGestureRecognizer
-                                </Border.GestureRecognizers>-->
+                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:ProfileViewModel}}, Path=GoToEditPageCommand}"
+                                                          CommandParameter="{Binding .}" />
+                                </Border.GestureRecognizers>
 
 
                                 <Grid

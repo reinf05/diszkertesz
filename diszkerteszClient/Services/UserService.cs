@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace diszkerteszClient.Services
 {
-    public class AuthenticationService
+    public class UserService
     {
         private const string ClientId = "ee879ed8-b52e-4100-9d08-0a530ca01dab";
         private const string TenantName = "diszkerteszentra";
@@ -31,7 +31,7 @@ namespace diszkerteszClient.Services
 
         private IPublicClientApplication application;
 
-        public AuthenticationService()
+        public UserService()
         {
             httpClient = new();
 
@@ -316,6 +316,106 @@ namespace diszkerteszClient.Services
             }
 
             httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
+        }
+
+        public async Task<bool> DeleteItemAsync(int itemId)
+        {
+            string URL = BaseUrl + $"delete-item/{itemId}";
+            try
+            {
+                await GetHeaderAsync();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"DeleteItemAsync Failed: {ex.Message}");
+                return false;
+            }
+            var response = await httpClient.DeleteAsync(URL);
+            if (response.IsSuccessStatusCode)
+            {
+                return true;
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine($"DeleteItemAsync Failed: {response.ReasonPhrase}");
+                return false;
+            }
+        }
+
+        public async Task<bool> UpdateItemAsync(UserItem userItem)
+        {
+            string URL = BaseUrl + "edit-item";
+            try
+            {
+                await GetHeaderAsync();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"UpdateItemAsync Failed: {ex.Message}");
+                return false;
+            }
+            string userItemJson = System.Text.Json.JsonSerializer.Serialize(userItem);
+            var response = await httpClient.PutAsync(URL, new StringContent(userItemJson, System.Text.Encoding.UTF8, "application/json"));
+            if (response.IsSuccessStatusCode)
+            {
+                return true;
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine($"UpdateItemAsync Failed: {response.ReasonPhrase}");
+                return false;
+            }
+        }
+
+        public async Task<UserItem?> GetItemByIdAsync(int itemId)
+        {
+            string URL = BaseUrl + $"get-item/{itemId}";
+            try
+            {
+                await GetHeaderAsync();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"GetItemByIdAsync Failed: {ex.Message}");
+                return null;
+            }
+            var response = await httpClient.GetAsync(URL);
+            if (response.IsSuccessStatusCode)
+            {
+                var userItem = await response.Content.ReadFromJsonAsync<UserItem>();
+                return userItem;
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine($"GetItemByIdAsync Failed: {response.ReasonPhrase}");
+                return null;
+            }
+        }
+
+        public async Task<bool> DeleteImage(string imageURL)
+        {
+            try
+            {
+                await GetHeaderAsync();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"ImageDelete Failed: {ex.Message}");
+                return false;
+            }
+
+            string URL = BaseUrl + "delete-image";
+            var response = await httpClient.PostAsync(URL, new StringContent(imageURL, System.Text.Encoding.UTF8, "application/json"));
+
+            if (response.IsSuccessStatusCode)
+            {
+                return true;
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine($"ImageDelete Failed: {response.ReasonPhrase}");
+                return false;
+            }
         }
     }
 }

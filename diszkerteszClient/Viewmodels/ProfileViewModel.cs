@@ -13,21 +13,21 @@ namespace diszkerteszClient.Viewmodels
 {
     public partial class ProfileViewModel : BaseViewModel
     {
-        private AuthenticationService authenticationService;
+        private UserService userService;
 
         [ObservableProperty]
         private ObservableCollection<UserItem>? userItems;
 
-        public ProfileViewModel(AuthenticationService authenticationService)
+        public ProfileViewModel(UserService authenticationService)
         {
-            this.authenticationService = authenticationService;
+            this.userService = authenticationService;
         }
 
         [RelayCommand]
         async Task SignInAsync()
         {
-            var authResult = await authenticationService.SignInAsync();
-            if(authResult is not null)
+            var authResult = await userService.SignInAsync();
+            if (authResult is not null)
             {
                 await Shell.Current.DisplayAlert("Success", $"Welcome {authResult.Account.Username}!", "OK");
                 IsLoaded = true;
@@ -38,7 +38,7 @@ namespace diszkerteszClient.Viewmodels
         [RelayCommand]
         async Task SignUpAsync()
         {
-            var signUpResult = await authenticationService.SignUpAsync();
+            var signUpResult = await userService.SignUpAsync();
             if (signUpResult is not null)
             {
                 await Shell.Current.DisplayAlert("Success", $"SignUp {signUpResult.Account.Username}!", "OK");
@@ -49,8 +49,8 @@ namespace diszkerteszClient.Viewmodels
         [RelayCommand]
         async Task SignOutAsync()
         {
-            await authenticationService.SignOutAsync();
-            UserItems = null; 
+            await userService.SignOutAsync();
+            UserItems = null;
             IsLoaded = false;
         }
 
@@ -69,19 +69,19 @@ namespace diszkerteszClient.Viewmodels
             }
             try
             {
-                var fetchedList = await authenticationService.GetCurrentUserList();
-                
-                if(fetchedList is null) { return false; }
+                var fetchedList = await userService.GetCurrentUserList();
 
-                if(UserItems == null)
+                if (fetchedList is null) { return false; }
+
+                if (UserItems == null)
                 {
                     UserItems = new ObservableCollection<UserItem>(fetchedList);
                     return true;
                 }
 
-                foreach(var item in UserItems.ToList())
+                foreach (var item in UserItems.ToList())
                 {
-                    if(!fetchedList.Any(x => x.Id == item.Id))
+                    if (!fetchedList.Any(x => x.Id == item.Id))
                     {
                         UserItems.Remove(item);
                     }
@@ -89,7 +89,7 @@ namespace diszkerteszClient.Viewmodels
 
                 foreach (var item in fetchedList)
                 {
-                    if(!UserItems.Any(x => x.Id == item.Id))
+                    if (!UserItems.Any(x => x.Id == item.Id))
                     {
                         UserItems.Add(item);
                     }
@@ -102,7 +102,16 @@ namespace diszkerteszClient.Viewmodels
                 System.Diagnostics.Debug.WriteLine($"LoadUserList Failed: {ex.Message}");
                 return false;
             }
-            return false;
+        }
+
+        [RelayCommand]
+        async Task GoToEditPageAsync(UserItem item)
+        {
+            var navigationParams = new Dictionary<string, object>
+            {
+                { "Item", item}
+            };
+            await Shell.Current.GoToAsync(nameof(View.EditPage), true, navigationParams);
         }
     }
 }

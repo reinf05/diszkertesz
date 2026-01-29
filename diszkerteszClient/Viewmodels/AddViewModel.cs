@@ -14,10 +14,10 @@ namespace diszkerteszClient.Viewmodels
 {
     public partial class AddViewModel : BaseViewModel
     {
-        private readonly AuthenticationService _authenticationService;
+        private readonly UserService _authenticationService;
         private UserItem userItem;
 
-        public AddViewModel(AuthenticationService authenticationService)
+        public AddViewModel(UserService authenticationService)
         {
             _authenticationService = authenticationService;
             userItem = new UserItem();
@@ -100,7 +100,7 @@ namespace diszkerteszClient.Viewmodels
         {
             try
             {
-                var result = await _authenticationService.UploadImageAsync(imageBytes, $"{ItemName}.jpeg");
+                var result = await _authenticationService.UploadImageAsync(imageBytes, $"{userItem.Name}-{Guid.NewGuid()}.jpeg");
                 if (string.IsNullOrEmpty(result))
                 {
                     await Shell.Current.DisplayAlert("Error", "Hiba történt a kép feltöltése során", "OK");
