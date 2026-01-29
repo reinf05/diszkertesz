@@ -59,6 +59,9 @@ Authentikációhoz kötött endpointok:
 - /user/user-list: Visszaadja az adott felhasználóhoz tartozó bejegyzéseket.
 - /user/upload-image: Feltölti a képet a Blob konténerbe, visszaadja az URL-t.
 - /user/post-list: Feltölti az adatbázisba a bejegyzést.
+- /user/delete-item/{id}: Törli az adatbázisból a megfelelő sort.
+- /user/edit-item: Frissití az adatbázis megfelelő sorát.
+- /user/delete-image: Törli a megadott képet blob storageból.
 
 **GithubActions CI/CD pipeline automatikusan elkészíti a Docker image-t és deployolja Azureba. Lásd: serverdocumentation.md**
 
@@ -83,7 +86,12 @@ A view-k felelnek az applikáció kinézetéért.
 - QuizPage.xaml: Felel a játék megjelenítéséért. 1 képet és 4 választ jelenít meg, valamint tartalmazza külön mezőben a helyes megoldást.
 - IdentifyPage.xaml: Alap esetben megjeleníti a kamerát, egy gombot amellyel el lehet készíteni a képet. Ha van elkészített kép, akkor megjeleníti azt, valamint két gombot, az egyikkel új képet lehet készíteni, a másikkal pedig el lehet küldeni azonosításra. Ha sikeres volt az azonosítás, akkor megjelenik a kép, alatta a latin neve a növénynek, egy százalékos szint, amely jelöli a model pontosságát, valamint hétköznapi nevek.
 - ProfilePage.xaml: Ha a felhasználó nincs bejelentkezve, akkor két gomb látszik, bejelentkezés és regisztráció. Ha bejelentkezett a felhasználó, akkor a saját listáját látja.
+<<<<<<< HEAD
 - AddPage.xaml: A felhasználó saját listájához bejegyzést készítő nézet. Kép készítését és kép kiválasztását is támogatja.
+=======
+- AddPage.xaml: Listaelem hozzáadását segítő nézet.
+- EditPage.xaml: Listaelem szerkesztését lehetővé teszi.
+>>>>>>> 21a5aea (Updated documentation)
 
 Minden view *code behind* fájljában a konstuktorban átadom *dependency injection*-el a megfelelő *viewmodel*-t, majd beállítom *BindingContext*-nek őket.
 
@@ -116,7 +124,13 @@ Implementálja a kép készítést (*CaptureAsync* relay command), az új kép k
 A gyorsabb válasz miatt a képeket átméretezzük mielőtt elküldjük a harmadik fél (*PlantNet*) számára. Az *IdentifyAsync* függvényen belül betöltjük egy *IImage* formátumba, a beépített függvényekkel átméretezzük, majd elmentjük (kissé rontott minőségben) egy *MemoryStream*-be, amelyet átalakítunk egy *byte* tömbbe. Ezt a kisebb, rosszabb minőségű képet adjuk át a *PlantService*-nek, hogy minél kevesebb időt vegyen el a kép feltöltése először a saját API-nak, majd onnan a harmadik fél API-hoz.
 
 ### Profile ViewModel
-Meghívja az *AuthenticationService* függvényeit, átalakítja a visszakapott adatokat a megfelelő formára, hogy a *ProfilePage* meg tudja jeleníteni. Kezeli a változókat amik alapján változik a hozzátartozó nézet.
+Meghívja az *UserService* függvényeit, átalakítja a visszakapott adatokat a megfelelő formára, hogy a *ProfilePage* meg tudja jeleníteni. Kezeli a változókat amik alapján változik a hozzátartozó nézet.
+
+### Add ViewModel
+Lehetővé teszi a kép készítését *toolkit* segítségével, valamint a kép kiválasztását a *mediapicker* segítségével. A képet *ha van* feltölti a felhőbe, a többi adatot pedig feltölti az adatbázisba az API-on keresztül a *UserService* meghívásával.
+
+### Edit ViewModel
+Hasonló az *Add Viewmodel*-hez, csak a mezők előre ki vannak töltve a megfelelő adatokkal. Lehetőség van menteni a változtatásokat, illetve a teljes elem törlésére is.
 
 ### Add ViewModel
 Több változó segítségével változtatja az *AddView* nézetet, attól függően, hogy éppen képet készítene/választana a felhasználó, elkészítette/kiválasztotta a képet, vagy az alap hozzáadás nézetnél marad. Kezeli a kamerát, a kép készítést, a kép kiválasztását *MediaPicker* segítségével, új kép készítését/választását. Gondoskodik a megfelelő formájú feltöltésről, valamint a kép feltöltését is kezdeményezi.
