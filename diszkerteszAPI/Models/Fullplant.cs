@@ -6,7 +6,7 @@
         public string Type { get; set; }
         public string Namel { get; set; }
         public string Nameh { get; set; }
-        public string Imagepath { get; set; }
+        public List<string> Imagepath { get; set; }
         public string Description { get; set; }
         public string Usage { get; set; }
         public string Pathogens { get; set; }

@@ -7,8 +7,8 @@ namespace diszkerteszClient.View
         public DetailPage(DetailViewModel detailViewModel)
         {
 
-            InitializeComponent();
             BindingContext = detailViewModel;
+            InitializeComponent();
         }
     }
 }

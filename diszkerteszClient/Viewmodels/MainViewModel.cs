@@ -225,7 +225,7 @@ namespace diszkerteszClient.Viewmodels
                     Namel = plant.Namel,
                     Nameh = plant.Nameh,
                     Type = plant.Type,
-                    Imagepath = baseURL + plant.Imagepath,
+                    Imagepath = plant.Imagepath,
                     Description = plant.Description,
                     Usage = plant.Usage,
                     Pathogens = plant.Pathogens,

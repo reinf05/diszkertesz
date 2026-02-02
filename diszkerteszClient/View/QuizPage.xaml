@@ -4,6 +4,7 @@
              x:Class="diszkerteszClient.View.QuizPage"
              xmlns:model="clr-namespace:diszkerteszClient.Models"
              xmlns:viewmodel="clr-namespace:diszkerteszClient.Viewmodels"
+             x:DataType="viewmodel:QuizViewModel"
              Title="{Binding Title}">
     <VerticalStackLayout
         Background="{AppThemeBinding Dark={StaticResource BackgroundDark}, Light={StaticResource SecondaryDark}}">

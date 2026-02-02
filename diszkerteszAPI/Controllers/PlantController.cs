@@ -1,9 +1,12 @@
-﻿using diszkerteszAPI.Models;
+﻿using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
+using diszkerteszAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NuGet.Protocol;
 using System.Drawing;
 using System.IO;
+using System.Text;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace diszkerteszAPI.Controllers
@@ -15,8 +18,10 @@ namespace diszkerteszAPI.Controllers
         private readonly int pageSize = 10;
 
         private readonly diszkerteszDbContext _context;
-        public PlantController(diszkerteszDbContext context)
+        private readonly BlobServiceClient _blobServiceClient;
+        public PlantController(diszkerteszDbContext context, BlobServiceClient BlobServiceClient)
         {
+            _blobServiceClient = BlobServiceClient;
             _context = context;
         }
 
@@ -58,8 +63,23 @@ namespace diszkerteszAPI.Controllers
         [HttpGet("fullplants/{id}")]
         public async Task<ActionResult<Fullplant>> GetFullplantById(int id)
         {
-            Plant plant = await _context.Plants.FindAsync(id);
-            Detail detail = await _context.Details.FindAsync(id);
+            Plant? plant = await _context.Plants.FindAsync(id);
+            Detail? detail = await _context.Details.FindAsync(id);
+
+            if (plant == null || detail == null)
+            {
+                return NotFound();
+            }
+
+            List<string> images = new List<string>();
+            BlobContainerClient blobContainerClient = _blobServiceClient.GetBlobContainerClient("images");
+
+            await foreach (BlobItem blobItem in blobContainerClient.GetBlobsAsync(prefix: $"{plant.Imagepath}"))
+            {
+                BlobClient blobClient = blobContainerClient.GetBlobClient(blobItem.Name);
+                Uri uri = blobClient.Uri;
+                images.Add(uri.ToString());
+            }
 
             return new Fullplant()
             {
@@ -67,7 +87,7 @@ namespace diszkerteszAPI.Controllers
                 Type = plant.Type,
                 Namel = plant.Namel,
                 Nameh = plant.Nameh,
-                Imagepath = plant.Imagepath,
+                Imagepath = images,
                 Description = detail.Description,
                 Usage = detail.Usage,
                 Pathogens = detail.Pathogens,

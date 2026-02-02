@@ -3,90 +3,87 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:model="clr-namespace:diszkerteszClient.Models"
              x:Class="diszkerteszClient.View.DetailPage"
+             xmlns:viewmodel="clr-namespace:diszkerteszClient.Viewmodels"
+             x:DataType="viewmodel:DetailViewModel"
              Title="{Binding Title}">
 
-    <Grid
-        RowDefinitions="Auto, Auto, *"
-        Background="{AppThemeBinding Dark={StaticResource BackgroundDark}, Light={StaticResource SecondaryDark}}">
-        <ScrollView
-            Orientation="Horizontal"
-            HorizontalOptions="Fill"
-            VerticalOptions="Center"
-            Grid.Row="0">
-            <HorizontalStackLayout 
-                Padding="10"
-                Spacing="10"    
-                VerticalOptions="Center"
-                HorizontalOptions="Center">
+    <Grid RowDefinitions="Auto, Auto, *"
+          Background="{AppThemeBinding Dark={StaticResource BackgroundDark}, Light={StaticResource SecondaryDark}}">
+        <!--<ScrollView Orientation="Horizontal"
+                    HorizontalOptions="Fill"
+                    VerticalOptions="Center"
+                    Grid.Row="0">
+            <HorizontalStackLayout Padding="10"
+                                   Spacing="10"
+                                   VerticalOptions="Center"
+                                   HorizontalOptions="Center">-->
+                
+                <!--<Image Source="{Binding FullPlant.Imagepath, StringFormat='{0}1.jpeg'}"
+                       Style="{StaticResource Thumbnail}"
+                       Grid.Column="0" />
+                <Image Source="{Binding FullPlant.Imagepath, StringFormat='{0}2.jpeg'}"
+                       Style="{StaticResource Thumbnail}"
+                       Grid.Column="0" />
+                <Image Source="{Binding FullPlant.Imagepath, StringFormat='{0}3.jpeg'}"
+                       Style="{StaticResource Thumbnail}"
+                       Grid.Column="0" />
+                <Image Source="{Binding FullPlant.Imagepath, StringFormat='{0}4.jpeg'}"
+                       Style="{StaticResource Thumbnail}"
+                       Grid.Column="0" />
+                <Image Source="{Binding FullPlant.Imagepath, StringFormat='{0}5.jpeg'}"
+                       Style="{StaticResource Thumbnail}"
+                       Grid.Column="0" />-->
 
-                <Image
-                    Source="{Binding FullPlant.Imagepath, StringFormat='{0}1.jpeg'}"
-                    Style="{StaticResource Thumbnail}"
-                    Grid.Column="0"/>
-                <Image
-                    Source="{Binding FullPlant.Imagepath, StringFormat='{0}2.jpeg'}"
-                    Style="{StaticResource Thumbnail}"
-                    Grid.Column="0"/>
-                <Image
-                    Source="{Binding FullPlant.Imagepath, StringFormat='{0}3.jpeg'}"
-                    Style="{StaticResource Thumbnail}"
-                    Grid.Column="0"/>
-                <Image
-                    Source="{Binding FullPlant.Imagepath, StringFormat='{0}4.jpeg'}"
-                    Style="{StaticResource Thumbnail}"
-                    Grid.Column="0"/>
-                <Image
-                    Source="{Binding FullPlant.Imagepath, StringFormat='{0}5.jpeg'}"
-                    Style="{StaticResource Thumbnail}"
-                    Grid.Column="0"/>
+            <!--</HorizontalStackLayout>
+        </ScrollView>-->
 
-            </HorizontalStackLayout>
-        </ScrollView>
-        
-        <VerticalStackLayout
-            Spacing="10"
-            HorizontalOptions="Center"
-            Grid.Row="1">
+        <CollectionView ItemsSource="{Binding FullPlant.Imagepath}">
+            <CollectionView.ItemsLayout>
+                <LinearItemsLayout Orientation="Horizontal"
+                                   ItemSpacing="10" />
+            </CollectionView.ItemsLayout>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="x:String">
+                    <Image Source="{Binding .}"
+                           Style="{StaticResource Thumbnail}"
+                           Grid.Column="0" />
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <VerticalStackLayout Spacing="10"
+                             HorizontalOptions="Center"
+                             Grid.Row="1">
             <Label Text="{Binding FullPlant.Namel}"
-                Style="{StaticResource TextBold}"/>
-            <Label Text="{Binding FullPlant.Nameh}"/>
-            <Label Text="{Binding FullPlant.Type}"/>
+                   Style="{StaticResource TextBold}" />
+            <Label Text="{Binding FullPlant.Nameh}" />
+            <Label Text="{Binding FullPlant.Type}" />
         </VerticalStackLayout>
-        
-        <ScrollView
-            Orientation="Vertical"
-            HorizontalOptions="Center"
-            VerticalOptions="Fill"
-            Grid.Row="2">
-            <VerticalStackLayout
-                HorizontalOptions="Fill"
-                VerticalOptions="Start">
-                
-                <Label
-                    Text="Általános jellemzők"
-                    Style="{StaticResource TextBold}"/>
-                <Label 
-                    Text="{Binding FullPlant.Description}"/>
-                
-                <Label
-                    Text="Felhasználás"
-                    Style="{StaticResource TextBold}"/>
-                <Label 
-                    Text="{Binding FullPlant.Usage}"/>
 
-                <Label
-                    Text="Növényvédelem"
-                    Style="{StaticResource TextBold}"/>
-                <Label 
-                    Text="{Binding FullPlant.Pathogens}" />
+        <ScrollView Orientation="Vertical"
+                    HorizontalOptions="Center"
+                    VerticalOptions="Fill"
+                    Grid.Row="2">
+            <VerticalStackLayout HorizontalOptions="Fill"
+                                 VerticalOptions="Start">
 
-                <Label
-                    Text="Szaporítás"
-                    Style="{StaticResource TextBold}"/>
-                <Label 
-                    Text="{Binding FullPlant.Propagation}"/>
+                <Label Text="Általános jellemzők"
+                       Style="{StaticResource TextBold}" />
+                <Label Text="{Binding FullPlant.Description}" />
+
+                <Label Text="Felhasználás"
+                       Style="{StaticResource TextBold}" />
+                <Label Text="{Binding FullPlant.Usage}" />
+
+                <Label Text="Növényvédelem"
+                       Style="{StaticResource TextBold}" />
+                <Label Text="{Binding FullPlant.Pathogens}" />
+
+                <Label Text="Szaporítás"
+                       Style="{StaticResource TextBold}" />
+                <Label Text="{Binding FullPlant.Propagation}" />
             </VerticalStackLayout>
         </ScrollView>
-        
+
     </Grid>
 </ContentPage>
