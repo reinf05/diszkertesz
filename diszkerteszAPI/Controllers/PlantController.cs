@@ -164,5 +164,39 @@ namespace diszkerteszAPI.Controllers
         //    }
         //}
 
+        [HttpGet("search")]
+        public async Task<Page<Plant>> Search([FromQuery] string? filter, [FromQuery] int pageNum = 1, [FromQuery] int pageSize = 0)
+        {
+            if(pageSize <= 0)
+            {
+                pageSize = this.pageSize;
+            }
+
+            var query = _context.Plants.AsQueryable();
+
+            if(!string.IsNullOrEmpty(filter))
+            {
+                query = query.Where(p => p.Namel.Contains(filter) || p.Nameh.Contains(filter));
+            }
+
+            var totalCount = await query.CountAsync();
+
+            var items = await query
+                .OrderBy(p => p.ID)
+                .Skip((pageNum - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            Page<Plant> result = new Page<Plant>()
+            {
+                Items = items,
+                PageNumber = pageNum,
+                TotalCount = totalCount,
+                TotalPages = (int)Math.Ceiling(totalCount / (double)pageSize)
+            };
+
+            return result;
+        }
+
     }
 }

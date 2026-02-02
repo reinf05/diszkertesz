@@ -44,7 +44,6 @@ namespace diszkerteszClient.Services
 
             if (response.IsSuccessStatusCode)
             {
-                //Problem here
                 var asd = await response.Content.ReadFromJsonAsync<Page<Plant>>();
                 return asd;
             }
@@ -96,6 +95,20 @@ namespace diszkerteszClient.Services
                 return responseString;
             }
             return $"Error {response.StatusCode}\n{responseString}";
+        }
+
+        public async Task<Page<Plant>> SearchPage(string filter, int pageNumber, int pageSize = 0)
+        {
+            string URL = baseURL + "search?filter=" + Uri.EscapeDataString(filter) + "&pageNum=" + pageNumber;
+
+            var response = await httpClient.GetAsync(URL);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var jsonResult = await response.Content.ReadFromJsonAsync<Page<Plant>>();
+                return jsonResult;
+            }
+            return null;
         }
     }
 }

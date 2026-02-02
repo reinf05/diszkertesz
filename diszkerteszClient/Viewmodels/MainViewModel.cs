@@ -18,17 +18,29 @@ namespace diszkerteszClient.Viewmodels
         private PlantService plantService;
         private int _currentPage = 1;
         private bool _canLoadNextPage = true;
-        public ObservableCollection<Plant> PlantList { get; } = new();
+
+        [ObservableProperty]
+        public ObservableCollection<Plant> plantList;
         private FullPlant fullPlant;
         private readonly string baseURL = "https://stdiszkerteszgerdev001.blob.core.windows.net/images/";
+
+        [ObservableProperty]
+        private string searchText = string.Empty;
+        private int _searchPageNumber = 1;
+        private bool _canLoadNextSearchPage = true;
+
+        [ObservableProperty]
+        private ObservableCollection<Plant> filteredPlants;
 
         [ObservableProperty] //Does not stall UI, but stalls not needed invocations of functions
         public bool isBusyMore = false;
         public MainViewModel(PlantService plantService)
         {
+            plantList = new ObservableCollection<Plant>();
+            filteredPlants = new ObservableCollection<Plant>();
             this.Title = "Dísznövények";
             this.plantService = plantService;
-        }
+        } 
 
         [RelayCommand]
         async Task GoToDetailsAsync(Plant plant)
@@ -109,6 +121,10 @@ namespace diszkerteszClient.Viewmodels
                 string path = plant.Imagepath;
                 plant.Imagepath = baseURL + path;
                 PlantList.Add(plant);
+                if (string.IsNullOrEmpty(SearchText))
+                {
+                    FilteredPlants.Add(plant);
+                }
             }
             _canLoadNextPage = page.HasNextPage;
             if (_canLoadNextPage)
@@ -155,6 +171,69 @@ namespace diszkerteszClient.Viewmodels
             finally
             {
                 IsBusy = false;
+            }
+        }
+
+        [RelayCommand]
+        public async Task SearchAsync(string filter)
+        {
+            FilteredPlants.Clear();
+            if(string.IsNullOrEmpty(SearchText))
+            {
+                foreach(var plant in PlantList)
+                {
+                    FilteredPlants.Add(plant);
+                }
+                return;
+            }
+
+            if (!_canLoadNextPage)
+            {
+                var filtered = PlantList.Where(p => p.Namel.Contains(SearchText, StringComparison.OrdinalIgnoreCase) || p.Nameh.Contains(SearchText, StringComparison.OrdinalIgnoreCase)).ToList();
+                
+                if(filtered.Count > 0)
+                {
+                    foreach(var plant in filtered)
+                    {
+                        FilteredPlants.Add(plant);
+                    }
+                    return;
+                }
+                else
+                {
+                    //Set searchtext to empty and reload all plants
+                    SearchText = string.Empty;
+                    FilteredPlants = new ObservableCollection<Plant>(PlantList);
+                    await Shell.Current.DisplayAlert("Info", "Növény nem található a letöltött adatok között. Kérem, törölje a keresőszöveget és próbálja újra.", "OK");
+                }
+            }
+            else
+            {
+                _searchPageNumber = 1;
+                var responsePage = await plantService.SearchPage(SearchText, _searchPageNumber);
+
+                foreach(var plant in responsePage.Items)
+                {
+                    string path = plant.Imagepath;
+                    plant.Imagepath = baseURL + path;
+                    FilteredPlants.Add(plant);
+                }
+
+                _canLoadNextSearchPage = responsePage.HasNextPage;
+                while (_canLoadNextSearchPage)
+                {
+                    _searchPageNumber++;
+                    responsePage = await plantService.SearchPage(SearchText, _searchPageNumber);
+
+                    foreach (var plant in responsePage.Items)
+                    {
+                        string path = plant.Imagepath;
+                        plant.Imagepath = baseURL + path;
+                        FilteredPlants.Add(plant);
+                    }
+
+                    _canLoadNextSearchPage = responsePage.HasNextPage;
+                }
             }
         }
     }

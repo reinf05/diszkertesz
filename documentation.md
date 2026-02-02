@@ -86,17 +86,13 @@ A view-k felelnek az applikáció kinézetéért.
 - QuizPage.xaml: Felel a játék megjelenítéséért. 1 képet és 4 választ jelenít meg, valamint tartalmazza külön mezőben a helyes megoldást.
 - IdentifyPage.xaml: Alap esetben megjeleníti a kamerát, egy gombot amellyel el lehet készíteni a képet. Ha van elkészített kép, akkor megjeleníti azt, valamint két gombot, az egyikkel új képet lehet készíteni, a másikkal pedig el lehet küldeni azonosításra. Ha sikeres volt az azonosítás, akkor megjelenik a kép, alatta a latin neve a növénynek, egy százalékos szint, amely jelöli a model pontosságát, valamint hétköznapi nevek.
 - ProfilePage.xaml: Ha a felhasználó nincs bejelentkezve, akkor két gomb látszik, bejelentkezés és regisztráció. Ha bejelentkezett a felhasználó, akkor a saját listáját látja.
-<<<<<<< HEAD
-- AddPage.xaml: A felhasználó saját listájához bejegyzést készítő nézet. Kép készítését és kép kiválasztását is támogatja.
-=======
 - AddPage.xaml: Listaelem hozzáadását segítő nézet.
 - EditPage.xaml: Listaelem szerkesztését lehetővé teszi.
->>>>>>> 21a5aea (Updated documentation)
 
 Minden view *code behind* fájljában a konstuktorban átadom *dependency injection*-el a megfelelő *viewmodel*-t, majd beállítom *BindingContext*-nek őket.
 
 ### Plant Service
-Ez felel a szerverrel való kommunikációért. Itt vannak megadva azok a függvények, amelyek elhagyhatatlanok a WebAPI és a kliens közti kommunikáció létrejöttéhez.
+Ez felel a szerverrel való kommunikációért. Itt vannak megadva azok a függvények, amelyek elhagyhatatlanok a WebAPI és a kliens közti kommunikáció létrejöttéhez. A növények betöltéséért felel, egyszerű nézetben, teljes nézetben, quiz nézetben valamint felel a keresésért a növények között és a növény felismerésért is.
 
 ### Authentication Service
 Ez felel a kommunikációért a Microsoft Entra External ID-vel, amely az authentikációt intézi. *SignInAync* és *SignOutAsync* függvények felelnek a be és kijelentkezésért, a *GetAccessTokenAsync* felel a token megújításáért ha szükséges. Lekéri a WebAPI-tól az adott felhasználóhoz tartozó listát, valamint kezeli az új bejegyzés feltöltését is. A bejegyzéshez tartozó képet is feltölti.
@@ -113,6 +109,9 @@ A *RelayCommand* kulcsszót használom a függvények előtt, így az *MVVM Comm
 Megadunk benne *RelayCommand*-okat, amelyek segítségével el tudjuk választani a *View* és a *ViewModel* szintjét egymástól, mivel egyszerűen a *Command* paraméterrel tudunk majd rájuk hivatkozni a nézeteknél. *LoadPageAsync* egy segítő függvény, amely feltölti a növény listát, amely egy figyelhető tulajdonság, így valós időben megjelenik az applikációban is. *GetFirstPageAsync*, *GetMorePageAsync* a növények betöltéséért felel. *GetFullPlantAsync* egy segítő függvény, amely lekéri a kiválasztott növény összes adatát, a *GoToDetailsAsync* függvény hívja meg, majd tovább is lép a megfelelő nézetre. Ez a viewmodel felelős azért is, hogy ha nincs több elérhető adat az adatbázisban, akkor meg se próbáljon lekérni több adatot.
 A *GetMorePageAsync* függvényhez hozzá adunk egy *CanExecute* kulcsszót is, amely megakadájozza a felhasználót, hogy tovább görgessen amíg tölt be a következő page, így nem fogja fölöslegesen elkezdeni a függvényt.
 
+#### Keresés
+A keresés egy *SearchBar* segítségével van megoldva. Ha a keresőmező üres, akkor az eredeti *PlantList* egyenlő a *FilteredPlants* listával. Amikor a felhasználó rákeres egy növényre, akkor először ellenőrizzük, hogy az összes növény le van e töltve a szerverről, ha igen akkor a helyi listából keres, így felgyorsítva a találatot, ha nem akkor a szerverre küld egy kérést a megadott keresőszóval.
+
 ### Detail ViewModel
 Egyetlen szerepe annyi, hogy megváltoztassa a nézet címét. Jövőben lehetőséget ad a fejlesztéshez.
 
@@ -124,16 +123,7 @@ Implementálja a kép készítést (*CaptureAsync* relay command), az új kép k
 A gyorsabb válasz miatt a képeket átméretezzük mielőtt elküldjük a harmadik fél (*PlantNet*) számára. Az *IdentifyAsync* függvényen belül betöltjük egy *IImage* formátumba, a beépített függvényekkel átméretezzük, majd elmentjük (kissé rontott minőségben) egy *MemoryStream*-be, amelyet átalakítunk egy *byte* tömbbe. Ezt a kisebb, rosszabb minőségű képet adjuk át a *PlantService*-nek, hogy minél kevesebb időt vegyen el a kép feltöltése először a saját API-nak, majd onnan a harmadik fél API-hoz.
 
 ### Profile ViewModel
-Meghívja az *UserService* függvényeit, átalakítja a visszakapott adatokat a megfelelő formára, hogy a *ProfilePage* meg tudja jeleníteni. Kezeli a változókat amik alapján változik a hozzátartozó nézet.
-
-### Add ViewModel
-Lehetővé teszi a kép készítését *toolkit* segítségével, valamint a kép kiválasztását a *mediapicker* segítségével. A képet *ha van* feltölti a felhőbe, a többi adatot pedig feltölti az adatbázisba az API-on keresztül a *UserService* meghívásával.
-
-### Edit ViewModel
-Hasonló az *Add Viewmodel*-hez, csak a mezők előre ki vannak töltve a megfelelő adatokkal. Lehetőség van menteni a változtatásokat, illetve a teljes elem törlésére is.
-
-### Add ViewModel
-Több változó segítségével változtatja az *AddView* nézetet, attól függően, hogy éppen képet készítene/választana a felhasználó, elkészítette/kiválasztotta a képet, vagy az alap hozzáadás nézetnél marad. Kezeli a kamerát, a kép készítést, a kép kiválasztását *MediaPicker* segítségével, új kép készítését/választását. Gondoskodik a megfelelő formájú feltöltésről, valamint a kép feltöltését is kezdeményezi.
+Meghívja az *AuthenticationService* függvényeit, átalakítja a visszakapott adatokat a megfelelő formára, hogy a *ProfilePage* meg tudja jeleníteni. Kezeli a változókat amik alapján változik a hozzátartozó nézet.
 
 ### Navigation
 Az AppShell.xaml fájlban létre hozok egy menüt, aminek segítségével lehet lépni a különböző lapok között. Ehhez TabBar-t használok.
