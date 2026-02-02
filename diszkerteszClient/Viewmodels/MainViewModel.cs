@@ -43,52 +43,6 @@ namespace diszkerteszClient.Viewmodels
              });
         }
 
-        //[RelayCommand]
-        //async Task GetPageAsync(bool first = false)
-        //{
-        //    if (IsBusy)
-        //    {
-        //        return;
-        //    }
-        //    try
-        //    {
-        //        if (first)
-        //        {
-        //            IsBusy = true;
-        //        }
-        //        if (_canLoadNextPage)
-        //        {
-        //            var page = await plantService.GetPlantPageAsync(_currentPage);
-
-        //            foreach (var plant in page.Items)
-        //            {
-        //                string path = plant.Imagepath;
-        //                plant.Imagepath = baseURL + path;
-        //                PlantList.Add(plant);
-        //            }
-        //            _canLoadNextPage = page.HasNextPage;
-        //        }
-
-        //        IsLoaded = true;
-
-        //    }
-
-        //    catch (Exception ex)
-        //    {
-        //        Debug.WriteLine(ex);
-        //        await Shell.Current.DisplayAlert("Error", ex.Message, "OK");
-        //    }
-        //    finally
-        //    {
-        //        IsBusy = false;
-        //        if (_canLoadNextPage) 
-        //        { 
-        //            _currentPage++;
-        //        }
-        //    }
-        //}
-
-
         public bool CanLoadMore => !IsBusy && !IsBusyMore && _canLoadNextPage; //Helper function
         //This will stop the user from scrolling more when there is data loading
         [RelayCommand(CanExecute = nameof(CanLoadMore))]
@@ -162,44 +116,6 @@ namespace diszkerteszClient.Viewmodels
                 _currentPage++;
             }
         }
-
-        //[RelayCommand]
-        //async Task GetPlantsAsync()
-        //{
-        //    if (IsBusy)
-        //    {
-        //        return;
-        //    }
-
-        //    try
-        //    {
-        //        IsBusy = true;
-        //        var plants = await plantService.GetAllPlants();
-
-        //        if (PlantList.Count != 0)
-        //        {
-        //            PlantList.Clear();
-        //        }
-
-        //        foreach (var plant in plants)
-        //        {
-        //            string path = plant.Imagepath;
-        //            plant.Imagepath = baseURL + path;
-        //            PlantList.Add(plant);
-        //        }
-        //        IsLoaded = true;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Debug.WriteLine(ex);
-        //        await Shell.Current.DisplayAlert("Error", ex.Message, "OK");
-        //    }
-        //    finally
-        //    {
-        //        IsBusy = false;
-        //    }
-        //}
-
         private async Task GetFullPlantAsync(int plantId)
         {
             if (IsBusy)
@@ -231,20 +147,6 @@ namespace diszkerteszClient.Viewmodels
                     Pathogens = plant.Pathogens,
                     Propagation = plant.Propagation
                 };
-                //try
-                //{
-                //    using var http = new HttpClient();
-                //    string url = $"{fullPlant.Imagepath}1.jpeg";
-                //    var res = await http.GetAsync(url);
-                //    Console.WriteLine($"Status: {res.StatusCode}");
-                //    var contentType = res.Content.Headers.ContentType?.ToString();
-                //    Console.WriteLine($"Content-Type: {contentType}");
-                //}
-                //catch (Exception ex)
-                //{
-                //    Console.WriteLine(ex.Message);
-                //}
-                //return;
             }
             catch (Exception ex)
             {

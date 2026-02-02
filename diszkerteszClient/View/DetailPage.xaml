@@ -9,33 +9,6 @@
 
     <Grid RowDefinitions="Auto, Auto, *"
           Background="{AppThemeBinding Dark={StaticResource BackgroundDark}, Light={StaticResource SecondaryDark}}">
-        <!--<ScrollView Orientation="Horizontal"
-                    HorizontalOptions="Fill"
-                    VerticalOptions="Center"
-                    Grid.Row="0">
-            <HorizontalStackLayout Padding="10"
-                                   Spacing="10"
-                                   VerticalOptions="Center"
-                                   HorizontalOptions="Center">-->
-                
-                <!--<Image Source="{Binding FullPlant.Imagepath, StringFormat='{0}1.jpeg'}"
-                       Style="{StaticResource Thumbnail}"
-                       Grid.Column="0" />
-                <Image Source="{Binding FullPlant.Imagepath, StringFormat='{0}2.jpeg'}"
-                       Style="{StaticResource Thumbnail}"
-                       Grid.Column="0" />
-                <Image Source="{Binding FullPlant.Imagepath, StringFormat='{0}3.jpeg'}"
-                       Style="{StaticResource Thumbnail}"
-                       Grid.Column="0" />
-                <Image Source="{Binding FullPlant.Imagepath, StringFormat='{0}4.jpeg'}"
-                       Style="{StaticResource Thumbnail}"
-                       Grid.Column="0" />
-                <Image Source="{Binding FullPlant.Imagepath, StringFormat='{0}5.jpeg'}"
-                       Style="{StaticResource Thumbnail}"
-                       Grid.Column="0" />-->
-
-            <!--</HorizontalStackLayout>
-        </ScrollView>-->
 
         <CollectionView ItemsSource="{Binding FullPlant.Imagepath}">
             <CollectionView.ItemsLayout>
