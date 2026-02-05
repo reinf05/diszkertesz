@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 
 namespace diszkerteszAPI.Models
 {
@@ -10,5 +11,9 @@ namespace diszkerteszAPI.Models
         public string Name { get; set; }
         public string? Description { get; set; }
         public string? Pictureurl { get; set; }
+        public int? PerenualID { get; set; }
+        public string? LatinName { get; set; }
+        public PlantTips? Tips { get; set; }
+
     }
 }

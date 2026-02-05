@@ -200,7 +200,10 @@ namespace diszkerteszAPI.Controllers
                     .ExecuteUpdateAsync(u => u
                         .SetProperty(p => p.Name, item.Name)
                         .SetProperty(p => p.Description, item.Description)
-                        .SetProperty(p => p.Pictureurl, item.Pictureurl));
+                        .SetProperty(p => p.Pictureurl, item.Pictureurl)
+                        .SetProperty(p => p.PerenualID, item.PerenualID)
+                        .SetProperty(p => p.LatinName, item.LatinName)
+                        .SetProperty(p => p.Tips, item.Tips));
 
             }
             catch (DbUpdateException ex)

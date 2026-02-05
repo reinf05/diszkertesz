@@ -19,24 +19,30 @@ namespace diszkerteszAPI.Controllers
 
         private readonly diszkerteszDbContext _context;
         private readonly BlobServiceClient _blobServiceClient;
+        private readonly HttpClient _httpClient;
+        private readonly string? plantnetApiKey;
+        private readonly string? perApiKey;
         public PlantController(diszkerteszDbContext context, BlobServiceClient BlobServiceClient)
         {
             _blobServiceClient = BlobServiceClient;
             _context = context;
+            _httpClient = new HttpClient();
+            plantnetApiKey = Environment.GetEnvironmentVariable("API-KEY");
+            perApiKey = Environment.GetEnvironmentVariable("PER-API-KEY");
         }
 
 
         [HttpGet("plants/{pageNum}")]
         public async Task<Page<Plant>> GetPlantByPage(int pageNum = 1)
         {
-            if(pageNum < 1)
+            if (pageNum < 1)
             {
                 pageNum = 1;
             }
             int totalCount = await _context.Plants.CountAsync();
             int totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
 
-            if(pageNum > totalPages) pageNum = totalPages;
+            if (pageNum > totalPages) pageNum = totalPages;
 
             var plants = await _context.Plants
                 .OrderBy(p => p.ID)
@@ -111,7 +117,7 @@ namespace diszkerteszAPI.Controllers
 
             Random rand = new Random();
             int index = 0;
-            while(index < 4)
+            while (index < 4)
             {
                 int id = rand.Next(1, plantCount);
                 Plant plant = await _context.Plants.FindAsync(id);
@@ -142,16 +148,13 @@ namespace diszkerteszAPI.Controllers
         //    content.Add(new StringContent(organs), "organs");
 
         //    string project = "all";
-        //    string apiKey = Environment.GetEnvironmentVariable("API-KEY");
-        //    if (apiKey == null)
+        //    if (plantnetApiKey == null)
         //    {
         //        return "Error: API key not found";
         //    }
         //    string URL = $"https://my-api.plantnet.org/v2/identify/{project}?api-key={apiKey}&lang={language}";
 
-        //    HttpClient client = new HttpClient();
-
-        //    var response = await client.PostAsync(URL, content);
+        //    var response = await _httpClient.PostAsync(URL, content);
 
         //    if (response.IsSuccessStatusCode)
         //    {
@@ -167,14 +170,14 @@ namespace diszkerteszAPI.Controllers
         [HttpGet("search")]
         public async Task<Page<Plant>> Search([FromQuery] string? filter, [FromQuery] int pageNum = 1, [FromQuery] int pageSize = 0)
         {
-            if(pageSize <= 0)
+            if (pageSize <= 0)
             {
                 pageSize = this.pageSize;
             }
 
             var query = _context.Plants.AsQueryable();
 
-            if(!string.IsNullOrEmpty(filter))
+            if (!string.IsNullOrEmpty(filter))
             {
                 query = query.Where(p => p.Namel.Contains(filter) || p.Nameh.Contains(filter));
             }
@@ -198,5 +201,106 @@ namespace diszkerteszAPI.Controllers
             return result;
         }
 
+        [HttpGet("tips/latin/{latinName}")]
+        public async Task<ActionResult<PlantTips>> GetTipsByLatinName(string latinName)
+        {
+            var existing = await _context.Translate
+                .Where(t => t.LatinName == latinName)
+                .Select(t => t.Tips)
+                .FirstOrDefaultAsync();
+
+            if (existing == null)
+            {
+
+                if (perApiKey == null) { return StatusCode(500, "Error: API key not found"); }
+
+                var searchResponse = await _httpClient.GetFromJsonAsync<PerenualSearchDTO>($"https://perenual.com/api/v2/species-list?key={perApiKey}&q={latinName}");
+
+                if (searchResponse?.Data == null || !searchResponse.Data.Any())
+                {
+                    return NotFound("No plant found with the given Latin name.");
+                }
+
+                int plantId = searchResponse.Data.First().Id;
+                var detailsResponse = await _httpClient.GetFromJsonAsync<PerenualDetailDTO>($"https://perenual.com/api/v2/species/details/{plantId}?key={perApiKey}");
+
+                if (detailsResponse is null)
+                {
+                    return NotFound("No details found for the given plant ID.");
+                }
+
+                var tips = new PlantTips()
+                {
+                    Water = detailsResponse.Watering,
+                    Light = detailsResponse.Sunlight[0],
+                    Cycle = detailsResponse.Cycle,
+                    CareLevel = detailsResponse.Care_level,
+                };
+
+                if (detailsResponse.Poisonous_to_pets || detailsResponse.Poisonous_to_humans) tips.Poisonous = "Igen";
+                else tips.Poisonous = "Nem";
+
+                if (detailsResponse.Soil.Count <= 0)
+                {
+                    tips.Soil = "Nem releváns";
+                } else
+                {
+                    tips.Soil = detailsResponse.Soil[0];
+                }
+
+                var translation = new Translate()
+                {
+                    PerenualID = plantId,
+                    LatinName = latinName,
+                    Tips = tips
+                };
+
+                foreach(string name in searchResponse.Data[0].Other_name)
+                {
+                    translation.EnglishNames ??= new List<string>();
+                    translation.EnglishNames.Add(name);
+                }
+
+                _context.Translate.Add(translation);
+                await _context.SaveChangesAsync();
+
+                return tips;
+            }
+            else
+            {
+                return existing;
+            }
+        }
+
+        [HttpGet("tips/hun/{hungarianName}")]
+        public async Task<ActionResult<PlantTips>> GetTipsByHungarianName(string hungarianName)
+        {
+            var existing = await _context.Translate
+                .Where(t => t.HungarianNames.Contains(hungarianName))
+                .Select(t => t.Tips)
+                .FirstOrDefaultAsync();
+
+            if(existing == null)
+            {
+                //Translate
+                //Check db if English name is already there
+                    //If yes, add Hungarian name and return the given tips
+                    //If no, get ID from /species-list and then the details
+                        //Refactor by giving this its own function
+                        //Save to db
+                        //Refactor by giving the save its own function
+                        //Return the given tips
+
+            }
+            else
+            {
+                return existing;
+            }
+
+                return NotFound("NIGGER");
+        }
+
+        //Add endpoint to picture recognition
+        //Need recognition using PlantNet, use GetTipsFromLatinName
     }
 }

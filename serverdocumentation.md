@@ -40,9 +40,16 @@ Blob storage
 First, I navigate to the Storage Account menu, then create a new storage account, linked to the appropriate resource group. I will name this as stdiszkerteszgerdev001, because storage account names cannot contain dashes. I will set the redundancy as Locally-redundant storage, because this will save the most cost for me.
 Next, I will create an images Blob container, which will be the root directory for all of the images. The access level should be Blob, so anyone can read it, but not anyone can write to it. This way all of the images will get a public URL, which can be used to view the images. Now I can simply upload all of the images to this container. 
 At this point I can remove the code part in the webAPI, that is responsible for serving the static files (images) from the server.
+### Database updates
+UsersShare table: Added Perenual ID (API used for plant care tips), Latin name and Saved tips column to support the automatic plant care tips for user specific plants.
+Translate table: Used as a cache to make automatic plant care tips faster, by allowing users to type in only the hungarian name of the plant and get the latin name, Perenual ID and care tips instantly from the designated API instead of from the third party API. (Might need to implement some kind of synchronization to ensure that the data is always up to date.)
+
 ## Azure Container Apps
 Azure Container Apps is responsible for running the Docker Image of the webAPI, which is published to a public Docker Hub repository. First of all, I have to create a new Container App Environment for the application, called caenv-diszkertesz-gerwest-dev-001. Inside this environment I can create the application itself called ca-diszkertesz-gerwest-dev-001. I have to specify the deployment source, which will be a container image (this is important for the steps later). Then I specify the image itself, and where to find it. In my case this is a public Docker Hub repository. I selected the smallest possible resources, to save costs. Ingress must be enabled, because this service must be accessible from anywhere by the mobile application. 
 I also need to add any Environmental variables if needed. I can create secrets in the Container App context, so these environmental variables can be hidden, providing more security. After the initial setup and provisioning I can access my webAPI through a link provided by Azure. I can also check the logs in live if something went wrong.
+
+## Translator
+Azure Translator is used to translate some hungarian common names of plants to english, because the third party API does not support hungarian. The creation is done by following the wizard.
 
 # Production
 All of these resources are created for production environment as well, so that testing and production can be clearly distinguished.
