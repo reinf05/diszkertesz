@@ -3,10 +3,15 @@ using Azure.Storage.Blobs.Models;
 using diszkerteszAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using NuGet.Protocol;
 using System.Drawing;
 using System.IO;
 using System.Text;
+using System.Text.Json.Serialization;
+using System.Web;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace diszkerteszAPI.Controllers
@@ -20,13 +25,16 @@ namespace diszkerteszAPI.Controllers
         private readonly diszkerteszDbContext _context;
         private readonly BlobServiceClient _blobServiceClient;
         private readonly HttpClient _httpClient;
+
         private readonly string? plantnetApiKey;
         private readonly string? perApiKey;
-        public PlantController(diszkerteszDbContext context, BlobServiceClient BlobServiceClient)
+        private readonly string sparqlEndpoint = "https://query.wikidata.org/sparql";
+
+        public PlantController(diszkerteszDbContext context, BlobServiceClient BlobServiceClient, IHttpClientFactory httpClientfactory)
         {
             _blobServiceClient = BlobServiceClient;
             _context = context;
-            _httpClient = new HttpClient();
+            _httpClient = httpClientfactory.CreateClient();
             plantnetApiKey = Environment.GetEnvironmentVariable("API-KEY");
             perApiKey = Environment.GetEnvironmentVariable("PER-API-KEY");
         }
@@ -135,37 +143,38 @@ namespace diszkerteszAPI.Controllers
             return returnquiz;
         }
 
-        //[HttpPost("identify")]
-        //public async Task<string> Identify([FromForm] IFormFile images, [FromForm] string organs)
-        //{
-        //    string language = "hu";
-        //    if (images == null || string.IsNullOrEmpty(organs))
-        //        return "Error: missing data";
+        [HttpPost("identify")]
+        [Consumes("multipart/form-data")]
+        public async Task<string> Identify([FromForm] IdentifyDTO data)
+        {
+            string language = "hu";
+            if (data.Images == null || string.IsNullOrEmpty(data.Organs))
+                return "Error: missing data";
 
-        //    var stream = images.OpenReadStream();
-        //    var content = new MultipartFormDataContent();
-        //    content.Add(new StreamContent(stream), "images", "image.jpeg");
-        //    content.Add(new StringContent(organs), "organs");
+            var stream = data.Images.OpenReadStream();
+            var content = new MultipartFormDataContent();
+            content.Add(new StreamContent(stream), "images", "image.jpeg");
+            content.Add(new StringContent(data.Organs), "organs");
 
-        //    string project = "all";
-        //    if (plantnetApiKey == null)
-        //    {
-        //        return "Error: API key not found";
-        //    }
-        //    string URL = $"https://my-api.plantnet.org/v2/identify/{project}?api-key={apiKey}&lang={language}";
+            string project = "all";
+            if (plantnetApiKey == null)
+            {
+                return "Error: API key not found";
+            }
+            string URL = $"https://my-api.plantnet.org/v2/identify/{project}?api-key={plantnetApiKey}&lang={language}";
 
-        //    var response = await _httpClient.PostAsync(URL, content);
+            var response = await _httpClient.PostAsync(URL, content);
 
-        //    if (response.IsSuccessStatusCode)
-        //    {
-        //        var jsonResponse = await response.Content.ReadAsStringAsync();
-        //        return jsonResponse;
-        //    }
-        //    else
-        //    {
-        //        return $"Error: {response.StatusCode}";
-        //    }
-        //}
+            if (response.IsSuccessStatusCode)
+            {
+                var jsonResponse = await response.Content.ReadAsStringAsync();
+                return jsonResponse;
+            }
+            else
+            {
+                return $"Error: {response.StatusCode}";
+            }
+        }
 
         [HttpGet("search")]
         public async Task<Page<Plant>> Search([FromQuery] string? filter, [FromQuery] int pageNum = 1, [FromQuery] int pageSize = 0)
@@ -211,60 +220,10 @@ namespace diszkerteszAPI.Controllers
 
             if (existing == null)
             {
+                var tipsResult = await GetTipByName(latinName);
 
-                if (perApiKey == null) { return StatusCode(500, "Error: API key not found"); }
-
-                var searchResponse = await _httpClient.GetFromJsonAsync<PerenualSearchDTO>($"https://perenual.com/api/v2/species-list?key={perApiKey}&q={latinName}");
-
-                if (searchResponse?.Data == null || !searchResponse.Data.Any())
-                {
-                    return NotFound("No plant found with the given Latin name.");
-                }
-
-                int plantId = searchResponse.Data.First().Id;
-                var detailsResponse = await _httpClient.GetFromJsonAsync<PerenualDetailDTO>($"https://perenual.com/api/v2/species/details/{plantId}?key={perApiKey}");
-
-                if (detailsResponse is null)
-                {
-                    return NotFound("No details found for the given plant ID.");
-                }
-
-                var tips = new PlantTips()
-                {
-                    Water = detailsResponse.Watering,
-                    Light = detailsResponse.Sunlight[0],
-                    Cycle = detailsResponse.Cycle,
-                    CareLevel = detailsResponse.Care_level,
-                };
-
-                if (detailsResponse.Poisonous_to_pets || detailsResponse.Poisonous_to_humans) tips.Poisonous = "Igen";
-                else tips.Poisonous = "Nem";
-
-                if (detailsResponse.Soil.Count <= 0)
-                {
-                    tips.Soil = "Nem releváns";
-                } else
-                {
-                    tips.Soil = detailsResponse.Soil[0];
-                }
-
-                var translation = new Translate()
-                {
-                    PerenualID = plantId,
-                    LatinName = latinName,
-                    Tips = tips
-                };
-
-                foreach(string name in searchResponse.Data[0].Other_name)
-                {
-                    translation.EnglishNames ??= new List<string>();
-                    translation.EnglishNames.Add(name);
-                }
-
-                _context.Translate.Add(translation);
-                await _context.SaveChangesAsync();
-
-                return tips;
+                if(tipsResult.Success) { return tipsResult.Data; }
+                return NotFound(tipsResult.ErrorMessage);
             }
             else
             {
@@ -275,32 +234,221 @@ namespace diszkerteszAPI.Controllers
         [HttpGet("tips/hun/{hungarianName}")]
         public async Task<ActionResult<PlantTips>> GetTipsByHungarianName(string hungarianName)
         {
-            var existing = await _context.Translate
-                .Where(t => t.HungarianNames.Contains(hungarianName))
-                .Select(t => t.Tips)
+            var existing = await _context.PlantNames
+                .Where(t => t.Language == "hu" && t.Name.Contains(hungarianName))
+                .Select(t => t.Translate.Tips)
                 .FirstOrDefaultAsync();
 
-            if(existing == null)
+            if (existing == null)
             {
                 //Translate
-                //Check db if English name is already there
-                    //If yes, add Hungarian name and return the given tips
-                    //If no, get ID from /species-list and then the details
-                        //Refactor by giving this its own function
-                        //Save to db
-                        //Refactor by giving the save its own function
-                        //Return the given tips
+                var translation = await GetLatinName(hungarianName);
 
-            }
-            else
-            {
-                return existing;
-            }
+                if(translation.Success == false) { return StatusCode(500, translation.ErrorMessage); }
 
-                return NotFound("NIGGER");
+                string latinName = translation.Data!;
+
+                var existingLatin = await _context.Translate
+                    .Where(t => t.LatinName == latinName)
+                    .Select(t => t.Tips)
+                    .FirstOrDefaultAsync();
+
+                if (existingLatin == null)
+                {
+                    var tipsResult = await GetTipByName(latinName);
+                    if(tipsResult.Success)
+                    {
+                        if(string.IsNullOrEmpty(tipsResult.MetaData)) 
+                        { 
+                            return StatusCode(500,"Latin name not found"); 
+                        } 
+                        var saved = await SaveHungarian(hungarianName, latinName); 
+                        if(!saved.Success) 
+                        { 
+                            return StatusCode(500, saved.ErrorMessage ?? "Unknown error"); 
+                        }
+                        return tipsResult.Data; 
+                    } 
+                    return NotFound(tipsResult.ErrorMessage);
+                }
+                else
+                {
+                    var saved = await SaveHungarian(hungarianName, latinName);
+                    if (!saved.Success) 
+                    { 
+                        return StatusCode(500, saved.ErrorMessage ?? "Unknown error"); 
+                    } 
+                    return existingLatin;
+                }
+            }
+            return existing;
         }
 
         //Add endpoint to picture recognition
         //Need recognition using PlantNet, use GetTipsFromLatinName
+
+        private async Task<ServiceResult<string>> GetLatinName(string name)
+        {
+            string sparqlQuery = $@"
+                        SELECT ?latin WHERE {{
+                        ?item rdfs:label ""{name}""@hu.
+                        ?item wdt:P225 ?latin.
+                    }} LIMIT 1";
+
+            string url = $"{sparqlEndpoint}?query={HttpUtility.UrlEncode(sparqlQuery)}&format=json";
+
+            HttpRequestMessage httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, url);
+            httpRequestMessage.Headers.Add("Accept", "application/sparql-results+json");
+            httpRequestMessage.Headers.Add("User-Agent", "diszkerteszAPI/1.0");
+
+            try
+            {
+                var response = await _httpClient.SendAsync(httpRequestMessage);
+                if (response.IsSuccessStatusCode)
+                {
+                    var jsonResponse = await response.Content.ReadAsStringAsync();
+                    //Might have some problems, need to be tested with actual data, but it should work
+                    string latinName = (string)JObject.Parse(jsonResponse).SelectToken("$.results.bindings[0].latin.value");
+
+                    if (!string.IsNullOrEmpty(latinName))
+                    {
+                        return ServiceResult<string>.SuccessResult(latinName);
+                    }
+                    else
+                    {
+                        return ServiceResult<string>.FailureResult("Latin name not found");
+                    }
+                }
+                else
+                {
+                    return ServiceResult<string>.FailureResult($"SPARQL query error: {response.StatusCode}");
+                }
+            }
+            catch (Exception ex)
+            {
+                return ServiceResult<string>.FailureResult($"SPARQL query exception: {ex.Message}");
+            }
+        }
+
+        private async Task<ServiceResult<PerenualSearchDTO>> GetPerenualSpecies(string name)
+        {
+            if (perApiKey == null) { return ServiceResult<PerenualSearchDTO>.FailureResult("API key not found"); }
+
+            var searchResponse = await _httpClient.GetFromJsonAsync<PerenualSearchDTO>($"https://perenual.com/api/v2/species-list?key={perApiKey}&q={name}");
+
+            if (searchResponse?.Data == null || searchResponse.Data.Count <= 0)
+            {
+                return ServiceResult<PerenualSearchDTO>.FailureResult("Plant not found");
+            }
+
+            return ServiceResult<PerenualSearchDTO>.SuccessResult(searchResponse);
+        }
+
+        private async Task<ServiceResult<PerenualDetailDTO>> GetPerenualDetails(int id)
+        {
+            if (perApiKey == null) { return ServiceResult<PerenualDetailDTO>.FailureResult("API key not found"); }
+            await Task.Delay(1000);
+            var detailsResponse = await _httpClient.GetFromJsonAsync<PerenualDetailDTO>($"https://perenual.com/api/v2/species/details/{id}?key={perApiKey}");
+
+            if (detailsResponse == null)
+            {
+                return ServiceResult<PerenualDetailDTO>.FailureResult("API error (ID not found)");
+            }
+
+            return ServiceResult<PerenualDetailDTO>.SuccessResult(detailsResponse);
+        }
+
+        private async Task<ServiceResult<PlantTips>> GetTipByName(string name)
+        {
+            var searchResult = await GetPerenualSpecies(name);
+
+            if (!searchResult.Success) { return ServiceResult<PlantTips>.FailureResult("Search went wrong"); }
+
+            int plantId = searchResult.Data.Data.First().Id;
+
+            var detailsResult = await GetPerenualDetails(plantId);
+
+            if (!detailsResult.Success) { return ServiceResult<PlantTips>.FailureResult("Details went wrong"); }
+
+            PerenualDetailDTO detailsData = detailsResult.Data;
+
+            var tips = new PlantTips()
+            {
+                Water = detailsData.Watering,
+                Light = detailsData.Sunlight[0],
+                Cycle = detailsData.Cycle,
+                CareLevel = detailsData.Care_level,
+            };
+
+            if (detailsData.Poisonous_to_pets || detailsData.Poisonous_to_humans) tips.Poisonous = "Igen";
+            else tips.Poisonous = "Nem";
+
+            if (detailsData.Soil.Count <= 0)
+            {
+                tips.Soil = "Nem releváns";
+            }
+            else
+            {
+                tips.Soil = detailsData.Soil[0];
+            }
+
+            string latinName = searchResult.Data.Data.First().Scientific_Name[0];
+            var translation = new Translate()
+            {
+                PerenualID = plantId,
+                //Not sure if this is the best way to do this, but it works for now
+                LatinName = latinName,
+                Tips = tips
+            };
+
+            foreach (string otherName in searchResult.Data.Data[0].Other_name)
+            {
+                translation.Names.Add(new PlantName()
+                {
+                    Name = otherName,
+                    Language = "en",
+                });
+            }
+
+            try
+            {
+                _context.Translate.Add(translation);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                return ServiceResult<PlantTips>.FailureResult("Database error");
+            }
+
+            return ServiceResult<PlantTips>.SuccessResult(tips, latinName);
+        }
+
+        private async Task<ServiceResult> SaveHungarian(string hungarianName, string englishName)
+        {
+            try
+            {
+                var existingTranslation = await _context.PlantNames
+                    .Where(t => t.Language == "en" && t.Name.Contains(englishName))
+                    .Select(t => t.Translate)
+                    .FirstOrDefaultAsync();
+
+                //should exist if GetTipByName was successful, but just in case
+                if (existingTranslation == null) { return ServiceResult.FailureResult("Translation not found"); }
+                
+                existingTranslation.Names.Add(new PlantName()
+                {
+                    Name = hungarianName,
+                    Language = "hu",
+                });
+
+                await _context.SaveChangesAsync();
+                //Update existing entry with new Hungarian name                            
+            }
+            catch (DbUpdateException ex)
+            {
+                return ServiceResult.FailureResult("Database error");
+            }
+             return ServiceResult.SuccessResult("Success");
+        }
     }
 }

@@ -35,6 +35,8 @@ A kommunikáció a szerver és a kliens között API hívásokkal lesz megoldva,
 
 A *diszkerteszDbContext* osztály határozza meg az adatbázis kontextusát, magába foglalja a táblákat.
 
+Az API IHttpClientFactory *dependency injection*-nel készít új *HttpClient*-et, és ez által kommunikál a klienssel.
+
 #### Models
 A modellek szükségesek ahhoz, hogy az adatok a megfelelő formában legyenek mielőtt feldolgozásra kerülnek.
 - Detail.cs: Egy növény részletes adatait reprezentálja.

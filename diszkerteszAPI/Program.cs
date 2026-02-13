@@ -45,6 +45,8 @@ namespace diszkerteszAPI
 
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
 
+            builder.Services.AddHttpClient();
+
             var app = builder.Build();
 
             app.UseAuthentication();
