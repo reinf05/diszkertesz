@@ -17,14 +17,19 @@ namespace diszkerteszClient.Viewmodels
         private readonly UserService _authenticationService;
         private UserItem userItem;
 
-        public AddViewModel(UserService authenticationService)
+        private readonly PlantService _plantService;
+
+        public AddViewModel(UserService authenticationService, PlantService plantService)
         {
             _authenticationService = authenticationService;
             userItem = new UserItem();
+            _plantService = plantService;
         }
 
         [ObservableProperty]
-        private string itemName;
+        private string itemHungarianName;
+        [ObservableProperty]
+        private string itemLatinName;
         [ObservableProperty]
         private string itemDescription;
 
@@ -63,6 +68,13 @@ namespace diszkerteszClient.Viewmodels
                 Image = ImageSource.FromStream(() => new MemoryStream(memoryStream.ToArray()));
                 imageBytes = memoryStream.ToArray();
                 HasImage = true;
+
+                bool tipsResult = await GetPlantTipsFromImage();
+                if (!tipsResult)
+                {
+                    await Shell.Current.DisplayAlert("Hiba", "Nem sikerült növényt azonosítani a képről. Kérem próbálja meg egy másik képpel vagy töltse ki a növény nevét manuálisan.", "OK");
+                    await NewImage();
+                }
             }
         }
 
@@ -92,7 +104,30 @@ namespace diszkerteszClient.Viewmodels
                     Image = ImageSource.FromStream(() => new MemoryStream(memoryStream.ToArray()));
                     imageBytes = memoryStream.ToArray();
                     HasImage = true;
+
+                    bool tipsResult = await GetPlantTipsFromImage();
+                    if (!tipsResult)
+                    {
+                        await Shell.Current.DisplayAlert("Hiba", "Nem sikerült növényt azonosítani a képről. Kérem próbálja meg egy másik képpel vagy töltse ki a növény nevét manuálisan.", "OK");
+                    }
                 }
+            }
+        }
+
+        private async Task<bool> GetPlantTipsFromImage()
+        {
+            //Future improvement
+            string organ = "auto";
+            var tip = await _plantService.GetTipsFromImage(imageBytes, organ);
+
+            if (tip != null) 
+            {
+                userItem.PlantTips = tip;
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
 
@@ -100,7 +135,7 @@ namespace diszkerteszClient.Viewmodels
         {
             try
             {
-                var result = await _authenticationService.UploadImageAsync(imageBytes, $"{userItem.Name}-{Guid.NewGuid()}.jpeg");
+                var result = await _authenticationService.UploadImageAsync(imageBytes, $"{userItem.LatinName}-{Guid.NewGuid()}.jpeg");
                 if (string.IsNullOrEmpty(result))
                 {
                     await Shell.Current.DisplayAlert("Error", "Hiba történt a kép feltöltése során", "OK");
@@ -118,16 +153,17 @@ namespace diszkerteszClient.Viewmodels
             }
         }
 
+        //ÁT KELL NÉZNI, NÉV AUTOMATIKUS KITÖLTÉSE, KÉP FELTÖLTÉSE, VAGY NÉV KITÖLTÉSE UTÁN FELTÖLTÉS
         [RelayCommand]
         async Task SubmitAsync()
         {
-            if(string.IsNullOrWhiteSpace(ItemName))
+            if(string.IsNullOrWhiteSpace(ItemHungarianName))
             {
                 await Shell.Current.DisplayAlert("Error", "Nevet kötelező megadni", "OK");
                 return;
             }
 
-            userItem.Name = ItemName;
+            userItem.HungarianName = ItemHungarianName;
             userItem.Description = ItemDescription;
 
             if(Image != null)

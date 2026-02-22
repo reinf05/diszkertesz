@@ -13,13 +13,18 @@ namespace diszkerteszClient.Models
         public int Owner { get; set; }
         
         [ObservableProperty]
-        private string name;
+        private string hungarianName;
+        [ObservableProperty]
+        private string latinName;
 
         [ObservableProperty]
         private string? description;
 
         [ObservableProperty]
         private string? pictureurl;
+
+        [ObservableProperty]
+        private PlantTips plantTips;
 
     }
 }

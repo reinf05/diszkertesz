@@ -91,7 +91,7 @@ namespace diszkerteszClient.Services
             var responseString = await response.Content.ReadAsStringAsync();
 
             if (response.IsSuccessStatusCode && !responseString.StartsWith("Error"))
-            { 
+            {
                 return responseString;
             }
             return $"Error {response.StatusCode}\n{responseString}";
@@ -107,6 +107,69 @@ namespace diszkerteszClient.Services
             {
                 var jsonResult = await response.Content.ReadFromJsonAsync<Page<Plant>>();
                 return jsonResult;
+            }
+            return null;
+        }
+
+        public async Task<PlantTips?> GetTipsFromImage(byte[] imageBytes, string organ)
+        {
+            string URL = baseURL + "tips/identify";
+
+            MultipartFormDataContent form = new();
+
+            var imageContent = new ByteArrayContent(imageBytes);
+            imageContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("image/jpeg");
+            form.Add(imageContent, "images", "image.jpeg");
+            form.Add(new StringContent(organ), "organs");
+
+            var response = await httpClient.PostAsync(URL, form);
+
+            if (response.IsSuccessStatusCode)
+            {
+                PlantTips? tips = await response.Content.ReadFromJsonAsync<PlantTips>();
+                if (tips != null)
+                {
+                    return tips;
+                }
+                return null;
+            }
+            return null;
+        }
+
+        public async Task<PlantTips?> GetTipsFromLatinName(string latinName)
+        {
+            string URL = baseURL + $"tips/{Uri.EscapeDataString(latinName)}";
+
+            var response = await httpClient.GetAsync(URL);
+
+
+            if (response.IsSuccessStatusCode)
+            {
+                PlantTips? tips = await response.Content.ReadFromJsonAsync<PlantTips>();
+
+                if (tips != null)
+                {
+                    return tips;
+                }
+                return null;
+            }
+            return null;
+        }
+
+        public async Task<PlantTips?> GetTipsFromHungarianName(string hungarianName)
+        {
+            string URL = baseURL + $"tips/hungarian/{Uri.EscapeDataString(hungarianName)}";
+
+            var response = await httpClient.GetAsync(URL);
+
+            if (response.IsSuccessStatusCode)
+            {
+                PlantTips? tips = await response.Content.ReadFromJsonAsync<PlantTips>();
+                if (tips != null)
+                {
+                    return tips;
+                }
+                return null;
             }
             return null;
         }
