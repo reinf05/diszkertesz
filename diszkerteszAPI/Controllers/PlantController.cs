@@ -2,6 +2,7 @@
 using Azure.Storage.Blobs.Models;
 using diszkerteszAPI.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Newtonsoft.Json;
@@ -10,6 +11,7 @@ using NuGet.Protocol;
 using System.Drawing;
 using System.IO;
 using System.Text;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Web;
 using static System.Net.Mime.MediaTypeNames;
@@ -222,12 +224,12 @@ namespace diszkerteszAPI.Controllers
             {
                 var tipsResult = await GetTipByName(latinName);
 
-                if(tipsResult.Success) { return tipsResult.Data; }
+                if(tipsResult.Success) { return Ok(tipsResult.Data); }
                 return NotFound(tipsResult.ErrorMessage);
             }
             else
             {
-                return existing;
+                return Ok(existing);
             }
         }
 
@@ -261,11 +263,11 @@ namespace diszkerteszAPI.Controllers
                         if(string.IsNullOrEmpty(tipsResult.MetaData)) 
                         { 
                             return StatusCode(500,"Latin name not found"); 
-                        } 
-                        var saved = await SaveHungarian(hungarianName, latinName); 
+                        }
+                        var saved = await SyncNames(latinName, new List<string> { hungarianName }, "hu");
                         if(!saved.Success) 
                         { 
-                            return StatusCode(500, saved.ErrorMessage ?? "Unknown error"); 
+                            return StatusCode(500, "Unable to save to database"); 
                         }
                         return tipsResult.Data; 
                     } 
@@ -273,10 +275,10 @@ namespace diszkerteszAPI.Controllers
                 }
                 else
                 {
-                    var saved = await SaveHungarian(hungarianName, latinName);
+                    var saved = await SyncNames(latinName, new List<string> { hungarianName }, "hu");
                     if (!saved.Success) 
                     { 
-                        return StatusCode(500, saved.ErrorMessage ?? "Unknown error"); 
+                        return StatusCode(500, "Unable to save to database"); 
                     } 
                     return existingLatin;
                 }
@@ -284,8 +286,72 @@ namespace diszkerteszAPI.Controllers
             return existing;
         }
 
-        //Add endpoint to picture recognition
-        //Need recognition using PlantNet, use GetTipsFromLatinName
+        [HttpPost("tips/identify")]
+        [Consumes("multipart/form-data")]
+        public async Task<ActionResult<PlantTips>> GetTipsFromIdentification([FromForm] IdentifyDTO identifyDTO)
+        {
+            var identificationResult = await Identify(identifyDTO);
+            if (identificationResult.StartsWith("Error"))
+            {
+                return StatusCode(500, identificationResult);
+            }
+
+            var doc = JsonDocument.Parse(identificationResult);
+            try
+            {
+                string? latinName = doc.RootElement
+                    .GetProperty("results")[0]
+                    .GetProperty("species")
+                    .GetProperty("scientificNameWithoutAuthor")
+                    .GetString();
+
+                if(string.IsNullOrEmpty(latinName)) { return StatusCode(500, "Latin name not found in response"); }
+
+                List<string> hungarianNames = new List<string>();
+
+                foreach(var commonName in doc.RootElement
+                    .GetProperty("results")[0]
+                    .GetProperty("species")
+                    .GetProperty("commonNames")
+                    .EnumerateArray())
+                {
+                    string? name = commonName.GetString();
+                    if (!string.IsNullOrEmpty(name))
+                    {
+                        hungarianNames.Add(name);
+                    }
+                }
+
+                var tips = await GetTipsByLatinName(latinName);
+
+                if(tips.Result is OkObjectResult okResult)
+                {
+
+                    PlantTips plantTips = (PlantTips)okResult.Value;
+                    plantTips.LatinName = latinName;
+
+                    if(hungarianNames.Count > 0)
+                    {
+                        plantTips.HungarianName = hungarianNames;
+
+                        var saved = await SyncNames(latinName, hungarianNames, "hu");
+                        if (!saved.Success) { return StatusCode(500, "Unable to save to database"); }
+
+                    }
+                    return Ok(plantTips);
+                }
+                else
+                {
+                    return NotFound("Latin name is not found in Perenual API");
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex);
+            }
+            
+        }
 
         private async Task<ServiceResult<string>> GetLatinName(string name)
         {
@@ -347,7 +413,6 @@ namespace diszkerteszAPI.Controllers
         private async Task<ServiceResult<PerenualDetailDTO>> GetPerenualDetails(int id)
         {
             if (perApiKey == null) { return ServiceResult<PerenualDetailDTO>.FailureResult("API key not found"); }
-            await Task.Delay(1000);
             var detailsResponse = await _httpClient.GetFromJsonAsync<PerenualDetailDTO>($"https://perenual.com/api/v2/species/details/{id}?key={perApiKey}");
 
             if (detailsResponse == null)
@@ -398,15 +463,17 @@ namespace diszkerteszAPI.Controllers
                 PerenualID = plantId,
                 //Not sure if this is the best way to do this, but it works for now
                 LatinName = latinName,
-                Tips = tips
+                Tips = tips,
+                Names = new List<PlantName>()
             };
+
 
             foreach (string otherName in searchResult.Data.Data[0].Other_name)
             {
-                translation.Names.Add(new PlantName()
+                translation.Names.Add(new PlantName
                 {
                     Name = otherName,
-                    Language = "en",
+                    Language = "en"
                 });
             }
 
@@ -423,32 +490,50 @@ namespace diszkerteszAPI.Controllers
             return ServiceResult<PlantTips>.SuccessResult(tips, latinName);
         }
 
-        private async Task<ServiceResult> SaveHungarian(string hungarianName, string englishName)
+        private async Task<ServiceResult> SyncNames(string latinName, List<string> otherNames, string language)
         {
-            try
-            {
-                var existingTranslation = await _context.PlantNames
-                    .Where(t => t.Language == "en" && t.Name.Contains(englishName))
-                    .Select(t => t.Translate)
-                    .FirstOrDefaultAsync();
+            var translation = await _context.Translate
+                .Include(t => t.Names)
+                .Where(t => t.LatinName == latinName)
+                .FirstOrDefaultAsync();
 
-                //should exist if GetTipByName was successful, but just in case
-                if (existingTranslation == null) { return ServiceResult.FailureResult("Translation not found"); }
-                
-                existingTranslation.Names.Add(new PlantName()
+            if (translation == null) return ServiceResult.FailureResult("Translation does not exist");
+
+            var existingNames = translation.Names
+                .Where(n => n.Language == language)
+                .Select(n => n.Name)
+                .ToList();
+
+            List<string> namesToAdd = new List<string>();
+            foreach(string name in otherNames)
+            {
+                if (!existingNames.Contains(name))
                 {
-                    Name = hungarianName,
-                    Language = "hu",
-                });
+                    namesToAdd.Add(name);
+                }
+            }
 
-                await _context.SaveChangesAsync();
-                //Update existing entry with new Hungarian name                            
-            }
-            catch (DbUpdateException ex)
+            if(namesToAdd.Count > 0)
             {
-                return ServiceResult.FailureResult("Database error");
+                foreach(string name in namesToAdd)
+                {
+                    translation.Names.Add(new PlantName
+                    {
+                        Name = name,
+                        Language = language
+                    });
+                }
+                try
+                {
+                    await _context.SaveChangesAsync();
+                }
+                catch
+                {
+                    return ServiceResult.FailureResult("Unable to save");
+                }
             }
-             return ServiceResult.SuccessResult("Success");
+
+            return ServiceResult.SuccessResult();
         }
     }
 }
