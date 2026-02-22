@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Maui.Views;
+﻿using CommunityToolkit.Maui.Converters;
+using CommunityToolkit.Maui.Views;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using diszkerteszClient.Models;
@@ -31,7 +32,9 @@ namespace diszkerteszClient.Viewmodels
         [ObservableProperty]
         private string itemLatinName;
         [ObservableProperty]
-        private string itemDescription;
+        private string? itemDescription;
+        [ObservableProperty]
+        private string? itemWater;
 
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(IsNotImage))]
@@ -123,6 +126,17 @@ namespace diszkerteszClient.Viewmodels
             if (tip != null) 
             {
                 userItem.PlantTips = tip;
+                ItemWater = tip.Water;
+                if (!String.IsNullOrEmpty(tip.LatinName))
+                {
+                    userItem.LatinName = tip.LatinName;
+                    ItemLatinName = tip.LatinName;
+                }
+                if(tip.HungarianName != null && tip.HungarianName.Count > 0)
+                {
+                    userItem.HungarianName = tip.HungarianName[0];
+                    ItemHungarianName = tip.HungarianName[0];
+                }
                 return true;
             }
             else
@@ -162,9 +176,6 @@ namespace diszkerteszClient.Viewmodels
                 await Shell.Current.DisplayAlert("Error", "Nevet kötelező megadni", "OK");
                 return;
             }
-
-            userItem.HungarianName = ItemHungarianName;
-            userItem.Description = ItemDescription;
 
             if(Image != null)
             {

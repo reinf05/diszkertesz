@@ -40,14 +40,17 @@
                    HeightRequest="20"
                    ClearButtonVisibility="WhileEditing"
                    Text="{Binding ItemLatinName}" />
+            <Label Grid.Row="1"
+                   Grid.Column="0"
+                   Margin="10,0,0,0"
+                   Text="{Binding ItemWater}" />
 
-            <Editor
-                Grid.Row="2"
-                Grid.ColumnSpan="2"
-                Placeholder="Növény leírása"
-                Margin="10"
-                HeightRequest="100"
-                Text="{Binding ItemDescription}"/>
+            <Editor Grid.Row="2"
+                    Grid.ColumnSpan="2"
+                    Placeholder="Növény leírása"
+                    Margin="10"
+                    HeightRequest="100"
+                    Text="{Binding ItemDescription}" />
 
             <Button
                 Grid.Row="3"

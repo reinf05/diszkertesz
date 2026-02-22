@@ -15,5 +15,7 @@ namespace diszkerteszClient.Models
         public string CareLevel { get; set; }
         public string Poisonous { get; set; }
 
+        public string? LatinName { get; set; }
+        public List<string>? HungarianName { get; set; }
     }
 }
