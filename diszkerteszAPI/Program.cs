@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using DotNetEnv;
 
 namespace diszkerteszAPI
 {
@@ -13,6 +14,9 @@ namespace diszkerteszAPI
     {
         public static void Main(string[] args)
         {
+            //Load environment variables from .env file
+            DotNetEnv.Env.Load();
+
             var builder = WebApplication.CreateBuilder(args);
 
             //Get the connection string from appsettings.Development.json
