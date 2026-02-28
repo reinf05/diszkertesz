@@ -8,7 +8,7 @@
              x:DataType="viewmodels:AddViewModel">
     <Grid>
         <Grid
-            RowDefinitions="auto,*,*,auto"
+            RowDefinitions="auto,*,*,*,auto"
             ColumnDefinitions="*,*"
             IsVisible="{Binding IsNotImage}">
             <ImageButton
@@ -31,7 +31,7 @@
                 Margin="20,100,0,0"
                 HeightRequest="20"
                 ClearButtonVisibility="WhileEditing"
-                Text="{Binding ItemHungarianName}"/>
+                Text="{Binding UserItem.HungarianName}"/>
 
             <Entry Grid.Row="1"
                    Grid.Column="1"
@@ -39,21 +39,44 @@
                    Margin="20,0,0,0"
                    HeightRequest="20"
                    ClearButtonVisibility="WhileEditing"
-                   Text="{Binding ItemLatinName}" />
-            <Label Grid.Row="1"
-                   Grid.Column="0"
-                   Margin="10,0,0,0"
-                   Text="{Binding ItemWater}" />
+                   Text="{Binding UserItem.LatinName}" />
 
-            <Editor Grid.Row="2"
+            <Grid
+                Grid.Row="2"
+                Grid.ColumnSpan="2"
+                RowDefinitions="*,*,*"
+                ColumnDefinitions="*,*"
+                VerticalOptions="Fill"
+                HorizontalOptions="Fill">
+                <Label Grid.Row="0"
+                       Grid.Column="0"
+                       Text="{Binding UserItem.PlantTips.CareLevel, StringFormat='Tartási nehézség: {0}'}" />
+                <Label Grid.Row="0"
+                       Grid.Column="1"
+                       Text="{Binding UserItem.PlantTips.Cycle, StringFormat='Típus: {0}'}" />
+                <Label Grid.Row="1"
+                       Grid.Column="0"
+                       Text="{Binding UserItem.PlantTips.Light, StringFormat='Fényigény: {0}'}" />
+                <Label Grid.Row="1"
+                       Grid.Column="1"
+                       Text="{Binding UserItem.PlantTips.Poisonous, StringFormat='Mérgező: {0}'}" />
+                <Label Grid.Row="2"
+                       Grid.Column="0"
+                       Text="{Binding UserItem.PlantTips.Soil, StringFormat='Talajigény: {0}'}" />
+                <Label Grid.Row="2"
+                       Grid.Column="1"
+                       Text="{Binding UserItem.PlantTips.Water, StringFormat='Vízigény: {0}'}" />
+            </Grid>
+
+            <Editor Grid.Row="3"
                     Grid.ColumnSpan="2"
                     Placeholder="Növény leírása"
                     Margin="10"
                     HeightRequest="100"
-                    Text="{Binding ItemDescription}" />
+                    Text="{Binding UserItem.Description}" />
 
             <Button
-                Grid.Row="3"
+                Grid.Row="4"
                 Grid.ColumnSpan="2"
                 Margin="10"
                 Text="Feltöltés"

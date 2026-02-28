@@ -16,6 +16,8 @@ namespace diszkerteszClient.Viewmodels
     public partial class AddViewModel : BaseViewModel
     {
         private readonly UserService _authenticationService;
+
+        [ObservableProperty]
         private UserItem userItem;
 
         private readonly PlantService _plantService;
@@ -26,15 +28,6 @@ namespace diszkerteszClient.Viewmodels
             userItem = new UserItem();
             _plantService = plantService;
         }
-
-        [ObservableProperty]
-        private string itemHungarianName;
-        [ObservableProperty]
-        private string itemLatinName;
-        [ObservableProperty]
-        private string? itemDescription;
-        [ObservableProperty]
-        private string? itemWater;
 
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(IsNotImage))]
@@ -125,17 +118,14 @@ namespace diszkerteszClient.Viewmodels
 
             if (tip != null) 
             {
-                userItem.PlantTips = tip;
-                ItemWater = tip.Water;
+                UserItem.PlantTips = tip;
                 if (!String.IsNullOrEmpty(tip.LatinName))
                 {
                     userItem.LatinName = tip.LatinName;
-                    ItemLatinName = tip.LatinName;
                 }
                 if(tip.HungarianName != null && tip.HungarianName.Count > 0)
                 {
                     userItem.HungarianName = tip.HungarianName[0];
-                    ItemHungarianName = tip.HungarianName[0];
                 }
                 return true;
             }
@@ -171,7 +161,7 @@ namespace diszkerteszClient.Viewmodels
         [RelayCommand]
         async Task SubmitAsync()
         {
-            if(string.IsNullOrWhiteSpace(ItemHungarianName))
+            if(string.IsNullOrWhiteSpace(UserItem.HungarianName))
             {
                 await Shell.Current.DisplayAlert("Error", "Nevet kötelező megadni", "OK");
                 return;
