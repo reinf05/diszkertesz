@@ -364,3 +364,6 @@ FodyWeavers.xsd
 
 # Ignore local development settings
 **/appsettings.Development.json
+
+# Ignore env files
+*.env

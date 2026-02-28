@@ -26,25 +26,48 @@ namespace diszkerteszClient.Viewmodels
         [RelayCommand]
         async Task SignInAsync()
         {
-            var authResult = await userService.SignInAsync();
-            if (authResult is not null)
+            try
             {
-                await Shell.Current.DisplayAlert("Success", $"Welcome {authResult.Account.Username}!", "OK");
-                IsLoaded = true;
-                await LoadUserList();
+                var authResult = await userService.SignInAsync();
+                if (authResult is not null)
+                {
+                    await Shell.Current.DisplayAlert("Success", $"Welcome {authResult.Account.Username}!", "OK");
+                    IsLoaded = true;
+                    await LoadUserList();
+                }
+                else
+                {
+                    await Shell.Current.DisplayAlert("Sikertelen bejelentkezés", "A bejelentkezés nem sikerült, próbálja meg újra", "OK");
+                }
+            }
+            catch(Exception ex)
+            {
+                await Shell.Current.DisplayAlert("Error", "Valami elromlott, próbálja meg újra", "OK");
             }
         }
 
         [RelayCommand]
         async Task SignUpAsync()
         {
-            var signUpResult = await userService.SignUpAsync();
-            if (signUpResult is not null)
+            try
             {
-                await Shell.Current.DisplayAlert("Success", $"SignUp {signUpResult.Account.Username}!", "OK");
-                IsLoaded = true;
+                var signUpResult = await userService.SignUpAsync();
+                if (signUpResult is not null)
+                {
+                    await Shell.Current.DisplayAlert("Success", $"SignUp {signUpResult.Account.Username}!", "OK");
+                    IsLoaded = true;
+                }
+                else
+                {
+                    await Shell.Current.DisplayAlert("Sikertelen bejelentkezés", "A bejelentkezés nem sikerült, próbálja meg újra", "OK");
+                }
+            }
+            catch (Exception ex)
+            {
+                await Shell.Current.DisplayAlert("Error", "Valami elromlott, próbálja meg újra", "OK");
             }
         }
+
 
         [RelayCommand]
         async Task SignOutAsync()
