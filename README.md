@@ -41,9 +41,10 @@ Verzió kezelés: GitHub
 CI/CD pipeline: GitHub Actions
 
 # Rendszerarchitektúra
+![Architecture Diagram](./DiszkerteszArchitecture.jpg)
 
 # App működés közben
-[text](https://drive.google.com/file/d/1dkBDjFkgEttIHqCvCIjUcai3MMv1Y8YE/view?usp=drive_link)
+[Demo video](https://drive.google.com/file/d/1dkBDjFkgEttIHqCvCIjUcai3MMv1Y8YE/view?usp=drive_link)
 
 # Mérnöki döntések, tanulságok
 ## Biztonság
