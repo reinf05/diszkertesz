@@ -69,7 +69,6 @@ namespace diszkerteszClient.Viewmodels
                 if (!tipsResult)
                 {
                     await Shell.Current.DisplayAlert("Hiba", "Nem sikerült növényt azonosítani a képről. Kérem próbálja meg egy másik képpel vagy töltse ki a növény nevét manuálisan.", "OK");
-                    await NewImage();
                 }
             }
         }

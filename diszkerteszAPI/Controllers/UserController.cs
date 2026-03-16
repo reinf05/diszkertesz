@@ -198,12 +198,12 @@ namespace diszkerteszAPI.Controllers
                 await _context.UsersShared
                     .Where(u => u.Id == item.Id)
                     .ExecuteUpdateAsync(u => u
-                        .SetProperty(p => p.Name, item.Name)
+                        .SetProperty(p => p.HungarianName, item.HungarianName)
                         .SetProperty(p => p.Description, item.Description)
                         .SetProperty(p => p.Pictureurl, item.Pictureurl)
                         .SetProperty(p => p.PerenualID, item.PerenualID)
                         .SetProperty(p => p.LatinName, item.LatinName)
-                        .SetProperty(p => p.Tips, item.Tips));
+                        .SetProperty(p => p.PlantTips, item.PlantTips));
 
             }
             catch (DbUpdateException ex)
