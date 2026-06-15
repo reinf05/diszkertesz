@@ -76,11 +76,19 @@ namespace diszkerteszAPI.Controllers
             return await _context.Details.FindAsync(id);
         }
 
+        [HttpGet("pathogens/{id}")]
+        public async Task<ActionResult<Pathogen>> GetPathogenById(int id)
+        {
+            return await _context.Pathogens.FindAsync(id);
+        }
+
         [HttpGet("fullplants/{id}")]
         public async Task<ActionResult<Fullplant>> GetFullplantById(int id)
         {
             Plant? plant = await _context.Plants.FindAsync(id);
-            Detail? detail = await _context.Details.FindAsync(id);
+            Detail? detail = await _context.Details
+                .Include(d => d.Pathogens)
+                .FirstOrDefaultAsync(d => d.Plant_ID == id);
 
             if (plant == null || detail == null)
             {
@@ -105,9 +113,17 @@ namespace diszkerteszAPI.Controllers
                 Nameh = plant.Nameh,
                 Imagepath = images,
                 Description = detail.Description,
+                Leaf = detail.Leaf,
+                Flower = detail.Flower,
+                Origin = detail.Origin,
+                Light = detail.Light,
+                Soil = detail.Soil,
+                Water = detail.Water,
                 Usage = detail.Usage,
-                Pathogens = detail.Pathogens,
-                Propagation = detail.Propagation
+                Defense = detail.Defense,
+                Pathogens = detail.Pathogens.ToList(),
+                Propagation = detail.Propagation,
+                Species = detail.Species
             };
 
         }
