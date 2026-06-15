@@ -37,24 +37,74 @@
                     HorizontalOptions="Center"
                     VerticalOptions="Fill"
                     Grid.Row="2">
+
             <VerticalStackLayout HorizontalOptions="Fill"
-                                 VerticalOptions="Start">
+                                 VerticalOptions="Start"
+                                 Spacing="10">
+
+                <Label Text="Származás"
+                       Style="{StaticResource TextBold}" />
+                <Label Text="{Binding FullPlant.Origin}" />
 
                 <Label Text="Általános jellemzők"
                        Style="{StaticResource TextBold}" />
                 <Label Text="{Binding FullPlant.Description}" />
 
+                <Label Text="Levél"
+                       Style="{StaticResource TextBold}" />
+                <Label Text="{Binding FullPlant.Leaf}" />
+
+                <Label Text="Virág"
+                       Style="{StaticResource TextBold}" />
+                <Label Text="{Binding FullPlant.Flower}" />
+
+                <Label Text="Fényigény"
+                       Style="{StaticResource TextBold}" />
+                <Label Text="{Binding FullPlant.Light}" />
+
+                <Label Text="Talajigény"
+                       Style="{StaticResource TextBold}" />
+                <Label Text="{Binding FullPlant.Soil}" />
+
+                <Label Text="Vízigény"
+                       Style="{StaticResource TextBold}" />
+                <Label Text="{Binding FullPlant.Water}" />
+
                 <Label Text="Felhasználás"
                        Style="{StaticResource TextBold}" />
                 <Label Text="{Binding FullPlant.Usage}" />
 
-                <Label Text="Növényvédelem"
+                <Label Text="Kórokozók"
                        Style="{StaticResource TextBold}" />
-                <Label Text="{Binding FullPlant.Pathogens}" />
+                <Label Text="{Binding FullPlant.Defense}" />
+                <VerticalStackLayout BindableLayout.ItemsSource="{Binding FullPlant.Pathogens}">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="model:Pathogen">
+                            <VerticalStackLayout Margin="10,5,0,15"
+                                                 Spacing="5">
+                                <Label Text="{Binding Name}"
+                                       FontAttributes="Bold" />
+
+                                <Label Text="{Binding Description}" />
+
+                                <HorizontalStackLayout Spacing="5">
+                                    <Label Text="Védekezés:"
+                                           FontAttributes="Italic" />
+                                    <Label Text="{Binding Defense}" />
+                                </HorizontalStackLayout>
+                            </VerticalStackLayout>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
 
                 <Label Text="Szaporítás"
                        Style="{StaticResource TextBold}" />
                 <Label Text="{Binding FullPlant.Propagation}" />
+
+                <Label Text="Ismertebb fajták"
+                       Style="{StaticResource TextBold}" />
+                <Label Text="{Binding FullPlant.Species}" />
+
             </VerticalStackLayout>
         </ScrollView>
 

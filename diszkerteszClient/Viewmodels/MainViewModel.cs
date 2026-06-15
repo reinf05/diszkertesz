@@ -153,15 +153,23 @@ namespace diszkerteszClient.Viewmodels
 
                 fullPlant = new FullPlant()
                 {
-                    Id = plant.Id,
+                    ID = plant.ID,
+                    Type = plant.Type,
                     Namel = plant.Namel,
                     Nameh = plant.Nameh,
-                    Type = plant.Type,
                     Imagepath = plant.Imagepath,
                     Description = plant.Description,
+                    Leaf = plant.Leaf,
+                    Flower = plant.Flower,
+                    Origin = plant.Origin,
+                    Light = plant.Light,
+                    Soil = plant.Soil,
+                    Water = plant.Water,
                     Usage = plant.Usage,
+                    Defense = plant.Defense,
                     Pathogens = plant.Pathogens,
-                    Propagation = plant.Propagation
+                    Propagation = plant.Propagation,
+                    Species = plant.Species
                 };
             }
             catch (Exception ex)
