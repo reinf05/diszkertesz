@@ -50,6 +50,10 @@
                        Style="{StaticResource TextBold}" />
                 <Label Text="{Binding FullPlant.Description}" />
 
+                <Label Text="Habitus"
+                       Style="{StaticResource TextBold}" />
+                <Label Text="{Binding FullPlant.Habitus}" />
+
                 <Label Text="Levél"
                        Style="{StaticResource TextBold}" />
                 <Label Text="{Binding FullPlant.Leaf}" />
@@ -57,6 +61,14 @@
                 <Label Text="Virág"
                        Style="{StaticResource TextBold}" />
                 <Label Text="{Binding FullPlant.Flower}" />
+
+                <Label Text="Termés"
+                       Style="{StaticResource TextBold}" />
+                <Label Text="{Binding FullPlant.Fruit}" />
+
+                <Label Text="Gyökérzet"
+                       Style="{StaticResource TextBold}" />
+                <Label Text="{Binding FullPlant.Root}" />
 
                 <Label Text="Fényigény"
                        Style="{StaticResource TextBold}" />
