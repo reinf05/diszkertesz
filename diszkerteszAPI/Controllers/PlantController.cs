@@ -2,19 +2,10 @@
 using Azure.Storage.Blobs.Models;
 using diszkerteszAPI.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using NuGet.Protocol;
-using System.Drawing;
-using System.IO;
-using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Web;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace diszkerteszAPI.Controllers
 {
@@ -113,8 +104,11 @@ namespace diszkerteszAPI.Controllers
                 Nameh = plant.Nameh,
                 Imagepath = images,
                 Description = detail.Description,
+                Habitus = detail.Habitus,
                 Leaf = detail.Leaf,
                 Flower = detail.Flower,
+                Fruit = detail.Fruit,
+                Root = detail.Root,
                 Origin = detail.Origin,
                 Light = detail.Light,
                 Soil = detail.Soil,

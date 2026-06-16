@@ -8,8 +8,11 @@
         public string Nameh { get; set; }
         public List<string> Imagepath { get; set; }
         public string Description { get; set; }
+        public string Habitus { get; set; }
         public string Leaf { get; set; }
         public string Flower { get; set; }
+        public string Fruit { get; set; }
+        public string Root { get; set; }
         public string Origin { get; set; }
         public string Light { get; set; }
         public string Soil { get; set; }
