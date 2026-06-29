@@ -87,7 +87,7 @@ namespace diszkerteszAPI.Controllers
             }
 
             List<string> images = new List<string>();
-            BlobContainerClient blobContainerClient = _blobServiceClient.GetBlobContainerClient("images");
+            BlobContainerClient blobContainerClient = _blobServiceClient.GetBlobContainerClient("images2");
 
             await foreach (BlobItem blobItem in blobContainerClient.GetBlobsAsync(prefix: $"{plant.Imagepath}"))
             {
