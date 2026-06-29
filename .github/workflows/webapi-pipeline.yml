@@ -115,7 +115,7 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
-    needs: [sonar,docker]
+    needs: [docker]
     env:
       REGISTRY_URL: docker.io
     steps:
