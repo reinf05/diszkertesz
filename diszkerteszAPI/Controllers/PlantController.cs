@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
 using System.Text.Json;
 using System.Web;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace diszkerteszAPI.Controllers
 {
@@ -19,6 +20,7 @@ namespace diszkerteszAPI.Controllers
 
         private readonly diszkerteszDbContext _context;
         private readonly BlobServiceClient _blobServiceClient;
+        private readonly BlobContainerClient _blobContainerClient;
         private readonly HttpClient _httpClient;
 
         private readonly string? plantnetApiKey;
@@ -28,6 +30,7 @@ namespace diszkerteszAPI.Controllers
         public PlantController(diszkerteszDbContext context, BlobServiceClient BlobServiceClient, IHttpClientFactory httpClientfactory)
         {
             _blobServiceClient = BlobServiceClient;
+            _blobContainerClient = _blobServiceClient.GetBlobContainerClient("images2");
             _context = context;
             _httpClient = httpClientfactory.CreateClient();
             plantnetApiKey = Environment.GetEnvironmentVariable("API-KEY");
@@ -88,15 +91,7 @@ namespace diszkerteszAPI.Controllers
                 return NotFound();
             }
 
-            List<string> images = new List<string>();
-            BlobContainerClient blobContainerClient = _blobServiceClient.GetBlobContainerClient("images2");
-
-            await foreach (BlobItem blobItem in blobContainerClient.GetBlobsAsync(prefix: $"{plant.Imagepath}"))
-            {
-                BlobClient blobClient = blobContainerClient.GetBlobClient(blobItem.Name);
-                Uri uri = blobClient.Uri;
-                images.Add(uri.ToString());
-            }
+            List<string> images = await GetImagesAsync(plant.Imagepath);
 
             return new Fullplant()
             {
@@ -148,7 +143,8 @@ namespace diszkerteszAPI.Controllers
                     returnquiz.Names[index] = plant.Namel;
                     if (index == 0)
                     {
-                        returnquiz.Imagepath = plant.Imagepath;
+                        List<string> images = await GetImagesAsync(plant.Imagepath);
+                        returnquiz.Imagepath = images;
                     }
                     index++;
                 }
@@ -546,6 +542,20 @@ namespace diszkerteszAPI.Controllers
             }
 
             return ServiceResult.SuccessResult();
+        }
+
+        private async Task<List<string>> GetImagesAsync(string prefix)
+        {
+            List<string> images = new List<string>();
+
+            await foreach (BlobItem blobItem in _blobContainerClient.GetBlobsAsync(prefix: $"{prefix}"))
+            {
+                BlobClient blobClient = _blobContainerClient.GetBlobClient(blobItem.Name);
+                Uri uri = blobClient.Uri;
+                images.Add(uri.ToString());
+            }
+
+            return images;
         }
     }
 }

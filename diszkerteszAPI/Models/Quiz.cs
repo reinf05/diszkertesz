@@ -2,7 +2,7 @@
 {
     public class Quiz
     {
-        public string Imagepath { get; set; }
+        public List<string> Imagepath { get; set; }
         public string[] Names { get; set; }
     }
 }
