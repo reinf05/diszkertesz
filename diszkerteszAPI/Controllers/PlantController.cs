@@ -141,7 +141,7 @@ namespace diszkerteszAPI.Controllers
             int index = 0;
             while (index < 4)
             {
-                int id = rand.Next(1, plantCount);
+                int id = rand.Next(0, plantCount);
                 Plant plant = await _context.Plants.FindAsync(id);
                 if (plant != null && !returnquiz.Names.Contains(plant.Namel))
                 {
@@ -156,6 +156,28 @@ namespace diszkerteszAPI.Controllers
             }
 
             return returnquiz;
+        }
+
+        [HttpGet("quizname")]
+        public async Task<ActionResult<QuizName>> GetQuizName(){
+            QuizName returnQuizName = new QuizName();
+
+            int plantCount = await _context.Plants.CountAsync();
+
+            if (plantCount == 0)
+            {
+                return NotFound("Nincsenek növények az adatbázisban.");
+            }
+
+            Random rand = new Random();
+            Plant plant = await _context.Plants.FindAsync(rand.Next(0, plantCount));
+
+            returnQuizName.Name = plant.Namel;
+            List<string> images = await GetImagesAsync(plant.Imagepath);
+            int imageNum = rand.Next(0, images.Count);
+            returnQuizName.Image = images[imageNum];
+
+            return returnQuizName;
         }
 
         [HttpPost("identify")]
