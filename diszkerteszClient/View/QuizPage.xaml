@@ -8,20 +8,45 @@
              Title="{Binding Title}">
     <VerticalStackLayout
         Background="{AppThemeBinding Dark={StaticResource BackgroundDark}, Light={StaticResource SecondaryDark}}">
+
+        <!-- Back button, only visible while a game is loaded -->
+        <Button
+            Text="← Vissza"
+            Margin="10"
+            HorizontalOptions="Start"
+            Command="{Binding GoBackCommand}"
+            IsVisible="{Binding IsLoaded}"/>
+
+        <!-- Game type selector / starter -->
+        <HorizontalStackLayout
+            Spacing="10"
+            Margin="10"
+            HorizontalOptions="Center"
+            IsVisible="{Binding IsNotLoaded}">
+            <Button
+                Text="Választós"
+                Command="{Binding GetQuizCommand}"/>
+            <Button
+                Text="Kép alapján"
+                Command="{Binding GetQuizNameCommand}"/>
+        </HorizontalStackLayout>
+
+        <!-- Multiple choice game -->
         <Grid
             ColumnDefinitions="*,*"
             RowDefinitions="*,*,*"
             RowSpacing="10"
-            IsVisible="{Binding IsLoaded}"
-            x:DataType="{x:Type model:Quiz}">
+            IsVisible="{Binding IsMultipleChoice}"
+            x:DataType="viewmodel:QuizViewModel">
             <Image
                 Source="{Binding Quiz.ChosenImage}"
                 WidthRequest="300"
                 HeightRequest="300"
                 Aspect="AspectFill"
                 Grid.Row="0"
-                Grid.ColumnSpan="2"/>
-            
+                Grid.ColumnSpan="2"
+                IsVisible="{Binding IsLoaded}"/>
+
             <CollectionView
                 ItemsSource="{Binding Quiz.Names}"
                 Grid.Row="1"
@@ -34,7 +59,7 @@
                         VerticalItemSpacing="10"/>
                 </CollectionView.ItemsLayout>
                 <CollectionView.ItemTemplate>
-                    <DataTemplate>
+                    <DataTemplate x:DataType="x:String">
                         <Button
                             Text="{Binding .}"
                             Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:QuizViewModel}}, Path=GiveAnswerCommand}"
@@ -42,15 +67,33 @@
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
-
         </Grid>
 
-        <Button
+        <!-- Image-to-name (typed answer) game -->
+        <VerticalStackLayout
+            Spacing="10"
             Margin="10"
-            Text="Játék!"
-            HorizontalOptions="Center"
-            Command="{Binding GetQuizCommand}"
-            IsVisible="{Binding IsNotLoaded}"
-            />
+            IsVisible="{Binding IsImageToName}">
+            <Image
+                Source="{Binding QuizName.Image}"
+                WidthRequest="300"
+                HeightRequest="300"
+                Aspect="AspectFill"
+                HorizontalOptions="Center"
+                IsVisible="{Binding IsLoaded}"/>
+
+            <HorizontalStackLayout
+                Spacing="10"
+                HorizontalOptions="Center"
+                IsVisible="{Binding IsLoaded}">
+                <Entry
+                    Placeholder="Latin név..."
+                    WidthRequest="220"
+                    Text="{Binding TypedAnswer}"/>
+                <Button
+                    Text="Submit"
+                    Command="{Binding SubmitAnswerCommand}"/>
+            </HorizontalStackLayout>
+        </VerticalStackLayout>
     </VerticalStackLayout>
 </ContentPage>

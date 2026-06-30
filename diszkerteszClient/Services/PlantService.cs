@@ -75,6 +75,18 @@ namespace diszkerteszClient.Services
             return null;
         }
 
+        public async Task<QuizName> GetQuizName()
+        {
+            string URL = baseURL + "quizname";
+            var response = await httpClient.GetAsync(URL);
+            if (response.IsSuccessStatusCode)
+            {
+                var quizName = await response.Content.ReadFromJsonAsync<QuizName>();
+                return quizName;
+            }
+            return null;
+        }
+
         public async Task<string> Identify(byte[] imageBytes, string organ)
         {
             string URL = baseURL + "identify";
