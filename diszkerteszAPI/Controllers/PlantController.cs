@@ -30,7 +30,7 @@ namespace diszkerteszAPI.Controllers
         public PlantController(diszkerteszDbContext context, BlobServiceClient BlobServiceClient, IHttpClientFactory httpClientfactory)
         {
             _blobServiceClient = BlobServiceClient;
-            _blobContainerClient = _blobServiceClient.GetBlobContainerClient("images2");
+            _blobContainerClient = _blobServiceClient.GetBlobContainerClient("images3");
             _context = context;
             _httpClient = httpClientfactory.CreateClient();
             plantnetApiKey = Environment.GetEnvironmentVariable("API-KEY");
@@ -55,6 +55,11 @@ namespace diszkerteszAPI.Controllers
                 .Skip((pageNum - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
+
+            foreach (var plant in plants)
+            {
+                plant.Images = await GetImagesAsync(plant.Imagepath);
+            }
 
             return new Page<Plant>()
             {
