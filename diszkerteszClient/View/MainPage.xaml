@@ -50,7 +50,7 @@
                             <Grid ColumnDefinitions="125,200"
                                   Padding="10"
                                   ColumnSpacing="20">
-                                <Image Source="{Binding Imagepath, StringFormat='{0}1.jpeg'}"
+                                <Image Source="{Binding Images[0]}"
                                        Style="{StaticResource Thumbnail}"
                                        Grid.Column="0" />
                                 <VerticalStackLayout Grid.Column="1"

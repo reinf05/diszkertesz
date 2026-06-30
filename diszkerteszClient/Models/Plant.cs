@@ -13,5 +13,6 @@ namespace diszkerteszClient.Models
         public string Namel { get; set; }
         public string Nameh { get; set; }
         public string Imagepath { get; set; }
+        public List<string> Images { get; set; }
     }
 }

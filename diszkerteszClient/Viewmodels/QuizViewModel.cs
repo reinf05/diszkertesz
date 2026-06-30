@@ -45,8 +45,9 @@ namespace diszkerteszClient.Viewmodels
                 }
                 var rnd = new Random();
 
-                string baseURL = "https://stdiszkerteszgerdev001.blob.core.windows.net/images/";
-                quizGet.ImagePath = $"{baseURL}{quizGet.ImagePath}{rnd.Next(1, 6)}.jpeg";
+                int randomImage = rnd.Next(0, quizGet.ImagePath.Count);
+
+                quizGet.ChosenImage = $"{quizGet.ImagePath[randomImage]}";
 
                 quizGet.Names = quizGet.Names.OrderBy(x => rnd.Next()).ToArray();
 

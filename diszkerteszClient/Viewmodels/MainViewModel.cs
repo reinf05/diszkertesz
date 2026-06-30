@@ -22,7 +22,6 @@ namespace diszkerteszClient.Viewmodels
         [ObservableProperty]
         public ObservableCollection<Plant> plantList;
         private FullPlant fullPlant;
-        private readonly string baseURL = "https://stdiszkerteszgerdev001.blob.core.windows.net/images/";
 
         [ObservableProperty]
         private string searchText = string.Empty;
@@ -118,8 +117,6 @@ namespace diszkerteszClient.Viewmodels
 
             foreach (var plant in page.Items)
             {
-                string path = plant.Imagepath;
-                plant.Imagepath = baseURL + path;
                 PlantList.Add(plant);
                 if (string.IsNullOrEmpty(SearchText))
                 {
@@ -222,8 +219,6 @@ namespace diszkerteszClient.Viewmodels
 
                 foreach(var plant in responsePage.Items)
                 {
-                    string path = plant.Imagepath;
-                    plant.Imagepath = baseURL + path;
                     FilteredPlants.Add(plant);
                 }
 
@@ -235,8 +230,6 @@ namespace diszkerteszClient.Viewmodels
 
                     foreach (var plant in responsePage.Items)
                     {
-                        string path = plant.Imagepath;
-                        plant.Imagepath = baseURL + path;
                         FilteredPlants.Add(plant);
                     }
 

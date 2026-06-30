@@ -15,7 +15,7 @@
             IsVisible="{Binding IsLoaded}"
             x:DataType="{x:Type model:Quiz}">
             <Image
-                Source="{Binding Quiz.ImagePath}"
+                Source="{Binding Quiz.ChosenImage}"
                 WidthRequest="300"
                 HeightRequest="300"
                 Aspect="AspectFill"
